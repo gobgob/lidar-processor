@@ -9,7 +9,6 @@ import time
 from threading import Thread
 import queue
 from typing import List
-import sys
 
 __author__ = ["Clément Besnier", ]
 
@@ -20,8 +19,8 @@ port = 17685
 def split_turn(turn: List[str]):
     return [measure.split(":") for measure in "".join(turn).split(";") if measure]
 
-class LidarThread(Thread):
 
+class LidarThread(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.measuring = True
@@ -65,5 +64,3 @@ if __name__ == "__main__":
     time.sleep(3)
     print(t.is_alive())
     # sys.exit(0)
-    
-

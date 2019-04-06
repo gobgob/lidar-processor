@@ -1,19 +1,18 @@
 #! /usr/bin/python3
 
-import sys
 import os
 import time
 import json
-src = os.path.join(os.getenv("HOME"), "RECHERCHES", "lidar-processor", "src")
-sys.path.append(os.path.join(src, "main"))
-from data_retrieval import LidarThread
+from src.main.data_retrieval import LidarThread
+
 
 def store_data():
     for i in range(20):
-        with open(os.path.join(src, "samples", "data_"+str(i)+".json"), "w") as f:
+        with open(os.path.join("lidar-process", "src", "samples", "data_"+str(i)+".json"), "w") as f:
             data = t.get_measures()
             json.dump(data, f)
         time.sleep(2)
+
 
 if __name__ == "__main__":
     t = LidarThread()
