@@ -5,7 +5,7 @@ Works with https://github.com/gobgob/rplidar_a3 which is the server
 """
 
 import socket
-# import time
+import time
 from threading import Thread
 import queue
 from typing import List
