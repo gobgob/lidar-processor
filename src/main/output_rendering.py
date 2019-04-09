@@ -60,6 +60,16 @@ def get_mins(cartesian_points):
     return x_min, y_min
 
 
+def change_basis(cartesian_points):
+    l = []
+    x_min, y_min = get_mins(cartesian_points)
+    for i in range(len(cartesian_points)):
+        x, y = cartesian_points[i]
+        x, y = x - x_min, y - y_min
+        l.append([x, y])
+    return l, [-x_min, -y_min]
+
+
 def hough_transform(cartesian_points, angle_step=0.2):
     """
 
@@ -69,7 +79,6 @@ def hough_transform(cartesian_points, angle_step=0.2):
     """
     thetas = np.deg2rad(np.arange(-90.0, 90.0, angle_step))
     width, height = get_width_height(cartesian_points)
-    x_min, y_min = get_mins(cartesian_points)
     diag_len = int(round(math.sqrt(width * width + height * height)))
     rhos = np.linspace(-diag_len, diag_len, diag_len * 2)
     cos_t = np.cos(thetas)
@@ -78,7 +87,6 @@ def hough_transform(cartesian_points, angle_step=0.2):
     accumulator = np.zeros((2 * diag_len, num_thetas), dtype=np.uint8)
     for i in range(len(cartesian_points)):
         x, y = cartesian_points[i]
-        x, y = x - x_min, y - y_min
         for t_idx in range(num_thetas):
             rho = diag_len + int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
             accumulator[rho, t_idx] += 20
@@ -104,4 +112,3 @@ def rho2intercept(theta, rho):
 
 def find_immobile_beacons(accumulative_space):
     pass
-
