@@ -48,7 +48,19 @@ def get_width_height(cartesian_points):
     return x_max - x_min, y_max - y_min
 
 
-def hough_transform(cartesian_points, angle_step=0.3):
+def get_mins(cartesian_points):
+    """
+
+    :param cartesian_points:
+    :return:
+    """
+    points = np.array(cartesian_points)
+    print(points.shape)
+    x_min, x_max, y_min, y_max = points[:, 0].min(), points[:, 0].max(), points[:, 1].min(), points[:, 1].max()
+    return x_min, y_min
+
+
+def hough_transform(cartesian_points, angle_step=0.2):
     """
 
     :param cartesian_points:
@@ -57,6 +69,7 @@ def hough_transform(cartesian_points, angle_step=0.3):
     """
     thetas = np.deg2rad(np.arange(-90.0, 90.0, angle_step))
     width, height = get_width_height(cartesian_points)
+    x_min, y_min = get_mins(cartesian_points)
     diag_len = int(round(math.sqrt(width * width + height * height)))
     rhos = np.linspace(-diag_len, diag_len, diag_len * 2)
     cos_t = np.cos(thetas)
@@ -65,6 +78,7 @@ def hough_transform(cartesian_points, angle_step=0.3):
     accumulator = np.zeros((2 * diag_len, num_thetas), dtype=np.uint8)
     for i in range(len(cartesian_points)):
         x, y = cartesian_points[i]
+        x, y = x - x_min, y - y_min
         for t_idx in range(num_thetas):
             rho = diag_len + int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
             accumulator[rho, t_idx] += 20

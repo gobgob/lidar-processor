@@ -21,8 +21,8 @@ sigma_angle = 35
 sigma_distance = 35
 facteur_temps = 8
 
-distance_max_x_cartesien = 5000
-distance_max_y_cartesien = 5000
+distance_max_x_cartesien = 7000
+distance_max_y_cartesien = 7000
 distance_max = 6000
 afficher_en_polaire = False
 affichage = True

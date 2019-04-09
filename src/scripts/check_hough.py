@@ -73,14 +73,14 @@ def reconstruct_image_with_lines(points, angles, dists):
         xxx, yyy = [], []
         print(-int(distance_max_x_cartesien / 2), int(distance_max_x_cartesien / 2))
         cost = math.cos(theta)
-        x0 = rho*cost
         sint = math.sin(theta)
+        x0 = rho*cost
         y0 = rho*sint
         x1 = x0 - 1000*sint
         y1 = y0 + 1000*cost
         x2 = x0 + 1000*sint
         y2 = y0 - 1000*cost
-        pl.plot([x1, x2], [y1, y2], 'b-')
+        pl.plot([x1, y1], [x2, y2], 'b-')
         # for x in range(-int(distance_max_x_cartesien / 2), int(distance_max_x_cartesien / 2)):
         #     # print(x)
         #     xxx.append(x)
