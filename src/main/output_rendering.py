@@ -10,6 +10,7 @@ The immobile beacons are used to change basis from the robot's to the table's.
 from typing import List
 import math
 import numpy as np
+from collections import defaultdict
 
 
 def keep_good_measures(turn: List, threshold: int):
@@ -32,8 +33,20 @@ def polar_to_y(measure: List):
     return distance*math.sin(math.radians(angle))
 
 
+def cartesian_to_polar(cartesian):
+    x, y = cartesian
+    if x != 0:
+        return [math.atan(y/x), math.sqrt(x*x+y*y)]
+    else:
+        return [math.pi/2, y]
+
+
 def one_turn_to_cartesian_points(turn: List):
     return [(polar_to_x(measure), polar_to_y(measure)) for measure in turn]
+
+
+# def cartesian_points_to_array(cartesian_points):
+#     np.zeros(())
 
 
 def get_width_height(cartesian_points):
@@ -70,7 +83,7 @@ def change_basis(cartesian_points):
     return l, [-x_min, -y_min]
 
 
-def hough_transform(cartesian_points, angle_step=0.2):
+def hough_transform(cartesian_points, angle_step=0.3):
     """
 
     :param cartesian_points:
@@ -84,13 +97,46 @@ def hough_transform(cartesian_points, angle_step=0.2):
     cos_t = np.cos(thetas)
     sin_t = np.sin(thetas)
     num_thetas = len(thetas)
-    accumulator = np.zeros((2 * diag_len, num_thetas), dtype=np.uint8)
+    # accumulator = np.zeros((2 * diag_len, num_thetas), dtype=np.uint8)
+    accumulator = defaultdict(int)
+
+    # for i in range(len(cartesian_points)):
     for i in range(len(cartesian_points)):
         x, y = cartesian_points[i]
         for t_idx in range(num_thetas):
-            rho = diag_len + int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
-            accumulator[rho, t_idx] += 20
+            rho = int(round(diag_len+x * cos_t[t_idx] + y * sin_t[t_idx]))
+            accumulator[rho, thetas[t_idx]] += 1
     return accumulator, thetas, rhos
+
+
+def take_brightest_points(accumulator):
+    theta_max = 0
+    rho_max = 0
+    max_value = 0
+
+    greatest_theta = 0
+    greatest_rho = 0
+    lowest_theta = 0
+    lowest_rho = 0
+    for key in accumulator:
+        current_rho, current_theta = key
+        if accumulator[key] > max_value:
+            max_value = accumulator[key]
+            rho_max, theta_max = key
+        if current_rho > greatest_rho:
+            greatest_rho = current_rho
+        if current_theta > greatest_theta:
+            greatest_theta = current_theta
+        if current_theta < lowest_theta:
+            lowest_theta = current_theta
+        if current_rho < lowest_rho:
+            lowest_rho = current_rho
+    extrema = [lowest_theta, greatest_theta, lowest_rho, greatest_rho]
+    print("extrema", extrema)
+    print("theta", theta_max)
+    print("rho", rho_max)
+
+    return [max_value], [theta_max], [rho_max], extrema
 
 
 def peak_votes(accumulator, thetas, rhos):

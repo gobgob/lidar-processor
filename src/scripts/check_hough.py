@@ -11,6 +11,7 @@ from skimage import io as skio
 from skimage import draw as skdr
 from skimage import transform as sktr
 import matplotlib.pylab as pl
+from collections import OrderedDict
 
 from src.constants import *
 
@@ -35,10 +36,17 @@ def display_measures(points):
     yy = []
     for x, y in points:
         xx.append(x)
-        yy.append(-y)
+        yy.append(y)
 
-    pl.plot(xx, yy, 'r,')
+    pl.plot(xx, yy, 'r.')
     fig.canvas.draw()
+    pl.show()
+
+
+def display_polar_measures(polar_points):
+
+    for theta, rho in polar_points:
+        pl.polar(math.radians(theta), rho, 'r,')
     pl.show()
 
 
@@ -50,22 +58,33 @@ def display_measures(points):
 #     return image
 
 
-def reconstruct_image_with_lines(points, angles, dists):
-    fig = pl.figure()
-    ax = fig.add_subplot(111)
-    ax.clear()
-    ax.set_xlim(0, distance_max_x_cartesien)
-    ax.set_ylim(0, distance_max_y_cartesien)
-    ax.axhline(0, 0)
-    ax.axvline(0, 0)
-    # pl.grid()
-
+def reconstruct_image_with_lines(polar_points, angles, dists):
+    # print(angles)
+    # print(dists)
+    # fig = pl.figure()
+    # ax = fig.add_subplot(111)
+    # ax.clear()
+    # # ax.set_xlim(0, distance_max_x_cartesien)
+    # ax.set_xlim(-int(distance_max_x_cartesien/2), int(distance_max_x_cartesien/2))
+    # # ax.set_ylim(0, distance_max_y_cartesien)
+    # ax.set_ylim(-int(distance_max_y_cartesien/2), int(distance_max_y_cartesien/2))
+    # ax.axhline(0, 0)
+    # ax.axvline(0, 0)
+    # # pl.grid()
+    #
     xx = []
     yy = []
-    for x, y in points:
-        xx.append(x)
-        yy.append(y)
-    pl.plot(xx, yy, 'r,')
+    # for x, y in points:
+    #     xx.append(x)
+    #     yy.append(y)
+    # pl.plot(xx, yy, 'r.')
+    cartesian_good_data = outr.one_turn_to_cartesian_points(polar_points)
+    cartesian_good_data, translation = outr.change_basis(cartesian_good_data)
+
+    for theta, rho in polar_points:
+        pl.polar(math.radians(theta), rho, 'r,')
+    # pl.show()
+
     # fig.canvas.draw()
     print("fini ?")
     for theta, rho in zip(angles, dists):
@@ -82,16 +101,26 @@ def reconstruct_image_with_lines(points, angles, dists):
         # y2 = y0 - 10000*cost
         # pl.plot(x1, y1, 'b-')
         # pl.plot(x2, y2, 'b-')
-        for x in range(0, distance_max_x_cartesien):
+        # for x in range(0, distance_max_x_cartesien):
+        for x in range(-int(distance_max_x_cartesien/2), int(distance_max_x_cartesien/2)):
             # print(x)
-            xxx.append(x)
-            y = rho / math.sin(theta) + math.tan(theta) * x
-            print("y", y)
-            yyy.append(y)
-        pl.plot(xxx, yyy, 'b-')
-        fig.canvas.draw()
+            y = rho / math.sin(theta) - (math.cos(theta)/math.sin(theta)) * x
+            a, d = outr.cartesian_to_polar([x, y])
+
+            # print("y", y)
+            # xxx.append(x)
+            # yyy.append(y)
+            xxx.append(a)
+            yyy.append(d)
+            # print("cartesian", [x+translation[0], -y-translation[1]])
+            # a, d = outr.cartesian_to_polar([x-translation[0], (y-translation[1])])
+
+            # print("polar", a, d)
+            # pl.polar(a, d, "b-")
+        pl.polar(xxx, yyy, 'b-')
+        # fig.canvas.draw()
     pl.show()
-    fig.canvas.draw()
+    # fig.canvas.draw()
 
     # skio.imsave("line_a" + '.jpg', image)
 
@@ -118,28 +147,35 @@ def measures_to_accumulators(data):
 
         cartesian_good_data = outr.one_turn_to_cartesian_points(good_data)
 
-        cartesian_good_data, translation = outr.change_basis(cartesian_good_data)
+        # cartesian_good_data, translation = outr.change_basis(cartesian_good_data)
 
-        width, height = outr.get_width_height(cartesian_good_data)
-        width, height = int(width), int(height)
-        print(width, height)
+        # width, height = outr.get_width_height(cartesian_good_data)
+        # width, height = int(width), int(height)
+        # print(width, height)
         # image = np.zeros((int(width), int(height)), dtype=np.uint8)
 
         print(i)
         accumulator, thetas, rhos = outr.hough_transform(cartesian_good_data)
-        skio.imsave("accumulator_"+str(i) + '.jpg', accumulator)
+        # skio.imsave("accumulator_"+str(i) + '.jpg', accumulator)
 
-        accum, angles, dists = sktr.hough_line_peaks(accumulator, thetas, rhos, 10, 12, num_peaks=15)
+        accum, angles, dists, extrema = outr.take_brightest_points(accumulator)
+
+        # print(extrema)
+
+        # accum, angles, dists = sktr.hough_line_peaks(accumulator, thetas, rhos, 10, 12, num_peaks=3)
         print(accum, angles, dists)
         # idx, theta, rho = outr.peak_votes(accumulator, thetas, rhos)
-        reconstruct_image_with_lines(cartesian_good_data, angles, dists)
+        reconstruct_image_with_lines(good_data, angles, dists)
 
 
 if __name__ == "__main__":
     measures = retm.get_data()
     # measures_to_images([measures[1]])
-    measures_to_accumulators([measures[1]])
+    measures_to_accumulators([measures[3]])
 
-    # good_data = outr.keep_good_measures(measures[1], 30)
+    # good_data = outr.keep_good_measures(measures[3], 30)
     # cartesian_good_data = outr.one_turn_to_cartesian_points(good_data)
     # display_measures(cartesian_good_data)
+
+    # good_data = outr.keep_good_measures(measures[3], 30)
+    # display_polar_measures(good_data)
