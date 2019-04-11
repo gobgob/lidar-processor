@@ -86,30 +86,57 @@ def change_basis(cartesian_points):
 def hough_transform(cartesian_points, angle_step=0.3):
     """
 
+
+
     :param cartesian_points:
     :param angle_step:
-    :return:
+    :return: array
     """
     thetas = np.deg2rad(np.arange(-90.0, 90.0, angle_step))
     width, height = get_width_height(cartesian_points)
     diag_len = int(round(math.sqrt(width * width + height * height)))
+    print("diag_len", diag_len)
     rhos = np.linspace(-diag_len, diag_len, diag_len * 2)
     cos_t = np.cos(thetas)
     sin_t = np.sin(thetas)
     num_thetas = len(thetas)
-    # accumulator = np.zeros((2 * diag_len, num_thetas), dtype=np.uint8)
-    accumulator = defaultdict(int)
+    accumulator = np.zeros((2 * diag_len, num_thetas), dtype=np.uint8)
 
-    # for i in range(len(cartesian_points)):
     for i in range(len(cartesian_points)):
         x, y = cartesian_points[i]
         for t_idx in range(num_thetas):
-            rho = int(round(diag_len+x * cos_t[t_idx] + y * sin_t[t_idx]))
-            accumulator[rho, thetas[t_idx]] += 1
+            rho = diag_len+int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
+            accumulator[rho, t_idx] += 20
     return accumulator, thetas, rhos
 
 
-def take_brightest_points(accumulator):
+def hough_transform_to_dict(cartesian_points, angle_step=0.3):
+    """
+
+    :param cartesian_points:
+    :param angle_step:
+    :return: dict
+    """
+    thetas = np.deg2rad(np.arange(-90.0, 90.0, angle_step))
+    width, height = get_width_height(cartesian_points)
+    diag_len = int(round(math.sqrt(width * width + height * height)))
+    print("diag_len", diag_len)
+    rhos = np.linspace(-diag_len, diag_len, diag_len * 2)
+    cos_t = np.cos(thetas)
+    sin_t = np.sin(thetas)
+    num_thetas = len(thetas)
+    accumulator = defaultdict(int)
+
+    for i in range(len(cartesian_points)):
+        x, y = cartesian_points[i]
+        for t_idx in range(num_thetas):
+            # rho = diag_len+int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
+            rho = int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
+            accumulator[rho, t_idx] += 1
+    return accumulator, thetas, rhos
+
+
+def take_brightest_points(accumulator, thetas):
     theta_max = 0
     rho_max = 0
     max_value = 0
@@ -136,7 +163,7 @@ def take_brightest_points(accumulator):
     print("theta", theta_max)
     print("rho", rho_max)
 
-    return [max_value], [theta_max], [rho_max], extrema
+    return [max_value], [thetas[theta_max]], [rho_max], extrema
 
 
 def peak_votes(accumulator, thetas, rhos):
