@@ -36,7 +36,19 @@ def polar_to_y(measure: List):
 def cartesian_to_polar(cartesian):
     x, y = cartesian
     if x != 0:
-        return [math.atan(y/x), math.sqrt(x*x+y*y)]
+        if x > 0 and y >= 0:
+            angle = math.atan(y / x)
+        elif x > 0 and y < 0:
+            angle = math.atan(y / x) + 2*math.pi
+        elif x < 0:
+            angle = math.atan(y / x) + math.pi
+        elif x == 0 and y > 0:
+            angle = math.pi/2
+        elif x == 0 and y < 0:
+            angle = 3*math.pi/2
+        else:
+            angle = 0
+        return [angle, math.sqrt(x*x+y*y)]
     else:
         return [math.pi/2, y]
 
@@ -106,6 +118,8 @@ def hough_transform(cartesian_points, angle_step=0.3):
         x, y = cartesian_points[i]
         for t_idx in range(num_thetas):
             rho = diag_len+int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
+            if rho < 0:
+                print("rho négatif", rho)
             accumulator[rho, t_idx] += 20
     return accumulator, thetas, rhos
 
@@ -130,13 +144,15 @@ def hough_transform_to_dict(cartesian_points, angle_step=0.3):
     for i in range(len(cartesian_points)):
         x, y = cartesian_points[i]
         for t_idx in range(num_thetas):
-            # rho = diag_len+int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
-            rho = int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
+            rho = diag_len+int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
+            # rho = int(round(x * cos_t[t_idx] + y * sin_t[t_idx]))
             accumulator[rho, t_idx] += 1
+            if rho < 0:
+                print("rho négatif", rho)
     return accumulator, thetas, rhos
 
 
-def take_brightest_points(accumulator, thetas):
+def take_brightest_points(accumulator, thetas, rhos):
     theta_max = 0
     rho_max = 0
     max_value = 0
@@ -163,7 +179,7 @@ def take_brightest_points(accumulator, thetas):
     print("theta", theta_max)
     print("rho", rho_max)
 
-    return [max_value], [thetas[theta_max]], [rho_max], extrema
+    return [max_value], [thetas[theta_max]], rhos[[rho_max]], extrema
 
 
 def peak_votes(accumulator, thetas, rhos):
