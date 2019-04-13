@@ -122,6 +122,7 @@ def reconstruct_image_with_lines_polar(polar_points, angles, dists):
             # print("polar", a, d)
             # pl.polar(a, d, "b-")
         pl.polar(xxx, yyy, 'b-')
+        # pl.plot(xxx, yyy, 'b-')
         # fig.canvas.draw()
     pl.show()
     # fig.canvas.draw()
@@ -257,7 +258,7 @@ def measures_to_accumulators_dict(data):
         accumulator, thetas, rhos = outr.hough_transform_to_dict(cartesian_good_data)
         # skio.imsave("accumulator_"+str(i) + '.jpg', accumulator)
 
-        accum, angles, dists, extrema = outr.take_brightest_points(accumulator, thetas)
+        accum, angles, dists, extrema = outr.take_brightest_points(accumulator, thetas, rhos)
 
         # print(extrema)
 
