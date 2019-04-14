@@ -4,7 +4,10 @@ Table with LiDAR obstacles.
 
 from typing import List
 
+import numpy as np
 import matplotlib.pylab as pl
+
+from src.constants import *
 
 
 class Point:
@@ -86,6 +89,11 @@ class Table:
 
     def plot(self):
         pl.show()
+
+    def simulate_measure(self, measure_point: Point):
+        thetas = np.deg2rad(np.arange(0, 180, angle_resolution))
+        for i in range(len(thetas)):
+            thetas[i]
 
 
 def main():

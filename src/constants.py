@@ -5,6 +5,7 @@ Log configuration
 Inspired by.
 """
 
+angle_resolution = 0.3
 
 tolerance_predicted_fixe_r = 2
 tolerance_predicted_fixe_theta = 2

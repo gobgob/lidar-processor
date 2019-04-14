@@ -269,7 +269,8 @@ def measures_to_accumulators_dict(data):
 
 
 if __name__ == "__main__":
-    measures = retm.get_data()
+    # measures = retm.get_data()
+    measures = retm.get_realistic_data()
     # measures_to_images([measures[1]])
 
     # display measures through an array
