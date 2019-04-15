@@ -21,6 +21,38 @@ class Point:
     def multiply_by(self, a):
         return Point(a*self.x, a*self.y)
 
+    def distance(self, other):
+        return np.sqrt(np.power(self.x - other.x, 2)+np.power(self.y - other.y, 2))
+
+    def __str__(self):
+        return "("+str(self.x)+","+str(self.y)+")"
+
+
+class Vector:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+
+    def set_by_points(self, point1, point2):
+        self.x = point2.x - point1.x
+        self.y = point2.y - point1.y
+
+    def compute_angle(self):
+        return np.arctan(self.y/self.x)
+
+    def compute_distance(self):
+        return np.sqrt(self.x**2 + self.y**2)
+
+    def apply_to_point(self, point: Point):
+        return Point(point.x+self.x, point.y+self.y)
+
+    def __str__(self):
+        return str(self.x)+" - "+str(self.y)
+
+    def set_coordinates(self, x: float, y: float):
+        self.x = x
+        self.y = y
+
 
 class Obstacle:
     def __init__(self, center: Point):
@@ -31,8 +63,8 @@ class Square(Obstacle):
     def __init__(self, positions: List[Point]):
         center = Point(0, 0)
         for position in positions:
-            center += position
-        center.multiply_by(1/4.)
+            center = center + position
+        center = center.multiply_by(1/4.)
 
         super().__init__(center)
 
@@ -90,10 +122,33 @@ class Table:
     def plot(self):
         pl.show()
 
-    def simulate_measure(self, measure_point: Point):
-        thetas = np.deg2rad(np.arange(0, 180, angle_resolution))
-        for i in range(len(thetas)):
-            thetas[i]
+    def simulate_measure(self, measure_point: Point, angle: float, rho: float):
+        # thetas = np.deg2rad(np.arange(0, 180, angle_resolution))
+        print(measure_point)
+        vectors = []
+        for obstacle in self.obstacles:
+            vec = Vector()
+            vec.set_by_points(measure_point, obstacle.center)
+            vectors.append(vec)
+            print(obstacle.center)
+            print(vec)
+
+        robot_vector = Vector()
+        robot_vector.set_coordinates(np.cos(angle)*rho, np.sin(angle)*rho)
+
+        return vectors, robot_vector
+
+        # for i in range(len(thetas)):
+        #     thetas[i]
+
+    def plot_measures(self, measure_point: Point, vectors: List[Vector], robot_vector: Vector):
+        for vector in vectors:
+            res = vector.apply_to_point(measure_point)
+            pl.plot([measure_point.x, res.x], [measure_point.y, res.y], "b-")
+
+        robot_vector.apply_to_point(measure_point)
+        # pl.plot([measure_point.x, measure_point.x+robot_vector.x], [measure_point.y, measure_point.y+robot_vector.y])
+        pl.arrow(measure_point.x, measure_point.y, robot_vector.x, robot_vector.y, width=1)
 
 
 def main():
@@ -109,9 +164,14 @@ def main():
     table.add_obstacle(beacon_2)
     table.add_obstacle(beacon_3)
 
+    measure = Point(-1000, 1100)
+
+    vectors, robot_vector = table.simulate_measure(measure, 0.5, 200)
+
     table.init_plot()
     table.plot_edges()
     table.plot_obstacles()
+    table.plot_measures(measure, vectors, robot_vector)
     table.plot()
 
 

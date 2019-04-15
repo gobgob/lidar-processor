@@ -17,6 +17,7 @@ from src.constants import *
 
 import src.main.output_rendering as outr
 import src.scripts.retrieve_measures as retm
+import src.scripts.retrieve_realistic_measures as retrm
 
 __author__ = ["Clément Besnier", ]
 
@@ -270,7 +271,7 @@ def measures_to_accumulators_dict(data):
 
 if __name__ == "__main__":
     # measures = retm.get_data()
-    measures = retm.get_realistic_data()
+    measures = retrm.get_realistic_data()
     # measures_to_images([measures[1]])
 
     # display measures through an array
