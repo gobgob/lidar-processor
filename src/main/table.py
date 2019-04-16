@@ -27,6 +27,22 @@ class Point:
     def __str__(self):
         return "("+str(self.x)+","+str(self.y)+")"
 
+    def rotate(self, angle: float):
+        """
+        >>> point = Point(2., 3.)
+        >>> point.rotate(np.pi)
+        >>> np.isclose(point.x, -2)
+        True
+        >>> np.isclose(point.y, -3)
+        True
+
+        :param angle:
+        :return:
+        """
+        res = np.matrix([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]) @ np.matrix([self.x, self.y]).T
+        self.x = res[0, 0]
+        self.y = res[1, 0]
+
 
 class Vector:
     def __init__(self):
@@ -53,6 +69,23 @@ class Vector:
         self.x = x
         self.y = y
 
+    def rotate(self, angle: float):
+        """
+        >>> v = Vector()
+        >>> v.set_coordinates(2., 3.)
+        >>> v.rotate(np.pi)
+        >>> np.isclose(v.x, -2)
+        True
+        >>> np.isclose(v.y, -3)
+        True
+
+        :param angle:
+        :return:
+        """
+        res = np.matrix([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]) @ np.matrix([self.x, self.y]).T
+        self.x = res[0, 0]
+        self.y = res[1, 0]
+
 
 class Obstacle:
     def __init__(self, center: Point):
@@ -77,13 +110,41 @@ class Square(Obstacle):
     def take_symmetric(self):
         return [[-position.x, -position.y] for position in self.positions]
 
+    def translate(self, vector: Vector):
+        self.center = vector.apply_to_point(self.center)
+        self.positions = [vector.apply_to_point(position) for position in self.positions]
+
+    def rotate(self, angle: float):
+        """
+        >>> v = Vector()
+        >>> v.set_coordinates(2., 3.)
+        >>> v.rotate(np.pi)
+        >>> np.isclose(v.x, -2)
+        True
+        >>> np.isclose(v.y, -3)
+        True
+
+        :param angle:
+        :return:
+        """
+        rotation_matrix = np.matrix([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
+        positions = []
+        for position in self.positions:
+            res = rotation_matrix @ np.matrix([position.x, position.y]).T
+            point = Point(res[0, 0], res[1, 0])
+            positions.append(point)
+        return Square(positions)
+
 
 class Table:
     def __init__(self):
         self.obstacles = []
         self.fig = None
 
-    def add_obstacle(self, obstacle: Obstacle):
+    # def add_obstacle(self, obstacle: Obstacle):
+    #     self.obstacles.append(obstacle)
+
+    def add_square_obstacle(self, obstacle: Square):
         self.obstacles.append(obstacle)
 
     def init_plot(self,):
@@ -150,6 +211,12 @@ class Table:
         # pl.plot([measure_point.x, measure_point.x+robot_vector.x], [measure_point.y, measure_point.y+robot_vector.y])
         pl.arrow(measure_point.x, measure_point.y, robot_vector.x, robot_vector.y, width=1)
 
+    def translate(self, vector: Vector):
+        self.obstacles = [obstacle.translate(vector) for obstacle in self.obstacles]
+
+    def rotate(self, angle: float):
+        self.obstacles = [obstacle.rotate(angle) for obstacle in self.obstacles]
+
 
 def main():
     table = Table()
@@ -160,9 +227,9 @@ def main():
                        Point(1500, 1000-50)])
     beacon_3 = Square([Point(-1500-100, 0+100), Point(-1500, 0+100), Point(-1500, 0), Point(-1500-100, 0)])
 
-    table.add_obstacle(beacon_1)
-    table.add_obstacle(beacon_2)
-    table.add_obstacle(beacon_3)
+    table.add_square_obstacle(beacon_1)
+    table.add_square_obstacle(beacon_2)
+    table.add_square_obstacle(beacon_3)
 
     measure = Point(-1000, 1100)
 
