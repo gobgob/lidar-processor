@@ -39,9 +39,9 @@ class Point:
         :param angle:
         :return:
         """
-        res = np.matrix([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]) @ np.matrix([self.x, self.y]).T
-        self.x = res[0, 0]
-        self.y = res[1, 0]
+        res = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]) @ np.array([self.x, self.y]).T
+        self.x = res[0]
+        self.y = res[1]
 
 
 class Vector:
@@ -82,9 +82,9 @@ class Vector:
         :param angle:
         :return:
         """
-        res = np.matrix([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]) @ np.matrix([self.x, self.y]).T
-        self.x = res[0, 0]
-        self.y = res[1, 0]
+        res = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]) @ np.array([self.x, self.y]).T
+        self.x = res[0]
+        self.y = res[1]
 
 
 class Obstacle:
@@ -127,11 +127,11 @@ class Square(Obstacle):
         :param angle:
         :return:
         """
-        rotation_matrix = np.matrix([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
+        rotation_matrix = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
         positions = []
         for position in self.positions:
-            res = rotation_matrix @ np.matrix([position.x, position.y]).T
-            point = Point(res[0, 0], res[1, 0])
+            res = rotation_matrix @ np.array([position.x, position.y]).T
+            point = Point(res[0], res[1])
             positions.append(point)
         return Square(positions)
 
@@ -151,8 +151,11 @@ class Table:
         self.fig = pl.figure()
         ax = self.fig.add_subplot(111)
         ax.clear()
-        ax.set_xlim(-1700, 1700)
-        ax.set_ylim(-100, 2100)
+        xlimits = 3000
+        y_max_limit = 3000
+        y_min_limit = -2000
+        ax.set_xlim(-xlimits, xlimits)
+        ax.set_ylim(y_min_limit, y_max_limit)
         ax.axhline(0, 0)
         ax.axvline(0, 0)
 
@@ -235,6 +238,17 @@ def main():
 
     vectors, robot_vector = table.simulate_measure(measure, 0.5, 200)
 
+    table.init_plot()
+    table.plot_edges()
+    table.plot_obstacles()
+    table.plot_measures(measure, vectors, robot_vector)
+    table.plot()
+
+    rotation_angle = np.pi/3
+    table.rotate(rotation_angle)
+    translation_vector = Vector()
+    translation_vector.set_coordinates(500, -500)
+    table.translate(translation_vector)
     table.init_plot()
     table.plot_edges()
     table.plot_obstacles()
