@@ -42,6 +42,7 @@ class Point:
         res = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]) @ np.array([self.x, self.y]).T
         self.x = res[0]
         self.y = res[1]
+        return Point(self.x, self.y)
 
 
 class Vector:
@@ -60,6 +61,7 @@ class Vector:
         return np.sqrt(self.x**2 + self.y**2)
 
     def apply_to_point(self, point: Point):
+        print(point)
         return Point(point.x+self.x, point.y+self.y)
 
     def __str__(self):
@@ -111,8 +113,9 @@ class Square(Obstacle):
         return [[-position.x, -position.y] for position in self.positions]
 
     def translate(self, vector: Vector):
-        self.center = vector.apply_to_point(self.center)
-        self.positions = [vector.apply_to_point(position) for position in self.positions]
+        return Square([vector.apply_to_point(position) for position in self.positions])
+        # self.center = vector.apply_to_point(self.center)
+        # self.positions =
 
     def rotate(self, angle: float):
         """
@@ -139,6 +142,7 @@ class Square(Obstacle):
 class Table:
     def __init__(self):
         self.obstacles = []
+        self.edges = []
         self.fig = None
 
     # def add_obstacle(self, obstacle: Obstacle):
@@ -146,6 +150,9 @@ class Table:
 
     def add_square_obstacle(self, obstacle: Square):
         self.obstacles.append(obstacle)
+
+    def add_edge_point(self, edge: Point):
+        self.edges.append(edge)
 
     def init_plot(self,):
         self.fig = pl.figure()
@@ -173,10 +180,9 @@ class Table:
         self.fig.canvas.draw()
 
     def plot_edges(self):
-        points = [Point(-1500, 0), Point(1500, 0), Point(1500, 2000), Point(-1500, 2000)]
         xx = []
         yy = []
-        for point in points:
+        for point in self.edges:
             xx.append(point.x)
             yy.append(point.y)
         xx.append(xx[0])
@@ -216,9 +222,11 @@ class Table:
 
     def translate(self, vector: Vector):
         self.obstacles = [obstacle.translate(vector) for obstacle in self.obstacles]
+        self.edges = [vector.apply_to_point(edge_point) for edge_point in self.edges]
 
     def rotate(self, angle: float):
         self.obstacles = [obstacle.rotate(angle) for obstacle in self.obstacles]
+        self.edges = [edge_point.rotate(angle) for edge_point in self.edges]
 
 
 def main():
@@ -234,6 +242,11 @@ def main():
     table.add_square_obstacle(beacon_2)
     table.add_square_obstacle(beacon_3)
 
+    table.add_edge_point(Point(-1500, 0))
+    table.add_edge_point(Point(1500, 0))
+    table.add_edge_point(Point(1500, 2000))
+    table.add_edge_point(Point(-1500, 2000))
+
     measure = Point(-1000, 1100)
 
     vectors, robot_vector = table.simulate_measure(measure, 0.5, 200)
@@ -244,11 +257,38 @@ def main():
     table.plot_measures(measure, vectors, robot_vector)
     table.plot()
 
-    rotation_angle = np.pi/3
-    table.rotate(rotation_angle)
+
+def main_2():
+    table = Table()
+    # for orange
+    beacon_1 = Square([Point(-1500 - 100, 2000), Point(-1500, 2000), Point(-1500, 2000 - 100),
+                       Point(-1500 - 100, 2000 - 100)])
+    beacon_2 = Square([Point(1500, 1000 + 50), Point(1500 + 100, 1000 + 50), Point(1500 + 100, 1000 - 50),
+                       Point(1500, 1000 - 50)])
+    beacon_3 = Square([Point(-1500 - 100, 0 + 100), Point(-1500, 0 + 100), Point(-1500, 0), Point(-1500 - 100, 0)])
+
+    table.add_square_obstacle(beacon_1)
+    table.add_square_obstacle(beacon_2)
+    table.add_square_obstacle(beacon_3)
+
+    table.add_edge_point(Point(-1500, 0))
+    table.add_edge_point(Point(1500, 0))
+    table.add_edge_point(Point(1500, 2000))
+    table.add_edge_point(Point(-1500, 2000))
+
     translation_vector = Vector()
-    translation_vector.set_coordinates(500, -500)
+    translation_vector.set_coordinates(+1000, -1100)
     table.translate(translation_vector)
+
+    # rotation_angle = np.pi / 3
+    rotation_angle = 0.5
+    table.rotate(rotation_angle)
+
+    measure = Point(-1000, 1100)
+    measure = translation_vector.apply_to_point(measure)
+    measure.rotate(rotation_angle)
+    vectors, robot_vector = table.simulate_measure(measure, 0.5, 200)
+
     table.init_plot()
     table.plot_edges()
     table.plot_obstacles()
@@ -258,3 +298,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    main_2()
