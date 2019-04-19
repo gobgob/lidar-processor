@@ -97,19 +97,22 @@ class Segment:
         self.p2 = p2
         self.x_difference = self.compute_x_difference()
         self.y_difference = self.compute_y_difference()
-        self.determinant = self.compute_determinant()
+        # self.determinant = self.compute_determinant()
 
-    def compute_determinant(self):
-        return self.p1.x * self.p2.y - self.p1.y * self.p2.x
+    def __str__(self):
+        return "p1: "+str(self.p1)+", p2: "+str(self.p2)
+
+    # def compute_determinant(self):
+    #     return self.p1.x * self.p2.y - self.p1.y * self.p2.x
 
     def compute_x_difference(self):
-        return self.p1.x - self.p2.x
+        return self.p2.x - self.p1.x
 
     def compute_y_difference(self):
-        return self.p1.y - self.p2.y
+        return self.p2.y - self.p1.y
 
-    def get_determinant(self):
-        return self.determinant
+    # def get_determinant(self):
+    #     return self.determinant
 
     def get_x_difference(self):
         return self.x_difference
@@ -118,14 +121,69 @@ class Segment:
         return self.y_difference
 
     def collide(self, other: Segment):
+        """
+        if denominator are of same sign and numerator is lesser than denominator, then the segments collide
+
+        >>> pa = Point(1.8, 2.1)
+        >>> pb = Point(0.8, 1.1)
+        >>> pc = Point(1, 1.25)
+        >>> pd = Point(0, 1.25)
+        >>> s1 = Segment(pa, pb)
+        >>> print(s1)
+
+        >>> s2 = Segment(pc, pd)
+        >>> print(s2)
+
+        >>> s1.collide(s2)
+
+        >>> s2.collide(s1)
+
+
+        >>> pa = Point(-1., 0.5)
+        >>> pb = Point(1., 0.5)
+        >>> pc = Point(0., 1.)
+        >>> pd = Point(0., 2.)
+        >>> s1 = Segment(pa, pb)
+        >>> print(s1)
+
+        >>> s2 = Segment(pc, pd)
+        >>> print(s2)
+
+        >>> s1.collide(s2)
+
+        >>> s2.collide(s1)
+
+        :param other:
+        :return:
+        """
+        false_segment = Segment(self.p1, other.p1)
+        # print(false_segment)
+
+        numerator = (false_segment.get_x_difference() * other.get_y_difference() -
+                     false_segment.get_y_difference() * other.get_x_difference())
+
         denominator = (self.get_x_difference() * other.get_y_difference() -
                        self.get_y_difference() * other.get_x_difference())
-        px = (self.get_determinant() * other.get_x_difference() - self.get_x_difference() * other.get_determinant()) / \
-            denominator
 
-        py = (self.get_determinant() * other.get_y_difference() - self.get_y_difference() * other.get_determinant()) / \
-            denominator
-        pass
+        # print(numerator)
+        # print(denominator)
+        t = numerator / denominator
+        print("t", t)
+        if 0 <= t <= 1:
+            print("x: ", self.p1.x + t * (self.p2.x - self.p1.x))
+            print("y: ", self.p1.y + t * (self.p2.y - self.p1.y))
+
+        # px = (self.get_determinant() * other.get_x_difference() - self.get_x_difference() * other.get_determinant())
+        # / \ denominator
+        # py = (self.get_determinant() * other.get_y_difference() - self.get_y_difference() * other.get_determinant())
+        # / \ denominator
+        return ((0 <= denominator and 0 <= numerator) or (denominator <= 0 and numerator <= 0)) and \
+               (abs(numerator) <= abs(denominator))
+
+        # if 0 < denominator and 0 < numerator or denominator < 0 and numerator < 0:
+        #     return numerator < denominator
+        # else:
+        #     return False
 
 
 class Obstacle:
@@ -280,14 +338,19 @@ class Table:
         for obstacle in self.obstacles:
             for i in range(len(obstacle.positions) - 1):
                 vertices.append(obstacle.positions[i])
-                edges.append((obstacle[i], obstacle[i + 1]))
-            edges.append((obstacle.positions[-1], obstacle.positions[0]))
+                edges.append(Segment(obstacle.positions[i], obstacle.positions[i + 1]))
+            edges.append(Segment(obstacle.positions[-1], obstacle.positions[0]))
 
-        # invisible_vertices = []
-        # for vertex in vertices:
-        #     for edge in edges:
-        #         if
-        #         invisible_vertices.append(vertex)
+        invisible_vertices = set()
+        for vertex in vertices:
+            for edge in edges:
+                if edge.collide(Segment(robot_point, vertex)):
+                    invisible_vertices.add(vertex)
+
+        print(len(vertices))
+        print(len(invisible_vertices))
+        for j in invisible_vertices:
+            print(j)
 
 
 def main():
@@ -357,6 +420,47 @@ def main_2():
     table.plot()
 
 
+def main_3():
+    table = Table()
+    # for orange
+    beacon_1 = Square([Point(-1500 - 100, 2000), Point(-1500, 2000), Point(-1500, 2000 - 100),
+                       Point(-1500 - 100, 2000 - 100)])
+    beacon_2 = Square([Point(1500, 1000 + 50), Point(1500 + 100, 1000 + 50), Point(1500 + 100, 1000 - 50),
+                       Point(1500, 1000 - 50)])
+    beacon_3 = Square([Point(-1500 - 100, 0 + 100), Point(-1500, 0 + 100), Point(-1500, 0), Point(-1500 - 100, 0)])
+
+    table.add_square_obstacle(beacon_1)
+    table.add_square_obstacle(beacon_2)
+    table.add_square_obstacle(beacon_3)
+
+    table.add_edge_point(Point(-1500, 0))
+    table.add_edge_point(Point(1500, 0))
+    table.add_edge_point(Point(1500, 2000))
+    table.add_edge_point(Point(-1500, 2000))
+
+    # translation_vector = Vector()
+    # translation_vector.set_coordinates(+1000, -1100)
+    # table.translate(translation_vector)
+
+    # rotation_angle = np.pi / 3
+    # rotation_angle = 0.5
+    # table.rotate(rotation_angle)
+
+    measure = Point(-1000, 1100)
+    # measure = translation_vector.apply_to_point(measure)
+    # measure.rotate(rotation_angle)
+    # vectors, robot_vector = table.simulate_measure(measure, 0, 200)
+
+    # table.init_plot()
+    # table.plot_edges()
+    # table.plot_obstacles()
+    # table.plot_measures(measure, vectors, robot_vector)
+    # table.plot()
+
+    table.generate_measures(measure)
+
+
 if __name__ == "__main__":
-    main()
-    main_2()
+    # main()
+    # main_2()
+    main_3()
