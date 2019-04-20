@@ -340,17 +340,46 @@ class Table:
                 vertices.append(obstacle.positions[i])
                 edges.append(Segment(obstacle.positions[i], obstacle.positions[i + 1]))
             edges.append(Segment(obstacle.positions[-1], obstacle.positions[0]))
+            vertices.append(obstacle.positions[-1])
 
-        invisible_vertices = set()
+        # for edge in edges:
+        #     xx = []
+        #     yy = []
+        #     xx.append(edge.p1.x)
+        #     xx.append(edge.p2.x)
+        #     yy.append(edge.p1.y)
+        #     yy.append(edge.p2.y)
+        #     pl.plot(xx, yy, "m-")
+
+        print("len(vertices)", len(vertices))
         for vertex in vertices:
             for edge in edges:
-                if edge.collide(Segment(robot_point, vertex)):
-                    invisible_vertices.add(vertex)
+                if vertex not in [edge.p1, edge.p2]:
+                    s = Segment(robot_point, vertex)
+                    if edge.collide(s):
+                        # xx = []
+                        # yy = []
+                        # xx.append(s.p1.x)
+                        # xx.append(s.p2.x)
+                        # yy.append(s.p1.y)
+                        # yy.append(s.p2.y)
+                        # pl.plot(xx, yy)
+                        if vertex in vertices:
+                            vertices.remove(vertex)
+                        if edge in edges:
+                            edges.remove(edge)
 
-        print(len(vertices))
-        print(len(invisible_vertices))
-        for j in invisible_vertices:
-            print(j)
+        print("len(vertices)", len(vertices))
+        for vertex in vertices:
+            s = Segment(robot_point, vertex)
+            pl.plot([s.p1.x, s.p2.x], [s.p1.y, s.p2.y], "m-")
+
+        # for e in edges:
+        #     print(e)
+
+        # print(len(vertices))
+        # for j in vertices:
+        #     print(j)
 
 
 def main():
@@ -446,18 +475,17 @@ def main_3():
     # rotation_angle = 0.5
     # table.rotate(rotation_angle)
 
-    measure = Point(-1000, 1100)
+    measure = Point(-300, 1400)
     # measure = translation_vector.apply_to_point(measure)
     # measure.rotate(rotation_angle)
-    # vectors, robot_vector = table.simulate_measure(measure, 0, 200)
+    vectors, robot_vector = table.simulate_measure(measure, 0, 200)
 
-    # table.init_plot()
-    # table.plot_edges()
+    table.init_plot()
+    table.plot_edges()
     # table.plot_obstacles()
     # table.plot_measures(measure, vectors, robot_vector)
-    # table.plot()
-
     table.generate_measures(measure)
+    table.plot()
 
 
 if __name__ == "__main__":
