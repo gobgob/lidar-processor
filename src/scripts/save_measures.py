@@ -25,4 +25,3 @@ if __name__ == "__main__":
     time.sleep(3)
     print(t.is_alive())
     # sys.exit(0)
-    

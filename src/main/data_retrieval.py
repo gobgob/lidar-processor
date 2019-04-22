@@ -2,6 +2,13 @@
 
 """
 Works with https://github.com/gobgob/rplidar_a3 which is the server
+
+Received data must respect the following rules:
+- each turn of measures is seperated by "M",
+- measures in one turn of measures are separated by ";",
+- one measure is "<angle>:<distance>:<quality>"
+
+
 """
 
 import socket

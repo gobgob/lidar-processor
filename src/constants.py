@@ -28,3 +28,8 @@ distance_max = 6000
 afficher_en_polaire = False
 affichage = True
 
+minimum_distance = 4000  # en mm
+maximum_distance = 80  # en mm
+tsec = 20
+tmaxsel = 200
+tminsel = 20
