@@ -9,8 +9,8 @@ from typing import List
 import numpy as np
 import matplotlib.pylab as pl
 
-from main.clustering import clusterize
-from scripts.check_clustering import test_clustering
+from src.main.clustering import clusterize
+from scripts.check_clustering import main_clustering
 from src.constants import *
 
 
@@ -527,7 +527,8 @@ def main_4():
     # measure = translation_vector.apply_to_point(measure)
     # measure.rotate(rotation_angle)
 
-    clusters = test_clustering()
+    clusters = main_clustering()
+    print("clusters", clusters)
 
     table.init_plot()
     table.plot_edges()
@@ -540,4 +541,5 @@ def main_4():
 if __name__ == "__main__":
     # main()
     # main_2()
-    main_3()
+    # main_3()
+    main_4()

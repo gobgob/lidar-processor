@@ -23,7 +23,8 @@ from constants import *
 
 def distance(point, other):
     diff = point - other
-    return diff * diff.T
+    res = np.sqrt(diff @ diff.T)
+    return res
 
 
 def cluster_distance(cluster, other):
@@ -39,9 +40,10 @@ def clusterize(cartesian_measures: List[np.ndarray]):
     :return:
     """
     n = 0
-    clusters = []
+    clusters = [[]]
     for i in range(2, len(cartesian_measures)):
-        if distance(cartesian_measures[i-2], cartesian_measures[i-1]) > tsec and \
+        dist = distance(cartesian_measures[i - 2], cartesian_measures[i - 1])
+        if dist > tsec and \
                 distance(cartesian_measures[i-1], cartesian_measures[i]) > tsec:
             n += 1
             clusters.append([])
@@ -54,5 +56,6 @@ def clusterize(cartesian_measures: List[np.ndarray]):
         else:
             new_clusters.append(clusters[j])
             n -= 1
+    return new_clusters
 
 

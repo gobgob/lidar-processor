@@ -8,9 +8,9 @@ from typing import List
 import numpy as np
 
 from constants import *
-import main.output_rendering as outr
-from main.data_retrieval import LidarThread
-from main.clustering import clusterize
+import src.main.output_rendering as outr
+from src.main.data_retrieval import LidarThread
+from src.main.clustering import clusterize
 
 __author__ = "Clément Besnier"
 
@@ -21,7 +21,7 @@ def remove_too_far_or_too_close(one_turn: List) -> List:
     :param one_turn: list of [<angle>, <distance>, <quality>]
     :return: list of [<angle>, <distance>]
     """
-    return [measure[:2] for measure in one_turn if measure[1] < minimum_distance or measure > maximum_distance]
+    return [measure for measure in one_turn if measure[1] < minimum_distance or measure[1] > maximum_distance]
 
 
 def main():
@@ -34,6 +34,7 @@ def main():
         one_turn_measure = remove_too_far_or_too_close(one_turn_measure)
         cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
         clusters = clusterize(cartesian_one_turn_measure)
+        print(clusters)
 
         time.sleep(3)
     t.close_connection()
