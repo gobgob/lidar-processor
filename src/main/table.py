@@ -9,6 +9,8 @@ from typing import List
 import numpy as np
 import matplotlib.pylab as pl
 
+from main.clustering import clusterize
+from scripts.check_clustering import test_clustering
 from src.constants import *
 
 
@@ -283,6 +285,13 @@ class Table:
             pl.plot(xx, yy, 'r-')
         self.fig.canvas.draw()
 
+    def plot_clusters(self):
+        """
+        TODO
+        :return:
+        """
+        pass
+
     def plot_edges(self):
         xx = []
         yy = []
@@ -479,6 +488,46 @@ def main_3():
     # measure = translation_vector.apply_to_point(measure)
     # measure.rotate(rotation_angle)
     vectors, robot_vector = table.simulate_measure(measure, 0, 200)
+
+    table.init_plot()
+    table.plot_edges()
+    # table.plot_obstacles()
+    # table.plot_measures(measure, vectors, robot_vector)
+    table.generate_measures(measure)
+    table.plot()
+
+
+def main_4():
+    table = Table()
+    # for orange
+    beacon_1 = Square([Point(-1500 - 100, 2000), Point(-1500, 2000), Point(-1500, 2000 - 100),
+                       Point(-1500 - 100, 2000 - 100)])
+    beacon_2 = Square([Point(1500, 1000 + 50), Point(1500 + 100, 1000 + 50), Point(1500 + 100, 1000 - 50),
+                       Point(1500, 1000 - 50)])
+    beacon_3 = Square([Point(-1500 - 100, 0 + 100), Point(-1500, 0 + 100), Point(-1500, 0), Point(-1500 - 100, 0)])
+
+    table.add_square_obstacle(beacon_1)
+    table.add_square_obstacle(beacon_2)
+    table.add_square_obstacle(beacon_3)
+
+    table.add_edge_point(Point(-1500, 0))
+    table.add_edge_point(Point(1500, 0))
+    table.add_edge_point(Point(1500, 2000))
+    table.add_edge_point(Point(-1500, 2000))
+
+    # translation_vector = Vector()
+    # translation_vector.set_coordinates(+1000, -1100)
+    # table.translate(translation_vector)
+
+    # rotation_angle = np.pi / 3
+    # rotation_angle = 0.5
+    # table.rotate(rotation_angle)
+
+    measure = Point(-300, 1400)
+    # measure = translation_vector.apply_to_point(measure)
+    # measure.rotate(rotation_angle)
+
+    clusters = test_clustering()
 
     table.init_plot()
     table.plot_edges()
