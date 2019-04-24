@@ -285,12 +285,17 @@ class Table:
             pl.plot(xx, yy, 'r-')
         self.fig.canvas.draw()
 
-    def plot_clusters(self):
+    def plot_clusters(self, clusters):
         """
         TODO
         :return:
         """
-        pass
+        xx = []
+        yy = []
+        for cluster_center in clusters:
+            xx.append(cluster_center[0])
+            yy.append(cluster_center[1])
+        pl.plot(xx, yy, "y,")
 
     def plot_edges(self):
         xx = []
@@ -532,6 +537,7 @@ def main_4():
 
     table.init_plot()
     table.plot_edges()
+    table.plot_clusters(clusters)
     # table.plot_obstacles()
     # table.plot_measures(measure, vectors, robot_vector)
     table.generate_measures(measure)
