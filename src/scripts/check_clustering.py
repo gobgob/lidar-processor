@@ -59,11 +59,11 @@ def plot_clustering():
 
     xx = []
     yy = []
-    print(clusters)
+    # print(clusters)
 
     for cluster_center in clusters:
         for i in cluster_center:
-            print(cluster_center)
+            # print(cluster_center)
             x = i[0]
             y = i[1]
             xx.append(x)

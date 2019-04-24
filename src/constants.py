@@ -30,6 +30,6 @@ affichage = True
 
 minimum_distance = 4000  # en mm
 maximum_distance = 80  # en mm
-tsec = 20
-tmaxsel = 200
-tminsel = 20
+tsec = 200
+tmaxsel = 500
+tminsel = 500
