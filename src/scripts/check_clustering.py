@@ -47,39 +47,39 @@ def plot_clustering():
     ax.axvline(0, 0)
     # pl.grid()
 
-    xx = []
-    yy = []
-    for x, y in cartesian_one_turn_measure:
-        xx.append(x)
-        yy.append(y)
+    # xx = []
+    # yy = []
+    # for x, y in cartesian_one_turn_measure:
+    #     xx.append(x)
+    #     yy.append(y)
+    # pl.plot(xx, yy, 'r:')
 
-    pl.plot(xx, yy, 'r,')
     # fig.canvas.draw()
     # pl.show()
 
-    xx = []
-    yy = []
     # print(clusters)
 
-    for i in means:
-        print(i)
-        x = i[0]
-        y = i[1]
-        xx.append(x)
-        yy.append(y)
-    pl.plot(xx, yy, "y+")
+    # xx = []
+    # yy = []
+    # for i in means:
+    #     print(i)
+    #     x = i[0]
+    #     y = i[1]
+    #     xx.append(x)
+    #     yy.append(y)
+    # pl.plot(xx, yy, "y+")
 
     for cluster_center in clusters:
         xx = []
         yy = []
+        print(len(cluster_center))
         for i in cluster_center:
-            # print(cluster_center)
             x = i[0]
             y = i[1]
             xx.append(x)
             yy.append(y)
             # pl.Circle((x, y), 30, color='b', fill=False)
-        pl.plot(xx, yy, )
+        pl.plot(xx, yy, '+')
     pl.show()
 
 

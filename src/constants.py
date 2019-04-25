@@ -28,8 +28,9 @@ distance_max = 6000
 afficher_en_polaire = False
 affichage = True
 
-minimum_distance = 4000  # en mm
-maximum_distance = 80  # en mm
-tsec = 200
+minimum_distance = 80  # in mm
+maximum_distance = 3500  # in mm
+minimum_distance_between_clusters = 80
 tmaxsel = 500
 tminsel = 500
+minimum_points_in_cluster = 5

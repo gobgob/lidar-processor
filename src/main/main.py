@@ -21,7 +21,7 @@ def remove_too_far_or_too_close(one_turn: List) -> List:
     :param one_turn: list of [<angle>, <distance>, <quality>]
     :return: list of [<angle>, <distance>]
     """
-    return [measure for measure in one_turn if measure[1] < minimum_distance or measure[1] > maximum_distance]
+    return [measure for measure in one_turn if minimum_distance < measure[1] < maximum_distance]
 
 
 def main():
