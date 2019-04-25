@@ -20,8 +20,8 @@ def main_clustering():
     one_turn_measure = mm.remove_too_far_or_too_close(one_turn_measure)
     cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
     cartesian_one_turn_measure = [np.array(measure) for measure in cartesian_one_turn_measure]
-    clusters = clus.clusterize(cartesian_one_turn_measure)
-    return clusters
+    clusters, means = clus.clusterize(cartesian_one_turn_measure)
+    return clusters, means
 
 
 def plot_clustering():
@@ -30,7 +30,7 @@ def plot_clustering():
     one_turn_measure = mm.remove_too_far_or_too_close(one_turn_measure)
     cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
     cartesian_one_turn_measure = [np.array(measure) for measure in cartesian_one_turn_measure]
-    clusters = clus.clusterize(cartesian_one_turn_measure)
+    clusters, means = clus.clusterize(cartesian_one_turn_measure)
 
     # display measures through an array
     # display raw measures
@@ -61,7 +61,17 @@ def plot_clustering():
     yy = []
     # print(clusters)
 
+    for i in means:
+        print(i)
+        x = i[0]
+        y = i[1]
+        xx.append(x)
+        yy.append(y)
+    pl.plot(xx, yy, "y+")
+
     for cluster_center in clusters:
+        xx = []
+        yy = []
         for i in cluster_center:
             # print(cluster_center)
             x = i[0]
@@ -69,7 +79,7 @@ def plot_clustering():
             xx.append(x)
             yy.append(y)
             # pl.Circle((x, y), 30, color='b', fill=False)
-    pl.plot(xx, yy, "y+")
+        pl.plot(xx, yy, )
     pl.show()
 
 
