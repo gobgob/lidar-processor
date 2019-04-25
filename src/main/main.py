@@ -11,6 +11,9 @@ from constants import *
 import src.main.output_rendering as outr
 from src.main.data_retrieval import LidarThread
 from src.main.clustering import clusterize
+from src.main.tracking import track_clusters
+from src.main.self_locator import find_beacons
+from src.main.enemy_locator import find_robots
 
 __author__ = "Clément Besnier"
 
@@ -33,6 +36,7 @@ def main():
     t = LidarThread()
     t.start()
     previous_clusters = []
+    first = True
     while measuring:
         one_turn_measure = t.get_measures()
         one_turn_measure = outr.keep_good_measures(one_turn_measure, 30)
@@ -41,7 +45,14 @@ def main():
         clusters = clusterize(cartesian_one_turn_measure)
         print(clusters)
         if match_has_begun():
-            track_clusters()
+            if first:
+                pass
+
+            beacons, robots = track_clusters(previous_clusters, clusters)
+        else:
+            # TODO determine the position of beacons and adverse robot just with the last measure
+            beacons = find_beacons(clusters)
+            robots = find_robots(clusters)
         previous_clusters = clusters.copy()
         time.sleep(1)
     t.close_connection()
