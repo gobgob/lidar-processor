@@ -65,24 +65,31 @@ def clusterize(cartesian_measures: List[np.ndarray]):
             clusters.append([])
         clusters[n].append(cartesian_measures[i])
     print("nombre de clusters : ", n)
-    new_clusters = clusters
-    # new_clusters = []
-    # j = 0
-    # while j <= n:
-    #     dist_j = cluster_distance(clusters[j], clusters[n])
-    #     if not (dist_j > tmaxsel or dist_j < tminsel):
-    #         new_clusters.append(clusters[j])
-    #         n -= 1
-    #     j += 1
-    print("nombre de clusters : ", len(new_clusters))
-    means = []
-    for cluster in new_clusters:
-        mean_cluster = np.sum(cluster, axis=0) / len(cluster)
-        means.append(mean_cluster)
-        print(mean_cluster)
-    # print("clusters : ", new_clusters)
 
-    return new_clusters, means
+    if len(clusters) > 1:
+        j = 0
+        k = 1
+        while k < n:
+            dist_j = cluster_distance(clusters[j], clusters[k])
+            # if not (dist_j > tmaxsel or dist_j < tminsel):
+            #     new_clusters.append(clusters[j])
+            #     n -= 1
+            if dist_j < 200:
+                clusters[j].extend(clusters[k])
+                del clusters[k]
+                n -= 1
+
+            j += 1
+            k += 1
+            # else:
+        print("nombre de clusters : ", len(clusters))
+        means = []
+        for cluster in clusters:
+            mean_cluster = np.sum(cluster, axis=0) / len(cluster)
+            means.append(mean_cluster)
+            print(mean_cluster)
+
+        return clusters, means
 
 
 if __name__ == "__main__":
