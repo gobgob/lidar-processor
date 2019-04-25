@@ -24,10 +24,15 @@ def remove_too_far_or_too_close(one_turn: List) -> List:
     return [measure for measure in one_turn if minimum_distance < measure[1] < maximum_distance]
 
 
+def match_has_begun():
+    return True
+
+
 def main():
     measuring = True
     t = LidarThread()
     t.start()
+    previous_clusters = []
     while measuring:
         one_turn_measure = t.get_measures()
         one_turn_measure = outr.keep_good_measures(one_turn_measure, 30)
@@ -35,8 +40,10 @@ def main():
         cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
         clusters = clusterize(cartesian_one_turn_measure)
         print(clusters)
-
-        time.sleep(3)
+        if match_has_begun():
+            track_clusters()
+        previous_clusters = clusters.copy()
+        time.sleep(1)
     t.close_connection()
     time.sleep(3)
     # sys.exit(0)
