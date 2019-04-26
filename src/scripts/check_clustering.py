@@ -24,13 +24,7 @@ def main_clustering():
     return clusters, means
 
 
-def plot_clustering():
-    one_turn_measure = get_realistic_data()[0]
-    one_turn_measure = outr.keep_good_measures(one_turn_measure, 30)
-    one_turn_measure = mm.remove_too_far_or_too_close(one_turn_measure)
-    cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
-    cartesian_one_turn_measure = [np.array(measure) for measure in cartesian_one_turn_measure]
-    clusters, means = clus.clusterize(cartesian_one_turn_measure)
+def plot_clustering(clusters):
 
     # display measures through an array
     # display raw measures
@@ -85,4 +79,5 @@ def plot_clustering():
 
 if __name__ == "__main__":
     # main_clustering()
-    plot_clustering()
+    clusters, means = main_clustering()
+    plot_clustering(clusters)
