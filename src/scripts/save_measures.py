@@ -3,10 +3,10 @@
 import os
 import time
 import json
-from src.main.data_retrieval import LidarThread
+from src.main.data_retrieval import LidarThread, EncoderThread
 
 
-def store_data():
+def store_lidar_data(t):
     for i in range(20):
         with open(os.path.join("lidar-process", "src", "samples", "data_"+str(i)+".json"), "w") as f:
             data = t.get_measures()
@@ -14,14 +14,53 @@ def store_data():
         time.sleep(2)
 
 
-if __name__ == "__main__":
+def store_lidar_and_encoder_data(lidar_thread: LidarThread, encoder_thread: EncoderThread):
+    measureing_duration = 100
+    start_time = time.time()
+    now = time.time()
+    while now - start_time < measureing_duration:
+
+        with open(os.path.join("lidar-process", "src", "samples", "lidar_data_" + str(now) + ".json"), "w") as f:
+            lidar_turn_data = lidar_thread.get_measures()
+            json.dump(lidar_turn_data, f)
+
+        with open(os.path.join("lidar-process", "src", "samples", "encoder_data_" + str(now) + ".json"), "w") as f:
+            encoder_data = encoder_thread.get_measures()
+            json.dump(encoder_data, f)
+
+        time.sleep(1)
+        now = time.time()
+
+
+def take_lidar_measure():
     t = LidarThread()
     t.start()
     time.sleep(2)
-    store_data()
+    store_lidar_data(t)
     # print(t.get_measures())
     # time.sleep(3)
     t.close_connection()
     time.sleep(3)
     print(t.is_alive())
     # sys.exit(0)
+
+
+def take_lidar_and_encoder_measures():
+    t_lidar = LidarThread()
+    t_encoder = EncoderThread()
+    t_lidar.start()
+    t_encoder.start()
+    time.sleep(2)
+    store_lidar_and_encoder_data(t_lidar, t_encoder)
+    # print(t.get_measures())
+    # time.sleep(3)
+    t_lidar.close_connection()
+    t_encoder.close_connection()
+    time.sleep(3)
+    print(t_lidar.is_alive())
+    print(t_encoder.is_alive())
+    # sys.exit(0)
+
+
+if __name__ == "__main__":
+    take_lidar_and_encoder_measures()
