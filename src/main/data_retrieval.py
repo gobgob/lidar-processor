@@ -12,6 +12,7 @@ Received data must respect the following rules:
 """
 
 import socket
+import struct
 import time
 from threading import Thread
 import queue
@@ -54,6 +55,29 @@ class EncoderThread(Thread):
         self.encoder_socket.send(b'\xFF\x01\x01\x00')  # sign off info
         self.encoder_socket.send(b'\xFF\x02\x01\x00')  # sign off error
 
+    @staticmethod
+    def interpret_bytes(byte_list, field_list):
+        output = []
+        i = 0
+        for field in field_list:
+            try:
+                if field.type == int:
+                    val, = struct.unpack_from("<i", byte_list, i)
+                    i += struct.calcsize("<i")
+                elif field.type == float:
+                    val, = struct.unpack_from("<f", byte_list, i)
+                    i += struct.calcsize("<f")
+                elif field.type == bool:
+                    val, = struct.unpack_from("<?", byte_list, i)
+                    i += struct.calcsize("<?")
+                else:
+                    raise ValueError
+                output.append(val)
+            except (IndexError, struct.error, ValueError):
+                print("Byte list:", byte_list, "Field name:", field.name)
+                raise
+        return output
+
     def run(self):
         print("Connection on {}".format(lidar_port))
         current_measure = bytearray()
@@ -66,14 +90,16 @@ class EncoderThread(Thread):
                     if c == b"\xFF":
                         remaining_to_read -= 1
                 elif remaining_to_read == 55:
-                    if c == b"\x00":
-                        are_robot_position_measures = True
+                    are_robot_position_measures = c == b"\x00"
+                    remaining_to_read -= 1
+
                 elif are_robot_position_measures and remaining_to_read <= 54:
                     current_measure.append(c)
                     remaining_to_read -= 1
 
-                if remaining_to_read == 0:
+                elif remaining_to_read == 0:
                     remaining_to_read = 56
+                    # self.interpret_bytes(current_measure, )
                     processed_measure = split_encoder_data(current_measure)
                     self.measures.put(processed_measure)
                     current_measure = bytearray()

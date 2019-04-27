@@ -8,7 +8,7 @@ from numpy import array, eye
 from math import cos, sin
 from numpy.linalg import inv
 
-from src.constants import *
+from main.constants import *
 
 
 def ekf(te, y_k, x_kalm_prec, p_kalm_prec):

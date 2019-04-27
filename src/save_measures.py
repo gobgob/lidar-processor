@@ -3,7 +3,7 @@
 import os
 import time
 import json
-from src.main.data_retrieval import LidarThread, EncoderThread
+from main.data_retrieval import LidarThread, EncoderThread
 
 
 def store_lidar_data(t):

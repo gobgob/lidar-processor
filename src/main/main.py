@@ -5,9 +5,7 @@
 import time
 from typing import List
 
-import numpy as np
-
-from constants import *
+from main.constants import *
 import src.main.output_rendering as outr
 from src.main.data_retrieval import LidarThread
 from src.main.clustering import clusterize

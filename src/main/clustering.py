@@ -6,10 +6,9 @@ from typing import List
 
 __author__ = "Clément Besnier"
 
-import math
 import numpy as np
 from scipy.optimize import root
-from constants import *
+from main.constants import *
 
 
 class Cluster:

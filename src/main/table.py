@@ -9,9 +9,7 @@ from typing import List
 import numpy as np
 import matplotlib.pylab as pl
 
-from src.main.clustering import clusterize
 from scripts.check_clustering import main_clustering
-from src.constants import *
 
 
 class Point:

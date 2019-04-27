@@ -8,16 +8,12 @@ Hough transform is used to find lines in images;
 import math
 import numpy as np
 from skimage import io as skio
-from skimage import draw as skdr
-from skimage import transform as sktr
 import matplotlib.pylab as pl
-from collections import OrderedDict
 
-from src.constants import *
+from main.constants import *
 
-import src.main.output_rendering as outr
-import src.scripts.retrieve_measures as retm
-import src.scripts.retrieve_realistic_measures as retrm
+import main.output_rendering as outr
+import retrieve_realistic_measures as retrm
 
 __author__ = ["Clément Besnier", ]
 

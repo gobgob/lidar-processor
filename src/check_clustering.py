@@ -5,12 +5,12 @@
 import numpy as np
 import matplotlib.pyplot as pl
 
-from src.constants import *
-import src.main.main as mm
-import src.main.clustering as clus
-import src.main.output_rendering as outr
-from src.scripts.retrieve_realistic_measures import get_realistic_data
-from src.scripts.check_hough import display_polar_measures, display_measures
+from main.constants import *
+import main.main as mm
+import main.clustering as clus
+import main.output_rendering as outr
+from retrieve_realistic_measures import get_realistic_data
+
 __author__ = "Clément Besnier"
 
 
