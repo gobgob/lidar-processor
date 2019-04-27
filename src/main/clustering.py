@@ -8,6 +8,7 @@ __author__ = "Clément Besnier"
 
 import math
 import numpy as np
+from scipy.optimize import root
 from constants import *
 
 
@@ -51,6 +52,25 @@ class Cluster:
     def __len__(self):
         return len(self.points)
 
+    def is_a_circle(self, radius):
+        """
+        >>> cluster = Cluster()
+
+        :param radius:
+        :return:
+        """
+        def objective_function(x, y):
+            circle_position = np.array([x, y])
+            dist_sum = 0
+            for point in self.points:
+                dist_sum += (distance(point, circle_position) - radius)**2
+            return dist_sum
+        initial_guess = self.get_mean()
+        solution = root(objective_function, initial_guess, method="lm")
+
+        print("solution", solution.x)
+        print("error", solution.fun)
+
 
 def distance(point, other):
     diff = point - other
@@ -70,9 +90,9 @@ def distance_al_kashi(angle1, distance1, angle2, distance2):
     return np.sqrt(distance1**2+distance2**2 - 2*distance1*distance2*np.cos(angle2 - angle1))
 
 
-def cluster_distance(cluster, other):
+def cluster_distance_mean(cluster, other):
     """
-    >>> cluster_distance([np.array([1, 2]), np.array([-1, -2])], [np.array([0, 4]), np.array([0, 4])])
+    >>> cluster_distance_mean([np.array([1, 2]), np.array([-1, -2])], [np.array([0, 4]), np.array([0, 4])])
     4.0
 
     :param cluster:
@@ -82,6 +102,18 @@ def cluster_distance(cluster, other):
     cluster_mean = np.sum(cluster, axis=0)/len(cluster)
     other_mean = np.sum(other, axis=0)/len(other)
     return distance(cluster_mean, other_mean)
+
+
+def cluster_distance_closest(cluster, other):
+    """
+
+    :param cluster:
+    :param other:
+    :return:
+    """
+    dist1 = distance(cluster[0], other[-1])
+    dist2 = distance(cluster[-1], other[0])
+    return min([dist1, dist2])
 
 
 def clusterize(cartesian_measures: List[np.ndarray]):
@@ -98,12 +130,17 @@ def clusterize(cartesian_measures: List[np.ndarray]):
             n += 1
             clusters.append([])
         clusters[n].append(cartesian_measures[i])
+    if distance(cartesian_measures[0], cartesian_measures[-1]) <= minimum_distance_between_clusters:
+        clusters[-1].extend(clusters[0])
+        clusters[0] = clusters.pop()
+        n -= 1
 
     if len(clusters) > 1:
         j = 0
         k = 1
         while k < n:
-            dist_j = cluster_distance(clusters[j], clusters[k])
+            # dist_j = cluster_distance_mean(clusters[j], clusters[k])
+            dist_j = cluster_distance_closest(clusters[j], clusters[k])
             # if cluster barycenters are close enough to each other, then clusters are merged
             if dist_j < 200:
                 clusters[j].extend(clusters[k])
@@ -117,6 +154,11 @@ def clusterize(cartesian_measures: List[np.ndarray]):
                 if len(clusters[j - 1]) < minimum_points_in_cluster:
                     del clusters[j - 1]
                     n -= 1
+        # if cluster_distance_mean(clusters[0], clusters[-1]) < 200:
+        if cluster_distance_closest(clusters[0], clusters[-1]) < 200:
+            clusters[-1].extend(clusters[0])
+            clusters[0] = clusters.pop()
+
         means = []
         for cluster in clusters:
             mean_cluster = np.sum(cluster, axis=0) / len(cluster)
