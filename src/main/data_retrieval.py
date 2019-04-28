@@ -30,17 +30,27 @@ def split_turn(turn: List[str]):
     return [measure.split(":") for measure in "".join(turn).split(";") if measure]
 
 
-def split_encoder_data(encoder_measure: bytearray):
+def split_encoder_data(encoder_measure: bytes):
     """
     From an encoder measure to the position and orientation of robot with a timestamp.
+
+    >>> measure = b"\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01"
+    >>> x, y, theta, t = split_encoder_data(measure)
+    >>> x
+    16843009
+
+    >>> y
+    16843009
+
+    >>> theta
+    16843009
 
     :param encoder_measure:
     :return:
     """
-    decoded_turn = b"".join(encoder_measure).decode("utf8")
-    x = decoded_turn[:4]
-    y = decoded_turn[4:9]
-    orientation = decoded_turn[9:13]
+    x, = struct.unpack('i', encoder_measure[:4])
+    y, = struct.unpack('i', encoder_measure[4:8])
+    orientation, = struct.unpack('i', encoder_measure[8:12])
     return [x, y, orientation, time.time()]
 
 
@@ -54,29 +64,6 @@ class EncoderThread(Thread):
         self.encoder_socket.send(b'\xFF\x00\x01\x01')  # sign on odometry
         self.encoder_socket.send(b'\xFF\x01\x01\x00')  # sign off info
         self.encoder_socket.send(b'\xFF\x02\x01\x00')  # sign off error
-
-    @staticmethod
-    def interpret_bytes(byte_list, field_list):
-        output = []
-        i = 0
-        for field in field_list:
-            try:
-                if field.type == int:
-                    val, = struct.unpack_from("<i", byte_list, i)
-                    i += struct.calcsize("<i")
-                elif field.type == float:
-                    val, = struct.unpack_from("<f", byte_list, i)
-                    i += struct.calcsize("<f")
-                elif field.type == bool:
-                    val, = struct.unpack_from("<?", byte_list, i)
-                    i += struct.calcsize("<?")
-                else:
-                    raise ValueError
-                output.append(val)
-            except (IndexError, struct.error, ValueError):
-                print("Byte list:", byte_list, "Field name:", field.name)
-                raise
-        return output
 
     def run(self):
         print("Connection on {}".format(lidar_port))

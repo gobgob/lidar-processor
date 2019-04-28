@@ -8,7 +8,7 @@ from main.data_retrieval import LidarThread, EncoderThread
 
 def store_lidar_data(t):
     for i in range(20):
-        with open(os.path.join("lidar-process", "src", "samples", "data_"+str(i)+".json"), "w") as f:
+        with open(os.path.join("lidar-processor", "src", "samples", "data_"+str(i)+".json"), "w") as f:
             data = t.get_measures()
             json.dump(data, f)
         time.sleep(2)
@@ -20,7 +20,7 @@ def store_lidar_and_encoder_data(lidar_thread: LidarThread, encoder_thread: Enco
     now = time.time()
     while now - start_time < measureing_duration:
 
-        with open(os.path.join("lidar-process", "src", "samples", "lidar_data_" + str(now) + ".json"), "w") as f:
+        with open(os.path.join("lidar-processor", "src", "samples", "lidar_data_" + str(now) + ".json"), "w") as f:
             lidar_turn_data = lidar_thread.get_measures()
             json.dump(lidar_turn_data, f)
 
