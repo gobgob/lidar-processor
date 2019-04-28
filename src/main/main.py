@@ -8,12 +8,12 @@ import time
 from typing import List
 
 from main.constants import *
-import src.main.output_rendering as outr
-from src.main.data_retrieval import LidarThread
-from src.main.clustering import clusterize
-from src.main.tracking import track_clusters
-from src.main.self_locator import find_beacons
-from src.main.enemy_locator import find_robots
+import main.output_rendering as outr
+from main.data_retrieval import LidarThread
+from main.clustering import clusterize
+from main.tracking import track_clusters
+from main.self_locator import find_beacons
+from main.enemy_locator import find_robots
 
 __author__ = "Clément Besnier"
 

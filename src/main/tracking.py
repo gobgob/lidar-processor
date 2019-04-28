@@ -2,7 +2,7 @@
 
 """
 
-from src.main.clustering import Cluster
+from main.clustering import Cluster
 
 __author__ = "Clément Besnier"
 

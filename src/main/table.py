@@ -9,7 +9,7 @@ from typing import List
 import numpy as np
 import matplotlib.pylab as pl
 
-from scripts.check_clustering import main_clustering
+from check_clustering import main_clustering
 
 
 class Point:
@@ -236,12 +236,6 @@ class Square(Obstacle):
             positions.append(point)
         return Square(positions)
 
-    def check_visible_points(self, robot_point: Point):
-        vertices = []
-        # vertices.extend([ for obstacle in self.o])
-        #         # for vertex in self.positions:
-        #         #     pass
-
 
 class Table:
     def __init__(self):
@@ -305,7 +299,8 @@ class Table:
         yy.append(yy[0])
         pl.plot(xx, yy, "g-")
 
-    def plot(self):
+    @staticmethod
+    def plot():
         pl.show()
 
     def simulate_measure(self, measure_point: Point, angle: float, rho: float):

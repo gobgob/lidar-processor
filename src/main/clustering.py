@@ -39,6 +39,9 @@ class Cluster:
     def add_point(self, point):
         self.points.append(point)
 
+    def add_points(self, points):
+        self.points.extend(points)
+
     def distance(self, other):
         if isinstance(other, Cluster):
             cluster_mean = np.sum(self.points, axis=0) / len(self.points)
@@ -53,7 +56,18 @@ class Cluster:
 
     def is_a_circle(self, radius):
         """
+
+        >>> thetas = np.deg2rad(np.arange(0, 150, 6))
+        >>> real_x, real_y = (-420, 780)
+        >>> real_radius = 100
+        >>> xx = real_radius * np.cos(thetas) + real_x
+        >>> yy = real_radius * np.sin(thetas) + real_y
+        >>> import matplotlib.pyplot as plt
+        >>> plt.plot(xx, yy)
+        >>> points = [np.array([xx[i], yy[i]]) for i in range(len(xx))]
         >>> cluster = Cluster()
+        >>> cluster.add_points(points)
+        >>> cluster.is_a_circle(100)
 
         :param radius:
         :return:
@@ -65,6 +79,7 @@ class Cluster:
                 dist_sum += (distance(point, circle_position) - radius)**2
             return dist_sum
         initial_guess = self.get_mean()
+        # initial_guess = 0
         solution = root(objective_function, initial_guess, method="lm")
 
         print("solution", solution.x)

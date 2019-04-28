@@ -3,9 +3,9 @@
 import os
 import json
 
-from src import the_path
-
 DIRECTORY = "data"
+
+the_path = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_measure_directories():
