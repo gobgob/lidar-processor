@@ -10,6 +10,9 @@ import numpy as np
 import matplotlib.pylab as pl
 
 from check_clustering import main_clustering
+from main.main import remove_too_far_or_too_close
+from main.output_rendering import keep_good_measures
+from retrieve_realistic_measures import get_table_measures
 
 
 class Point:
@@ -208,7 +211,7 @@ class Square(Obstacle):
         pass
 
     def take_symmetric(self):
-        return [[-position.x, -position.y] for position in self.positions]
+        self.positions = [Point(-position.x, -position.y) for position in self.positions]
 
     def translate(self, vector: Vector):
         return Square([vector.apply_to_point(position) for position in self.positions])
@@ -321,6 +324,14 @@ class Table:
 
         # for i in range(len(thetas)):
         #     thetas[i]
+
+    def plot_lidar_measures(self, measures):
+        xx, yy = [], []
+
+        for measure in measures:
+            xx.append(measure[0])
+            yy.append(measure[1])
+        pl.plot(xx, yy, "r,")
 
     def plot_measures(self, measure_point: Point, vectors: List[Vector], robot_vector: Vector):
         for vector in vectors:
@@ -534,6 +545,41 @@ def main_4():
     # table.plot_obstacles()
     # table.plot_measures(measure, vectors, robot_vector)
     table.generate_measures(measure)
+    table.plot()
+
+
+def main_5():
+    table = Table()
+
+    table.add_edge_point(Point(-1500, 0))
+    table.add_edge_point(Point(1500, 0))
+    table.add_edge_point(Point(1500, 2000))
+    table.add_edge_point(Point(-1500, 2000))
+
+    samples = ["0_-1820_pi_over_2", "1210_1400_pi"]
+    measures = get_table_measures(samples[0])
+    for i in range(len(measures)):
+        one_turn_measure = keep_good_measures(measures[i], 100)
+        one_turn_measure = remove_too_far_or_too_close(one_turn_measure)
+
+    translation_vector = Vector()
+    translation_vector.set_coordinates(+1000, -1100)
+    table.translate(translation_vector)
+
+    rotation_angle = np.pi / 3
+    rotation_angle = 0.5
+    table.rotate(rotation_angle)
+
+    # measure = Point(0, 1800)
+    # measure = translation_vector.apply_to_point(measure)
+    # measure.rotate(rotation_angle)
+
+    table.init_plot()
+    table.plot_edges()
+    table.plot_measures()
+
+    # table.plot_obstacles()
+    # table.plot_measures(measure, vectors, robot_vector)
     table.plot()
 
 

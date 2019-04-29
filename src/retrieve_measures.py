@@ -4,7 +4,7 @@
 import os
 import json
 
-from src import the_path
+the_path = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_data():

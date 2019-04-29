@@ -8,6 +8,23 @@ DIRECTORY = "data"
 the_path = os.path.dirname(os.path.abspath(__file__))
 
 
+def get_table_measures(directory_name: str):
+    """
+
+    :param directory_name:
+    :return:
+    """
+    if os.path.exists(os.path.join("samples", directory_name)):
+        measures = []
+        for filename in os.listdir(os.path.join("samples", directory_name)):
+            with open(os.path.join("samples", directory_name, filename), "r") as f:
+                data = json.load(f)
+                measures.append([[float(k) for k in j] for j in data])
+        return measures
+    else:
+        return None
+
+
 def get_measure_directories():
     return [file for file in os.listdir(os.path.join(the_path, DIRECTORY))
             if os.path.isdir(os.path.join(the_path, DIRECTORY, file))]
