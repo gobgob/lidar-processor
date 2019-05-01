@@ -9,7 +9,8 @@ from typing import List
 
 from main.constants import *
 import main.output_rendering as outr
-from main.data_retrieval import LidarThread
+from main.data_retrieval import LidarThread, EncoderThread
+from main.communication import HLThread
 from main.clustering import clusterize
 from main.tracking import track_clusters
 from main.self_locator import find_beacons
@@ -33,12 +34,24 @@ def match_has_begun():
 
 def main():
     measuring = True
-    t = LidarThread()
-    t.start()
+
+    t_lidar = LidarThread()
+    t_lidar.start()
+
+    t_ll = EncoderThread()
+    t_ll.start()
+
+    t_hl = HLThread()
+    t_hl.start()
+
+    # TODO preparation before the match
+
     previous_clusters = []
     first = True
+
+    # TODO the match has just begun
     while measuring:
-        one_turn_measure = t.get_measures()
+        one_turn_measure = t_lidar.get_measures()
         one_turn_measure = outr.keep_good_measures(one_turn_measure, 30)
         one_turn_measure = remove_too_far_or_too_close(one_turn_measure)
         cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
@@ -55,7 +68,7 @@ def main():
             robots = find_robots(clusters)
         previous_clusters = clusters.copy()
         time.sleep(1)
-    t.close_connection()
+    t_lidar.close_connection()
     time.sleep(3)
     # sys.exit(0)
 

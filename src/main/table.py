@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pylab as pl
 
 from check_clustering import main_clustering
-from main.main import remove_too_far_or_too_close
+from main.main_script import remove_too_far_or_too_close
 from main.output_rendering import keep_good_measures
 from retrieve_realistic_measures import get_table_measures
 

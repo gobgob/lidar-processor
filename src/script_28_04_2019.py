@@ -6,7 +6,7 @@ Display measures
 """
 import numpy as np
 
-from main.main import remove_too_far_or_too_close
+from main.main_script import remove_too_far_or_too_close
 from main.table import Table, Point, Vector, Square
 from plot_measures import display_polar_measures
 from retrieve_realistic_measures import get_table_measures
@@ -91,4 +91,5 @@ def display_measures_and_table():
 
 
 if __name__ == "__main__":
-    display_measures_and_table()
+    # display_measures_and_table()
+    display_just_measures()

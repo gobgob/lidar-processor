@@ -4,6 +4,7 @@
 Log configuration
 Inspired by.
 """
+import enum
 
 angle_resolution = 0.3
 
@@ -34,3 +35,11 @@ minimum_distance_between_clusters = 80
 tmaxsel = 500
 tminsel = 500
 minimum_points_in_cluster = 5
+
+FIX_BEACON_RADIUS = 100
+ADVERSE_ROBOT_BEACON_RADIUS = 80
+
+
+class TeamColor(enum.Enum):
+    purple = enum.auto()
+    yellow = enum.auto()

@@ -18,6 +18,8 @@ class Cluster:
     def __init__(self):
         self.points = []
         self.mean = None
+        self.beacon_radius = FIX_BEACON_RADIUS
+        self.adverse_robot_radius = ADVERSE_ROBOT_BEACON_RADIUS
 
     def get_std(self):
         return np.std(self.points)
@@ -54,7 +56,7 @@ class Cluster:
     def __len__(self):
         return len(self.points)
 
-    def is_a_circle(self, radius):
+    def is_a_fix_beacon(self):
         """
 
         >>> thetas = np.deg2rad(np.arange(0, 150, 6))
@@ -62,28 +64,50 @@ class Cluster:
         >>> real_radius = 100
         >>> xx = real_radius * np.cos(thetas) + real_x
         >>> yy = real_radius * np.sin(thetas) + real_y
-        >>> import matplotlib.pyplot as plt
-        >>> plt.plot(xx, yy)
+
+        # >>> import matplotlib.pyplot as plt
+        # >>> l = plt.plot(xx, yy)
+
         >>> points = [np.array([xx[i], yy[i]]) for i in range(len(xx))]
         >>> cluster = Cluster()
         >>> cluster.add_points(points)
-        >>> cluster.is_a_circle(100)
+        >>> cluster.is_a_fix_beacon(100)
 
-        :param radius:
         :return:
         """
-        def objective_function(x, y):
-            circle_position = np.array([x, y])
-            dist_sum = 0
-            for point in self.points:
-                dist_sum += (distance(point, circle_position) - radius)**2
-            return dist_sum
+
         initial_guess = self.get_mean()
+        # print(type(initial_guess))
         # initial_guess = 0
-        solution = root(objective_function, initial_guess, method="lm")
+        solution = root(self._beacons_objective_function, initial_guess, method="lm")
 
         print("solution", solution.x)
         print("error", solution.fun)
+        return solution
+
+    def is_an_adverse_robot_beacon(self):
+        initial_guess = self.get_mean()
+        # print(type(initial_guess))
+        # initial_guess = 0
+        solution = root(self._adverse_objective_function, initial_guess, method="lm")
+
+        print("solution", solution.x)
+        print("error", solution.fun)
+        return solution
+
+    def _beacons_objective_function(self, pos):
+        # circle_position = np.array([x, y])
+        return self._objective_function(pos, self.beacon_radius)
+
+    def _objective_function(self, pos, radius):
+        circle_position = pos
+        dist_sum = 0
+        for point in self.points:
+            dist_sum += (distance(point, circle_position) - radius) ** 2
+        return dist_sum, 0
+
+    def _adverse_objective_function(self, pos):
+        return self._objective_function(pos, self.adverse_robot_radius)
 
 
 def distance(point, other):

@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as pl
 
 from main.constants import *
-import main.main as mm
+import main.main_script as mm
 import main.clustering as clus
 import main.output_rendering as outr
 from retrieve_realistic_measures import get_realistic_data
