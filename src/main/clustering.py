@@ -95,6 +95,23 @@ class Cluster:
         print("error", solution.fun)
         return solution
 
+    def is_a_circle(self, radius):
+        def objective_function(pos):
+            circle_position = pos
+            dist_sum = 0
+            for point in self.points:
+                dist_sum += (distance(point, circle_position) - radius) ** 2
+            return dist_sum, 0
+        initial_guess = self.get_mean()
+        # print(type(initial_guess))
+        # initial_guess = 0
+        solution = root(objective_function, initial_guess, method="lm")
+
+        print("solution", solution.x)
+        print("error", solution.fun)
+        return solution
+
+
     def _beacons_objective_function(self, pos):
         # circle_position = np.array([x, y])
         return self._objective_function(pos, self.beacon_radius)
