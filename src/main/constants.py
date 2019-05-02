@@ -35,6 +35,7 @@ minimum_distance_between_clusters = 80
 tmaxsel = 500
 tminsel = 500
 minimum_points_in_cluster = 5
+maximum_points_in_cluster = 50
 
 FIX_BEACON_RADIUS = 100
 ADVERSE_ROBOT_BEACON_RADIUS = 80

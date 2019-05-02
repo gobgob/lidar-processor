@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 
-
 """
 Display measures
 """
+
 import numpy as np
 
-from main.main_script import remove_too_far_or_too_close
+import main.data_cleansing as dacl
 from main.table import Table, Point, Vector, Square
 from plot_measures import display_polar_measures
 from retrieve_realistic_measures import get_table_measures
@@ -20,8 +20,8 @@ def display_just_measures():
     samples = ["0_-1820_pi_over_2", "1210_1400_pi", "-1210_1400_0"]
     measures = get_table_measures(samples[1])
     for i in range(len(measures)):
-        one_turn_measure = outr.keep_good_measures(measures[i], 100)
-        one_turn_measure = remove_too_far_or_too_close(one_turn_measure)
+        one_turn_measure = dacl.keep_good_measures(measures[i], 100)
+        one_turn_measure = dacl.remove_too_far_or_too_close(one_turn_measure)
         display_polar_measures(one_turn_measure)
 
 
@@ -44,8 +44,8 @@ def display_measures_and_table():
     measures = get_table_measures(samples[identifier])
     one_turn_measures = []
     for i in range(len(measures)):
-        one_turn_measure = outr.keep_good_measures(measures[i], 100)
-        one_turn_measure = remove_too_far_or_too_close(one_turn_measure)
+        one_turn_measure = dacl.keep_good_measures(measures[i], 100)
+        one_turn_measure = dacl.remove_too_far_or_too_close(one_turn_measure)
         one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
         one_turn_measures.append(one_turn_measure)
 

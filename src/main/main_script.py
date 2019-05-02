@@ -19,15 +19,6 @@ from main.enemy_locator import find_robots
 __author__ = "Clément Besnier"
 
 
-def remove_too_far_or_too_close(one_turn: List) -> List:
-    """
-
-    :param one_turn: list of [<angle>, <distance>, <quality>]
-    :return: list of [<angle>, <distance>]
-    """
-    return [measure for measure in one_turn if minimum_distance < measure[1] < maximum_distance]
-
-
 def main():
 
     t_lidar = LidarThread()

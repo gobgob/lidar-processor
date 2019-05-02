@@ -13,6 +13,7 @@ import matplotlib.pylab as pl
 from main.constants import *
 
 import main.output_rendering as outr
+import main.data_cleansing as dacl
 import retrieve_realistic_measures as retrm
 
 __author__ = ["Clément Besnier", ]
@@ -187,7 +188,7 @@ def reconstruct_image_with_lines_cartesian(cartesian_data, angles, dists):
 
 def measures_to_images(data):
     for i, measure in enumerate(data):
-        good_data = outr.keep_good_measures(measure, 30)
+        good_data = dacl.keep_good_measures(measure, 30)
 
         cartesian_good_data = outr.one_turn_to_cartesian_points(good_data)
 
@@ -209,7 +210,7 @@ def measures_to_accumulators_array(data):
     """
     print("-----------measures_to_accumulators_array-----------")
     for i, measure in enumerate(data):
-        good_data = outr.keep_good_measures(measure, 30)
+        good_data = dacl.keep_good_measures(measure, 30)
 
         cartesian_good_data = outr.one_turn_to_cartesian_points(good_data)
 
@@ -240,7 +241,7 @@ def measures_to_accumulators_dict(data):
     """
     print("-----------measures_to_accumulators_dict-----------")
     for i, measure in enumerate(data):
-        good_data = outr.keep_good_measures(measure, 30)
+        good_data = dacl.keep_good_measures(measure, 30)
 
         cartesian_good_data = outr.one_turn_to_cartesian_points(good_data)
 
@@ -282,6 +283,6 @@ if __name__ == "__main__":
 
     # display raw measures
     print("-----------Measures display-----------")
-    filtered_data = outr.keep_good_measures(measures[3], 30)
+    filtered_data = dacl.keep_good_measures(measures[3], 30)
     display_polar_measures(filtered_data)
     display_measures(filtered_data)

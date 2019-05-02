@@ -10,8 +10,7 @@ import numpy as np
 import matplotlib.pylab as pl
 
 from check_clustering import main_clustering
-from main.main_script import remove_too_far_or_too_close
-from main.output_rendering import keep_good_measures
+import main.data_cleansing as dacl
 from retrieve_realistic_measures import get_table_measures
 
 
@@ -559,8 +558,8 @@ def main_5():
     samples = ["0_-1820_pi_over_2", "1210_1400_pi"]
     measures = get_table_measures(samples[0])
     for i in range(len(measures)):
-        one_turn_measure = keep_good_measures(measures[i], 100)
-        one_turn_measure = remove_too_far_or_too_close(one_turn_measure)
+        one_turn_measure = dacl.keep_good_measures(measures[i], 100)
+        one_turn_measure = dacl.remove_too_far_or_too_close(one_turn_measure)
 
     translation_vector = Vector()
     translation_vector.set_coordinates(+1000, -1100)

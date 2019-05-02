@@ -13,16 +13,6 @@ import numpy as np
 from collections import defaultdict
 
 
-def keep_good_measures(turn: List, threshold: int):
-    """
-
-    :param turn: list of measures ; one measure is [angle (in rad), distance (in m), quality (from 0 to 47)]
-    :param threshold:
-    :return:
-    """
-    return [measure[:2] for measure in turn if measure[2] > threshold]
-
-
 def polar_to_x(measure: List):
     angle, distance = measure
     return distance*math.cos(math.radians(angle))
