@@ -81,8 +81,8 @@ class Cluster:
         # initial_guess = 0
         solution = root(self._beacons_objective_function, initial_guess, method="lm")
 
-        print("solution", solution.x)
-        print("error", solution.fun)
+        # print("solution", solution.x)
+        # print("error", solution.fun)
         return solution
 
     def is_an_adverse_robot_beacon(self):
@@ -91,8 +91,8 @@ class Cluster:
         # initial_guess = 0
         solution = root(self._adverse_objective_function, initial_guess, method="lm")
 
-        print("solution", solution.x)
-        print("error", solution.fun)
+        # print("solution", solution.x)
+        # print("error", solution.fun)
         return solution
 
     def is_a_circle(self, radius):
@@ -107,8 +107,8 @@ class Cluster:
         # initial_guess = 0
         solution = root(objective_function, initial_guess, method="lm")
 
-        print("solution", solution.x)
-        print("error", solution.fun)
+        # print("solution", solution.x)
+        # print("error", solution.fun)
         return solution
 
 
