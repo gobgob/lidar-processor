@@ -2,7 +2,9 @@
 
 """
 Communication with high level of the robot.
+The protocole is given at https://github.com/gobgob/chariot-elevateur/blob/master/doc/protocole-lidar-hl.txt
 """
+
 import queue
 import socket
 from threading import Thread
@@ -18,10 +20,15 @@ hl_port = 8765
 class HLThread(Thread):
     def __init__(self):
         Thread.__init__(self)
-        self.measuring = True
-        self.messages = queue.Queue(maxsize=10)
+        self.communicating = True
+        self.messages = queue.Queue(maxsize=1)
         self.hl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.hl_socket.connect((hl_host, hl_port))
+
+        self.match_has_begun = False
+        self.team_colour = None
+        self.match_stopped = False
+        # self.
 
     def ask_status(self):
         self.hl_socket.send("ASK_STATUS\n".encode("ascii"))
@@ -34,21 +41,22 @@ class HLThread(Thread):
         print("Connection on {}".format(hl_port))
         current_measure = []
 
-        while self.measuring:
+        while self.communicating:
             content = self.hl_socket.recv(100).decode("ascii")
             for c in content:
                 if c == '\n':
                     current_measure = "".join(current_measure)
                     if current_measure == "ACK":
-                        self.messages.put("ACK")
+                        # self.messages.put("ACK")
+                        pass
                     elif current_measure == "INIT VIOLET":
-                        self.messages.put(TeamColor.purple)
+                        self.team_colour = TeamColor.purple
                     elif current_measure == "INIT JAUNE":
-                        self.messages.put(TeamColor.yellow)
+                        self.team_colour = TeamColor.yellow
                     elif current_measure == "START":
-                        self.messages.put(current_measure)
+                        self.match_has_begun = True
                     elif current_measure == "STOP":
-                        self.messages.put(current_measure)
+                        self.match_stopped = True
 
                     current_measure = []
                 else:
@@ -56,11 +64,17 @@ class HLThread(Thread):
         print("connexion fermée")
 
     def get_measuring(self):
-        return self.measuring
+        return self.communicating
 
     def close_connection(self):
         self.hl_socket.close()
-        self.measuring = False
+        self.communicating = False
 
-    def get_measures(self):
-        return self.messages.get()
+    def has_match_begun(self):
+        return self.match_has_begun
+
+    def get_team_colour(self):
+        return self.team_colour
+
+    def has_match_stopped(self):
+        return self.match_stopped
