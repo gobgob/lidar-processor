@@ -26,11 +26,11 @@ def main_clustering():
     return clusters, means
 
 
-def plot_clustering(clusters):
+def plot_clustering(clusters, showing=True):
 
     # display measures through an array
     # display raw measures
-    print("-----------Measures display-----------")
+    # print("-----------Measures display-----------")
     # display_polar_measures(one_turn_measure)
     # display_measures(one_turn_measure)
 
@@ -68,15 +68,16 @@ def plot_clustering(clusters):
     for cluster_center in clusters:
         xx = []
         yy = []
-        print(len(cluster_center))
+        # print(len(cluster_center))
         for i in cluster_center:
             x = i[0]
             y = i[1]
             xx.append(x)
             yy.append(y)
             # pl.Circle((x, y), 30, color='b', fill=False)
-        pl.plot(xx, yy, '+')
-    pl.show()
+        pl.plot(xx, yy, '.')
+    if showing:
+        pl.show()
 
 
 if __name__ == "__main__":

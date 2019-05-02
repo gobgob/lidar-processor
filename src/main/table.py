@@ -66,7 +66,7 @@ class Vector:
         return np.sqrt(self.x ** 2 + self.y ** 2)
 
     def apply_to_point(self, point: Point):
-        print(point)
+        # print(point)
         return Point(point.x + self.x, point.y + self.y)
 
     def __str__(self):
@@ -171,7 +171,7 @@ class Segment:
         # print(numerator)
         # print(denominator)
         t = numerator / denominator
-        print("t", t)
+        # print("t", t)
         if 0 <= t <= 1:
             print("x: ", self.p1.x + t * (self.p2.x - self.p1.x))
             print("y: ", self.p1.y + t * (self.p2.y - self.p1.y))
@@ -308,14 +308,14 @@ class Table:
 
     def simulate_measure(self, measure_point: Point, angle: float, rho: float):
         # thetas = np.deg2rad(np.arange(0, 180, angle_resolution))
-        print(measure_point)
+        # print(measure_point)
         vectors = []
         for obstacle in self.obstacles:
             vec = Vector()
             vec.set_by_points(measure_point, obstacle.center)
             vectors.append(vec)
-            print(obstacle.center)
-            print(vec)
+            # print(obstacle.center)
+            # print(vec)
 
         robot_vector = Vector()
         robot_vector.set_coordinates(np.cos(angle) * rho, np.sin(angle) * rho)
@@ -369,7 +369,7 @@ class Table:
         #     yy.append(edge.p2.y)
         #     pl.plot(xx, yy, "m-")
 
-        print("len(vertices)", len(vertices))
+        # print("len(vertices)", len(vertices))
         for vertex in vertices:
             for edge in edges:
                 if vertex not in [edge.p1, edge.p2]:
@@ -387,7 +387,7 @@ class Table:
                         if edge in edges:
                             edges.remove(edge)
 
-        print("len(vertices)", len(vertices))
+        # print("len(vertices)", len(vertices))
         for vertex in vertices:
             s = Segment(robot_point, vertex)
             pl.plot([s.p1.x, s.p2.x], [s.p1.y, s.p2.y], "m-")
@@ -537,7 +537,7 @@ def main_4():
     # measure.rotate(rotation_angle)
 
     clusters = main_clustering()
-    print("clusters", clusters)
+    # print("clusters", clusters)
 
     table.init_plot()
     table.plot_edges()

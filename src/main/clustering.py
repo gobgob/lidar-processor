@@ -111,7 +111,6 @@ class Cluster:
         # print("error", solution.fun)
         return solution
 
-
     def _beacons_objective_function(self, pos):
         # circle_position = np.array([x, y])
         return self._objective_function(pos, self.beacon_radius)
