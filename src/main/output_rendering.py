@@ -12,6 +12,8 @@ import math
 import numpy as np
 from collections import defaultdict
 
+__author__ = "Clément Besnier"
+
 
 def polar_to_x(measure: List):
     angle, distance = measure

@@ -1,13 +1,15 @@
+#!/usr/bin/python3
 """
 
 """
+from typing import List
 
 from main.clustering import Cluster
 
 __author__ = "Clément Besnier"
 
 
-def track_clusters(previous_clusters: Cluster, current_clusters: Cluster):
+def track_clusters(previous_clusters: List[Cluster], current_clusters: List[Cluster]):
     """
 
     :param previous_clusters:

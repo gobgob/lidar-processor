@@ -4,11 +4,13 @@
 """
 from typing import List
 
-__author__ = "Clément Besnier"
 
 import numpy as np
 from scipy.optimize import root
 from main.constants import *
+
+
+__author__ = "Clément Besnier"
 
 
 class Cluster:

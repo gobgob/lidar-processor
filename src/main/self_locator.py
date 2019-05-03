@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 """
 
 At the beginning, we know the position of the robot and immobile beacons.

@@ -4,30 +4,31 @@
 
 
 """
+
 import time
-from typing import List
 
 from main.constants import *
 import main.output_rendering as outr
-from main.data_retrieval import LidarThread, EncoderThread
-from main.communication import HLThread
-from main.clustering import clusterize
-from main.tracking import track_clusters
-from main.self_locator import find_beacons
-from main.enemy_locator import find_robots
+import main.data_retrieval as datr
+import main.data_cleansing as dacl
+import main.communication as comm
+import main.clustering as clus
+import main.tracking as trac
+import main.self_locator as sloc
+import main.enemy_locator as eloc
 
 __author__ = "Clément Besnier"
 
 
 def main():
 
-    t_lidar = LidarThread()
+    t_lidar = datr.LidarThread()
     t_lidar.start()
 
-    t_ll = EncoderThread()
+    t_ll = datr.EncoderThread()
     t_ll.start()
 
-    t_hl = HLThread()
+    t_hl = comm.HLThread()
     t_hl.start()
 
     # TODO preparation before the match
@@ -46,24 +47,24 @@ def main():
 
     previous_clusters = []
     one_turn_measure = t_lidar.get_measures()
-    one_turn_measure = outr.keep_good_measures(one_turn_measure, 30)
-    one_turn_measure = remove_too_far_or_too_close(one_turn_measure)
+    one_turn_measure = dacl.keep_good_measures(one_turn_measure, 30)
+    one_turn_measure = dacl.remove_too_far_or_too_close(one_turn_measure)
     cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
-    clusters = clusterize(cartesian_one_turn_measure)
-    beacons, robots = track_clusters(previous_clusters, clusters)
+    clusters = clus.clusterize(cartesian_one_turn_measure)
+    beacons, robots = trac.track_clusters(previous_clusters, clusters)
 
     # TODO the match has just begun
     while not t_hl.has_match_stopped():
         one_turn_measure = t_lidar.get_measures()
-        one_turn_measure = outr.keep_good_measures(one_turn_measure, 30)
-        one_turn_measure = remove_too_far_or_too_close(one_turn_measure)
+        one_turn_measure = dacl.keep_good_measures(one_turn_measure, 30)
+        one_turn_measure = dacl.remove_too_far_or_too_close(one_turn_measure)
         cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
-        clusters = clusterize(cartesian_one_turn_measure)
+        clusters = clus.clusterize(cartesian_one_turn_measure)
         print(clusters)
 
         # TODO determine the position of beacons and adverse robot just with the last measure
-        beacons = find_beacons(clusters)
-        robots = find_robots(clusters)
+        beacons = sloc.find_beacons(clusters)
+        robots = eloc.find_robots(clusters)
         previous_clusters = clusters.copy()
         time.sleep(1)
     t_lidar.close_connection()

@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Table with LiDAR obstacles.
 """
@@ -12,6 +13,9 @@ import matplotlib.pylab as pl
 from check_clustering import main_clustering
 import main.data_cleansing as dacl
 from retrieve_realistic_measures import get_table_measures
+
+
+__author__ = "Clément Besnier"
 
 
 class Point:

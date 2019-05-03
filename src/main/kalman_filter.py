@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-Inspired by.
+Inspired by https://github.com/hermes-project/lidar.
 """
 
 from numpy import array, eye
@@ -9,6 +9,8 @@ from math import cos, sin
 from numpy.linalg import inv
 
 from main.constants import *
+
+__author__ = ["https://github.com/hermes-project/lidar", ]
 
 
 def ekf(te, y_k, x_kalm_prec, p_kalm_prec):

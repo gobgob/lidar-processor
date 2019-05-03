@@ -4,14 +4,25 @@
 Log configuration
 Inspired by.
 """
+
+import os
+import sys
 import enum
 
+__author__ = "Clément Besnier"
+
+PROJECT_NAME = "lidar-processor"
+# Useful in case we don't run the code in the right directory.
+own_path = os.path.join(os.getenv("HOME"), PROJECT_NAME)
+sys.path.append(own_path)
+# region LiDAR settings
 angle_resolution = 0.3
+# endregion
 
 tolerance_predicted_fixe_r = 2
 tolerance_predicted_fixe_theta = 2
 tolerance_predicted_fixe = [tolerance_predicted_fixe_r, tolerance_predicted_fixe_theta]
-# [distance en mm, angle en radian]
+# [distance in mm, angle in radian]
 tolerance_kalman_r = 100
 tolerance_kalman_theta = 100
 tolerance_kalman = [tolerance_kalman_r, tolerance_kalman_theta]
