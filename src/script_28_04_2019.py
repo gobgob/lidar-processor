@@ -21,7 +21,7 @@ def display_just_measures():
     measures = get_table_measures(samples[1])
     for i in range(len(measures)):
         one_turn_measure = dacl.keep_good_measures(measures[i], 100)
-        one_turn_measure = dacl.remove_too_far_or_too_close(one_turn_measure)
+        one_turn_measure = dacl.keep_not_too_far_or_not_too_close(one_turn_measure)
         display_polar_measures(one_turn_measure)
 
 
@@ -45,7 +45,7 @@ def display_measures_and_table():
     one_turn_measures = []
     for i in range(len(measures)):
         one_turn_measure = dacl.keep_good_measures(measures[i], 100)
-        one_turn_measure = dacl.remove_too_far_or_too_close(one_turn_measure)
+        one_turn_measure = dacl.keep_not_too_far_or_not_too_close(one_turn_measure)
         one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
         one_turn_measures.append(one_turn_measure)
 

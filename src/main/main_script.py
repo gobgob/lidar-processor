@@ -31,24 +31,35 @@ def main():
     t_hl = comm.HLThread()
     t_hl.start()
 
-    # TODO preparation before the match
+    time.sleep(3)
+
+    start_enemy_positions = []
+
+    one_turn_points = dacl.filter_points(t_lidar.get_measures(), 50)
+    one_turn_clusters = clus.clusterize(one_turn_points)
+
     while not t_hl.has_match_begun():
         # team colour
         if t_hl.get_team_colour() is not None:
             if t_hl.get_team_colour() == TeamColor.purple:
-                start_position = [1, 2]
+                start_enemy_positions = eloc.find_robots_in_purple_zone(one_turn_clusters)
             elif t_hl.get_team_colour() == TeamColor.yellow:
-                start_position = [1, 3]
-        # TODO measure and compute the positions of the adverse robots
-        # TODO send the position
-            x, y, r, i = 0, 0, 100, 1
+                start_enemy_positions = eloc.find_robot_in_yellow_zone(one_turn_clusters)
 
-            t_hl.send_robot_position(x, y, r, i, int(time.time()))
+            one_turn_points = dacl.filter_points(t_lidar.get_measures(), 50)
+            cartesian_one_turn_points = outr.one_turn_to_cartesian_points(one_turn_points)
+            one_turn_clusters = clus.clusterize(cartesian_one_turn_points)
+
+            beacon_positions = sloc.find_beacons(one_turn_clusters)
+            self_position = sloc.find_own_position(beacon_positions)
+            t_ll.send_self_position(self_position)
+            for enemy_position in start_enemy_positions:
+                t_hl.send_robot_position(*enemy_position)
 
     previous_clusters = []
     one_turn_measure = t_lidar.get_measures()
     one_turn_measure = dacl.keep_good_measures(one_turn_measure, 30)
-    one_turn_measure = dacl.remove_too_far_or_too_close(one_turn_measure)
+    one_turn_measure = dacl.keep_not_too_far_or_not_too_close(one_turn_measure)
     cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
     clusters = clus.clusterize(cartesian_one_turn_measure)
     beacons, robots = trac.track_clusters(previous_clusters, clusters)
@@ -57,7 +68,7 @@ def main():
     while not t_hl.has_match_stopped():
         one_turn_measure = t_lidar.get_measures()
         one_turn_measure = dacl.keep_good_measures(one_turn_measure, 30)
-        one_turn_measure = dacl.remove_too_far_or_too_close(one_turn_measure)
+        one_turn_measure = dacl.keep_not_too_far_or_not_too_close(one_turn_measure)
         cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
         clusters = clus.clusterize(cartesian_one_turn_measure)
         print(clusters)

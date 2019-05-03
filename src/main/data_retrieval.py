@@ -105,6 +105,14 @@ class EncoderThread(Thread):
     def get_measures(self):
         return self.measures.get()
 
+    def send_self_position(self, self_position):
+        """
+        TODO
+        :param: self_position
+        :return:
+        """
+        self.encoder_socket.send(b'')
+
 
 class LidarThread(Thread):
     def __init__(self):

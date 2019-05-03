@@ -563,7 +563,7 @@ def main_5():
     measures = get_table_measures(samples[0])
     for i in range(len(measures)):
         one_turn_measure = dacl.keep_good_measures(measures[i], 100)
-        one_turn_measure = dacl.remove_too_far_or_too_close(one_turn_measure)
+        one_turn_measure = dacl.keep_not_too_far_or_not_too_close(one_turn_measure)
 
     translation_vector = Vector()
     translation_vector.set_coordinates(+1000, -1100)

@@ -19,3 +19,21 @@ def find_robots(cluster: List[Cluster]):
         if np.numeric.isclose(solution.fun,  0.0001):
             robots.append(solution.x)
     return robots
+
+
+def find_robots_in_purple_zone(clusters: List[Cluster]) -> np.ndarray:
+    """
+
+    :param clusters:
+    :return: x, y, radius, index, timestamp
+    """
+    return None
+
+
+def find_robot_in_yellow_zone(clusters: List[Cluster]) -> np.ndarray:
+    """
+
+    :param clusters:
+    :return: x, y, radius, index, timestamp
+    """
+    return None

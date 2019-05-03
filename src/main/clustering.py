@@ -223,5 +223,9 @@ def clusterize(cartesian_measures: List[np.ndarray]):
         return clusters, means
 
 
+def compute_clusters(one_turn_measure: List):
+    return
+
+
 if __name__ == "__main__":
     pass
