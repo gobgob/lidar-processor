@@ -14,6 +14,24 @@ from main.constants import *
 __author__ = "Clément Besnier"
 
 
+class Beacon:
+    def __init__(self):
+        self.radius = 0
+        self.x_center = 0
+        self.y_center = 0
+        self.index = 0
+        self.cluster = None
+
+    def set_parameters(self, x: int, y: int, r: int, i: int):
+        self.x_center = x
+        self.y_center = y
+        self.radius = r
+        self.index = i
+
+    def set_cluster(self, cluster):
+        self.cluster = cluster
+
+
 class Cluster:
     """
     Cluster of points. May be an obstacle or a beacon.
@@ -74,7 +92,7 @@ class Cluster:
         >>> points = [np.array([xx[i], yy[i]]) for i in range(len(xx))]
         >>> cluster = Cluster()
         >>> cluster.add_points(points)
-        >>> cluster.is_a_fix_beacon(100)
+        >>> cluster.is_a_fix_beacon()
 
         :return:
         """
@@ -86,7 +104,12 @@ class Cluster:
 
         # print("solution", solution.x)
         # print("error", solution.fun)
-        return solution
+        beacon = None
+        if np.numeric.isclose(solution.fun) < TOLERANCE_FOR_CIRCLE_COHERENCE:
+            beacon = Beacon()
+            beacon.set_parameters(solution.x[0], solution.x[1], FIX_BEACON_RADIUS, 0)
+            beacon.set_cluster(self)
+        return beacon
 
     def is_an_opponent_robot_beacon(self):
         initial_guess = self.get_mean()
@@ -96,7 +119,11 @@ class Cluster:
 
         # print("solution", solution.x)
         # print("error", solution.fun)
-        return solution
+        beacon = None
+        if solution.fun < TOLERANCE_FOR_CIRCLE_COHERENCE:
+            beacon = Beacon()
+            beacon.set_parameters(solution.x[0], solution.x[1], OPPONENT_ROBOT_BEACON_RADIUS, 0)
+        return beacon
 
     def is_a_circle(self, radius):
         def objective_function(pos):
