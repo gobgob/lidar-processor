@@ -13,7 +13,8 @@ from typing import List
 
 import numpy as np
 
-from main.clustering import Cluster
+from main.constants import *
+from main.clustering import Cluster, Beacon
 
 __author__ = "Clément Besnier"
 
@@ -26,20 +27,29 @@ def find_beacons(cluster: List[Cluster]):
     """""
     fix_beacons = []
     for cluster in cluster:
-        solution = cluster.is_a_fix_beacon()
-        if np.numeric.isclose(solution.fun,  0.0001):
-            fix_beacons.append(solution.x)
+        beacon = cluster.is_a_fix_beacon()
+        if beacon:
+            fix_beacons.append(beacon)
     return fix_beacons
 
 
-def find_own_position(beacon_positions: List[np.ndarray]) -> List[int, int, int, int, float]:
+def find_own_position(beacons: List[Beacon], own_colour_team: TeamColor) -> List[int, int]:
     """
 
-    :param beacon_positions: list of positions of the 3 beacons.
+
+    :param beacons: list of the 3 beacons.
+    :param own_colour_team:
     :return: [first space coordinate of the robot, second space coordinate of the robot, radius of the robot,
     index of the robot, timestamp]
     """
-    x, y, r, i, t = 0, 0, 0, 0, time.time()
-    # TODO write the code!!!!!!! Of course.
 
-    return [x, y, r, i, t]
+    for beacon in beacons:
+        # TODO imporve it, because I need to get polar coordinates to do it correctly
+        if own_colour_team == TeamColor.orange:
+            x = beacons_orange[beacon.index][0] - beacon.cluster
+            y = beacons_orange[beacon.index][1]
+            print(x, y)
+        elif own_colour_team == TeamColor.purple:
+            x = beacons_purple[beacon.index][0]
+            y = beacons_purple[beacon.index][1]
+            print(x, y)
