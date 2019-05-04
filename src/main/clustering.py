@@ -174,6 +174,10 @@ def distance_al_kashi(angle1, distance1, angle2, distance2):
     return np.sqrt(distance1**2+distance2**2 - 2*distance1*distance2*np.cos(angle2 - angle1))
 
 
+def polar_distance(polar_measure_1, polar_measure_2):
+    return distance_al_kashi(polar_measure_1[0], polar_measure_1[1], polar_measure_2[0], polar_measure_2[1])
+
+
 def cluster_distance_mean(cluster, other):
     """
     >>> cluster_distance_mean([np.array([1, 2]), np.array([-1, -2])], [np.array([0, 4]), np.array([0, 4])])
@@ -200,10 +204,61 @@ def cluster_distance_closest(cluster, other):
     return min([dist1, dist2])
 
 
+def polar_clusterize(polar_measures):
+    """
+
+        :param polar_measures: Polar coordinates
+        :return:
+        """
+    n = 0
+    clusters = [[polar_measures[0]]]
+
+    for i in range(1, len(polar_measures) - 1):
+        if polar_distance(polar_measures[i - 1], polar_measures[i]) > minimum_distance_between_clusters:
+            n += 1
+            clusters.append([])
+        clusters[n].append(polar_measures[i])
+    if polar_distance(polar_measures[0], polar_measures[-1]) <= minimum_distance_between_clusters:
+        clusters[-1].extend(clusters[0])
+        clusters[0] = clusters.pop()
+        n -= 1
+
+    if len(clusters) > 1:
+        j = 0
+        k = 1
+        while k < n:
+            # dist_j = cluster_distance_mean(clusters[j], clusters[k])
+            dist_j = cluster_distance_closest(clusters[j], clusters[k])
+            # if cluster barycenters are close enough to each other, then clusters are merged
+            if dist_j < 200:
+                clusters[j].extend(clusters[k])
+                del clusters[k]
+                n -= 1
+            else:
+                # if the j'th and k'th are far enough, then, they are just different clusters
+                j += 1
+                k += 1
+                # if a cluster has too few points, then it is deleted
+                if len(clusters[j - 1]) < minimum_points_in_cluster:
+                    del clusters[j - 1]
+                    n -= 1
+        # if cluster_distance_mean(clusters[0], clusters[-1]) < 200:
+        if cluster_distance_closest(clusters[0], clusters[-1]) < 200:
+            clusters[-1].extend(clusters[0])
+            clusters[0] = clusters.pop()
+
+        means = []
+        for cluster in clusters:
+            mean_cluster = np.sum(cluster, axis=0) / len(cluster)
+            means.append(mean_cluster)
+            # print(mean_cluster)
+        return clusters, means
+
+
 def clusterize(cartesian_measures: List[np.ndarray]):
     """
 
-    :param cartesian_measures: Cartseian coordinates
+    :param cartesian_measures: Cartesian coordinates
     :return:
     """
     n = 0
