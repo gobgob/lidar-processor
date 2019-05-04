@@ -97,7 +97,7 @@ class EncoderThread(Thread):
         return self.measuring
 
     def close_connection(self):
-        self.encoder_socket.send(b'0xFF 0x00 0x01 0x00')
+        self.encoder_socket.send(b'\xFF\x00\x01\x00')
         time.sleep(1)
         self.encoder_socket.close()
         self.measuring = False
