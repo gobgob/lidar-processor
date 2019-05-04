@@ -13,11 +13,14 @@ __author__ = "Clément Besnier"
 
 PROJECT_NAME = "lidar-processor"
 # Useful in case we don't run the code in the right directory.
-own_path = os.path.join(os.getenv("HOME"), PROJECT_NAME)
+home_path = os.getenv("HOME") if os.getenv("HOME") is not None else "C:/Users/Clément/PycharmProjects/"
+own_path = os.path.join(home_path, PROJECT_NAME)
 sys.path.append(own_path)
 # region LiDAR settings
 angle_resolution = 0.3
 # endregion
+
+TIME_RESOLUTION_ENCODER = 0.02
 
 THRESHOLD_QUALITY = 30
 
@@ -50,13 +53,17 @@ tminsel = 500
 minimum_points_in_cluster = 5
 maximum_points_in_cluster = 50
 
+TOLERANCE_FOR_CIRCLE_COHERENCE = 100
+
 FIX_BEACON_RADIUS = 100
 OPPONENT_ROBOT_BEACON_RADIUS = 80
+
+too_much_angle_shift = 2  # in degree
 
 
 class TeamColor(enum.Enum):
     purple = enum.auto()
-    yellow = enum.auto()
+    orange = enum.auto()
 
 
 # region start position
@@ -82,3 +89,32 @@ PURPLE_START_ZONE = [[1050, 1700],  # upper left
                      [1500, 1700]  # lower right
                      ]
 # endregion
+
+# region beacons
+beacon_1_orange = [[-1500 - 100, 2000],  # upper left
+                   [-1500, 2000 - 100]  # lower right
+                   ]
+
+beacon_2_orange = [[1500, 1000 + 50],  # upper left
+                   [1500 + 100, 1000 - 50]  # lower right
+                   ]
+
+beacon_3_orange = [[-1500 - 100, 0 + 100],  # upper left
+                   [-1500, 0]  # lower right
+                   ]
+
+beacons_orange = [beacon_1_orange, beacon_2_orange, beacon_3_orange]
+
+beacon_1_purple = [[1500, 2000],  # upper left
+                   [-1500 - 100, 2000 - 100]  # lower right
+                   ]
+
+beacon_2_purple = [[-1500-100, 1000 + 50],  # upper left
+                   [-1500, 1000 - 50]  # lower right
+                   ]
+
+beacon_3_purple = [[1500, 100],  # upper left
+                   [1500+100, 0]  # lower right
+                   ]
+
+beacons_purple = [beacon_1_purple, beacon_2_purple, beacon_3_purple]
