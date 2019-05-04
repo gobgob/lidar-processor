@@ -1,6 +1,7 @@
+#!/usr/bin/python3
+
 """
-
-
+Clustering module.
 """
 from typing import List
 
@@ -21,7 +22,7 @@ class Cluster:
         self.points = []
         self.mean = None
         self.beacon_radius = FIX_BEACON_RADIUS
-        self.adverse_robot_radius = ADVERSE_ROBOT_BEACON_RADIUS
+        self.adverse_robot_radius = OPPONENT_ROBOT_BEACON_RADIUS
 
     def get_std(self):
         return np.std(self.points)
@@ -87,7 +88,7 @@ class Cluster:
         # print("error", solution.fun)
         return solution
 
-    def is_an_adverse_robot_beacon(self):
+    def is_an_opponent_robot_beacon(self):
         initial_guess = self.get_mean()
         # print(type(initial_guess))
         # initial_guess = 0
@@ -221,10 +222,6 @@ def clusterize(cartesian_measures: List[np.ndarray]):
             means.append(mean_cluster)
             # print(mean_cluster)
         return clusters, means
-
-
-def compute_clusters(one_turn_measure: List):
-    return
 
 
 if __name__ == "__main__":
