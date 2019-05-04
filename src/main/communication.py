@@ -52,7 +52,7 @@ class HLThread(Thread):
                     elif current_measure == "INIT VIOLET":
                         self.team_colour = TeamColor.purple
                     elif current_measure == "INIT JAUNE":
-                        self.team_colour = TeamColor.yellow
+                        self.team_colour = TeamColor.orange
                     elif current_measure == "START":
                         self.match_has_begun = True
                     elif current_measure == "STOP":
