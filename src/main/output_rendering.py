@@ -30,7 +30,7 @@ def cartesian_to_polar(cartesian):
     if x != 0:
         if x > 0 and y >= 0:
             angle = math.atan(y / x)
-        elif x > 0 and y < 0:
+        elif x > 0 > y:
             angle = math.atan(y / x) + 2*math.pi
         elif x < 0:
             angle = math.atan(y / x) + math.pi

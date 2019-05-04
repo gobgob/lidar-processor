@@ -117,7 +117,7 @@ class Segment:
     def get_y_difference(self):
         return self.y_difference
 
-    def collide(self, other: Segment):
+    def collide(self, other):
         """
         if denominator are of same sign and numerator is lesser than denominator, then the segments collide
 
