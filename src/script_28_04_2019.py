@@ -7,7 +7,8 @@ Display measures
 import numpy as np
 
 import main.data_cleansing as dacl
-from main.table import Table, Point, Vector, Square
+from main.geometry import Point, Vector
+from main.table import Table, Square
 from plot_measures import display_polar_measures
 from retrieve_realistic_measures import get_table_measures
 
@@ -58,9 +59,9 @@ def display_measures_and_table():
                        Point(1500, 1000 - 50)])
     beacon_3 = Square([Point(-1500 - 100, 0 + 100), Point(-1500, 0 + 100), Point(-1500, 0), Point(-1500 - 100, 0)])
 
-    beacon_1.take_symmetric()
-    beacon_2.take_symmetric()
-    beacon_3.take_symmetric()
+    # beacon_1.take_symmetric()
+    # beacon_2.take_symmetric()
+    # beacon_3.take_symmetric()
 
     table.add_square_obstacle(beacon_1)
     table.add_square_obstacle(beacon_2)
@@ -71,11 +72,11 @@ def display_measures_and_table():
     table.add_edge_point(Point(1500, 2000))
     table.add_edge_point(Point(-1500, 2000))
 
-    table.translate(translation_vectors[identifier])
+    # table.translate(translation_vectors[identifier])
 
-    rotation_angle = np.pi
     # rotation_angle = 0.5
-    table.rotate(rotation_angle)
+    # rotation_angle = np.pi/2
+    # table.rotate(rotation_angle)
 
     # measure = Point(0, 1800)
     # measure = translation_vector.apply_to_point(measure)
