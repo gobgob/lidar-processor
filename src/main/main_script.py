@@ -37,6 +37,7 @@ def main():
 
     # region # variable initialisation
     start_enemy_positions = []
+    own_colour_team = None
     computed_opponent_robot_position = False
     previous_clusters = queue.Queue(3)
     previous_beacons = queue.Queue(3)
@@ -55,10 +56,12 @@ def main():
             if t_hl.get_team_colour() == TeamColor.purple:
                 start_enemy_positions = eloc.find_robots_in_purple_zone(one_turn_clusters)
                 computed_opponent_robot_position = True
+                own_colour_team = TeamColor.purple
 
-            elif t_hl.get_team_colour() == TeamColor.yellow:
+            elif t_hl.get_team_colour() == TeamColor.orange:
                 start_enemy_positions = eloc.find_robot_in_orange_zone(one_turn_clusters)
                 computed_opponent_robot_position = True
+                own_colour_team = TeamColor.orange
 
             # retrieves and filters measures
             one_turn_points = dacl.filter_points(t_lidar.get_measures(), 50)
@@ -68,8 +71,8 @@ def main():
             # find beacons position
             beacon_positions = sloc.find_beacons(one_turn_clusters)
             # find own position
-            self_position = sloc.find_own_position(beacon_positions)
-            t_ll.send_self_position(self_position)
+            self_position = sloc.find_own_position(beacon_positions, own_colour_team)
+            t_ll.send_position_shift(self_position)
 
             # send the positions of the opponent robots
             if computed_opponent_robot_position:
@@ -86,9 +89,13 @@ def main():
         previous_clusters.put(clusters)
         # endregion
 
+        # region # retrieves position from encoders
+        proprioceptive_position = datr.from_encoder_position_to_lidar_measure(*t_ll.get_measures())
+        # endregion
+
         # region # estimations of positions
         beacons = sloc.find_beacons(clusters)
-        own_position = sloc.find_own_position(beacons)
+        own_position = sloc.find_own_position(beacons, own_colour_team)
         robots = eloc.find_robots(clusters)
         # endregion
 
@@ -97,6 +104,8 @@ def main():
         previous_opponent_robots.put(robots.copy())
         previous_self_positions.put(own_position.copy())
 
+        if datr.are_encoder_measures_and_lidar_measures_different(proprioceptive_position, own_position):
+            t_ll.send_position_shift(proprioceptive_position - own_position)  # convention
         time.sleep(1)
     # endregion
 
