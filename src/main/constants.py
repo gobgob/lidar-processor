@@ -19,6 +19,8 @@ sys.path.append(own_path)
 angle_resolution = 0.3
 # endregion
 
+THRESHOLD_QUALITY = 30
+
 tolerance_predicted_fixe_r = 2
 tolerance_predicted_fixe_theta = 2
 tolerance_predicted_fixe = [tolerance_predicted_fixe_r, tolerance_predicted_fixe_theta]
@@ -49,9 +51,34 @@ minimum_points_in_cluster = 5
 maximum_points_in_cluster = 50
 
 FIX_BEACON_RADIUS = 100
-ADVERSE_ROBOT_BEACON_RADIUS = 80
+OPPONENT_ROBOT_BEACON_RADIUS = 80
 
 
 class TeamColor(enum.Enum):
     purple = enum.auto()
     yellow = enum.auto()
+
+
+# region start position
+PURPLE_SELF_X = 1210
+PURPLE_SELF_Y = 1400
+PURPLE_SELF_THETA = 3.14
+
+ORANGE_SELF_X = -1200
+ORANGE_SELF_Y = 1400
+ORANGE_SELF_THETA = 0
+# endregion
+
+# region opponent robot
+ORANGE_START_ZONE = [[-1500, 1700],  # upper left
+                     # [-1500, 1100],
+                     [-1050, 1100],  # lower right
+                     # [-1050, 1700],
+                     ]
+
+PURPLE_START_ZONE = [[1050, 1700],  # upper left
+                     # [1050, 1100],
+                     # [1500, 1100],
+                     [1500, 1700]  # lower right
+                     ]
+# endregion
