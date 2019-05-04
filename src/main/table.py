@@ -58,7 +58,7 @@ class Square(Obstacle):
         pass
 
     def take_symmetric(self):
-        self.positions = [geom.Point(-position.x, -position.y) for position in self.positions]
+        self.positions = [geom.Point(-position.x, position.y) for position in self.positions]
 
     def translate(self, vector: geom.Vector):
         return Square([vector.apply_to_point(position) for position in self.positions])
