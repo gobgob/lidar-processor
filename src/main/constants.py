@@ -105,8 +105,8 @@ beacon_3_orange = [[-1500 - 100, 0 + 100],  # upper left
 
 beacons_orange = [beacon_1_orange, beacon_2_orange, beacon_3_orange]
 
-beacon_1_purple = [[1500, 2000],  # upper left
-                   [-1500 - 100, 2000 - 100]  # lower right
+beacon_1_purple = [[1500+100, 2000],  # upper left
+                   [1500, 2000 - 100]  # lower right
                    ]
 
 beacon_2_purple = [[-1500-100, 1000 + 50],  # upper left

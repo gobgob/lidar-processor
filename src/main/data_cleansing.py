@@ -39,7 +39,7 @@ def keep_not_too_far_or_not_too_close(one_turn: List) -> List:
 
 
 def filter_points(one_turn: List, threshold: Union[int, float]) -> List:
-    return [measure for measure in one_turn if filter_keep_not_too_far_or_not_too_close(measure) and
+    return [measure[:2] for measure in one_turn if filter_keep_not_too_far_or_not_too_close(measure) and
             filter_keep_good_measure(measure, threshold)]
 
 

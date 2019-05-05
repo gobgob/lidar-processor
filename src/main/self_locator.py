@@ -33,7 +33,7 @@ def find_beacons(cluster: List[Cluster]):
     return fix_beacons
 
 
-def find_own_position(beacons: List[Beacon], own_colour_team: TeamColor) -> List[int, int]:
+def find_own_position(beacons: List[Beacon], own_colour_team: TeamColor):
     """
 
 
@@ -53,3 +53,11 @@ def find_own_position(beacons: List[Beacon], own_colour_team: TeamColor) -> List
             x = beacons_purple[beacon.index][0]
             y = beacons_purple[beacon.index][1]
             print(x, y)
+
+    beacon_1 = Beacon()
+    beacon_1.set_by_upper_left_and_lower_right(beacons_purple[0][0], beacons_purple[0][1])
+
+    beacon_2 = Beacon()
+    beacon_2.set_by_upper_left_and_lower_right(beacons_purple[1][0], beacons_purple[1][1])
+    beacon_3 = Beacon()
+    beacon_3.set_by_upper_left_and_lower_right(beacons_purple[2][0], beacons_purple[2][1])

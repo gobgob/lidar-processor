@@ -8,6 +8,8 @@ from typing import List
 
 import numpy as np
 from scipy.optimize import root
+
+import main.geometry as geom
 from main.constants import *
 
 
@@ -19,6 +21,7 @@ class Beacon:
         self.radius = 0
         self.x_center = 0
         self.y_center = 0
+        self.center = None
         self.index = 0
         self.cluster = None
 
@@ -27,9 +30,24 @@ class Beacon:
         self.y_center = y
         self.radius = r
         self.index = i
+        self.center = geom.Point(x, y)
 
     def set_cluster(self, cluster):
         self.cluster = cluster
+
+    def set_by_upper_left_and_lower_right(self, upper_left, lower_right):
+        self.x_center = (upper_left[0]+lower_right[0])/2
+        self.y_center = (upper_left[1]+lower_right[1])/2
+        self.center = geom.Point(self.x_center, self.y_center)
+
+    def set_radius(self, radius):
+        self.radius = radius
+
+    def set_index(self, index):
+        self.index = index
+
+    def __str__(self):
+        return str(self.center)+" , "+str(self.radius)+" n°"+str(self.index)
 
 
 class Cluster:
@@ -48,9 +66,10 @@ class Cluster:
     def is_linear(self):
         """
         TODO
-        Hough transform
+        Hough transform or RANSAC
         :return:
         """
+        pass
 
     def compute_mean(self):
         self.mean = np.sum(self.points, axis=0)/len(self.points)
@@ -204,12 +223,24 @@ def cluster_distance_closest(cluster, other):
     return min([dist1, dist2])
 
 
+def cluster_polar_distance_closest(cluster, other):
+    """
+
+    :param cluster:
+    :param other:
+    :return:
+    """
+    dist1 = polar_distance(cluster[0], other[-1])
+    dist2 = polar_distance(cluster[-1], other[0])
+    return min([dist1, dist2])
+
+
 def polar_clusterize(polar_measures):
     """
 
-        :param polar_measures: Polar coordinates
-        :return:
-        """
+    :param polar_measures: Polar coordinates
+    :return:
+    """
     n = 0
     clusters = [[polar_measures[0]]]
 
@@ -228,7 +259,7 @@ def polar_clusterize(polar_measures):
         k = 1
         while k < n:
             # dist_j = cluster_distance_mean(clusters[j], clusters[k])
-            dist_j = cluster_distance_closest(clusters[j], clusters[k])
+            dist_j = cluster_polar_distance_closest(clusters[j], clusters[k])
             # if cluster barycenters are close enough to each other, then clusters are merged
             if dist_j < 200:
                 clusters[j].extend(clusters[k])
@@ -243,7 +274,7 @@ def polar_clusterize(polar_measures):
                     del clusters[j - 1]
                     n -= 1
         # if cluster_distance_mean(clusters[0], clusters[-1]) < 200:
-        if cluster_distance_closest(clusters[0], clusters[-1]) < 200:
+        if cluster_polar_distance_closest(clusters[0], clusters[-1]) < 200:
             clusters[-1].extend(clusters[0])
             clusters[0] = clusters.pop()
 

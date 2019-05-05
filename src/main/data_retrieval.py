@@ -24,7 +24,7 @@ from main.constants import *
 
 __author__ = ["Clément Besnier", ]
 
-lidar_host = "127.0.0.1"
+lidar_host = "172.24.1.1"
 lidar_port = 17685
 encoder_host = "172.16.0.2"
 encoder_port = 80
@@ -91,36 +91,55 @@ class EncoderThread(Thread):
         self.measures = queue.Queue(maxsize=10)
         self.encoder_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.encoder_socket.connect((encoder_host, encoder_port))
-        self.encoder_socket.send(b'\xFF\x00\x01\x01')  # sign on odometry
-        self.encoder_socket.send(b'\xFF\x01\x01\x00')  # sign off info
-        self.encoder_socket.send(b'\xFF\x02\x01\x00')  # sign off error
+        self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))  # sign on odometry b'\xFF\x00\x01\x01'
+        self.encoder_socket.send(bytes([0xFF, 0x01, 0x01, 0x01]))  # sign off info b'\xFF\x01\x01\x00'
+        self.encoder_socket.send(bytes([0xFF, 0x02, 0x01, 0x01]))  # sign off error b'\xFF\x02\x01\x00'
+        # self.encoder_socket.send(bytes([0xFF, 0x80, 0x00]))
+        time.sleep(1)
+        # content = self.encoder_socket.recv(100)
+        # print(content)
 
     def run(self):
-        print("Connection on {}".format(lidar_port))
+        print("Connection on {}".format(encoder_port))
         current_measure = bytearray()
         are_robot_position_measures = True
         remaining_to_read = 56
         while self.measuring:
             content = self.encoder_socket.recv(100)
             for c in content:
+                # print(type(c))
+                # print(remaining_to_read)
                 if remaining_to_read == 56:
-                    if c == b"\xFF":
+                    # print(c)
+                    # print(bytes([0xFF]))
+                    # print(b"\xFF")
+                    # if c == b"\xFF":
+
+                    # print(c == bytes([0xFF]))
+                    # print(c == b"\xFF")
+                    if c == 255:
                         remaining_to_read -= 1
                 elif remaining_to_read == 55:
-                    are_robot_position_measures = c == b"\x00"
-                    remaining_to_read -= 1
+                    # print("c", c)
+                    are_robot_position_measures = c == 0  # b"\x00"
+                    if not are_robot_position_measures:
+                        remaining_to_read = 56
+                    else:
+                        remaining_to_read -= 1
 
-                elif are_robot_position_measures and remaining_to_read <= 54:
+                elif are_robot_position_measures and 0 < remaining_to_read <= 54:
                     current_measure.append(c)
                     remaining_to_read -= 1
 
-                elif remaining_to_read == 0:
+                if remaining_to_read == 0:
                     remaining_to_read = 56
                     # self.interpret_bytes(current_measure, )
                     processed_measure = split_encoder_data(current_measure)
+                    # print(processed_measure)
                     self.measures.put(processed_measure)
                     current_measure = bytearray()
-
+                # else:
+                #     print(c)
         print("connexion fermée")
 
     def get_measuring(self):
@@ -133,9 +152,10 @@ class EncoderThread(Thread):
         self.measuring = False
 
     def get_measures(self):
+        print("measures of encoder "+str(self.measures.empty()))
         return self.measures.get()
 
-    def send_position_shift(self, position_shift: np.ndarray):
+    def send_position_shift(self, position_shift):
         """
 
         :param: position_shift
@@ -152,12 +172,12 @@ class LidarThread(Thread):
         self.measuring = True
         self.measures = queue.Queue(maxsize=10)
         self.lidar_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
         self.lidar_socket.connect((lidar_host, lidar_port))
 
     def run(self):
         print("Connection on {}".format(lidar_port))
         current_measure = []
-
         while self.measuring:
             content = self.lidar_socket.recv(500).decode("utf-8")
             for c in content:
