@@ -97,6 +97,10 @@ class Vector:
             v.set_coordinates(self.x+other.x, self.y+other.y)
             return v
 
+    def multiplat_by(self, a):
+        self.x *= a
+        self.y *= a
+
 
 class Segment:
     def __init__(self, p1: Point, p2: Point):
