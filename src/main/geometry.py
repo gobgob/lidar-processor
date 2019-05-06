@@ -53,6 +53,10 @@ class Vector:
         self.x = point2.x - point1.x
         self.y = point2.y - point1.y
 
+    def create_unitary(self, angle):
+        self.x = np.cos(angle)
+        self.y = np.sin(angle)
+
     def compute_angle(self):
         return np.arctan(self.y / self.x)
 
@@ -86,6 +90,12 @@ class Vector:
         res = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]) @ np.array([self.x, self.y]).T
         self.x = res[0]
         self.y = res[1]
+
+    def __add__(self, other):
+        if isinstance(other, Vector):
+            v = Vector()
+            v.set_coordinates(self.x+other.x, self.y+other.y)
+            return v
 
 
 class Segment:

@@ -96,6 +96,13 @@ class Table:
     # def add_obstacle(self, obstacle: Obstacle):
     #     self.obstacles.append(obstacle)
 
+    def plot_vector(self, vector: geom.Vector):
+        pl.plot([0, vector.x], [0, vector.y], "-")
+
+    def plot_vector_from_point(self, point: geom.Point, vector: geom.Vector):
+        other_point = vector.apply_to_point(point)
+        pl.plot([point.x, other_point.x], [point.y, other_point.y])
+
     def add_square_obstacle(self, obstacle: Square):
         self.obstacles.append(obstacle)
 

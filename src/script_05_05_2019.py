@@ -48,7 +48,7 @@ def display_measures_and_table():
         one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
         one_turn_measures.append(one_turn_measure)
 
-    # table instanciation
+    # table instantiation
     table = Table()
 
     beacon_1 = Square([Point(-1500 - 100, 2000), Point(-1500, 2000), Point(-1500, 2000 - 100),
