@@ -97,6 +97,9 @@ class Vector:
         res = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]) @ np.array([self.x, self.y]).T
         self.x = res[0]
         self.y = res[1]
+        new_vec = Vector()
+        new_vec.set_coordinates(self.x, self.y)
+        return new_vec
 
     def __add__(self, other):
         if isinstance(other, Vector):

@@ -91,6 +91,8 @@ class Table:
     def __init__(self):
         self.obstacles = []
         self.edges = []
+        self.vectors = []
+        self.points = []
         self.fig = None
 
     # def add_obstacle(self, obstacle: Obstacle):
@@ -99,8 +101,24 @@ class Table:
     def plot_vector(self, vector: geom.Vector):
         pl.plot([0, vector.x], [0, vector.y], "-")
 
+    def plot_vectors(self):
+        print("vectors")
+        for vector in self.vectors:
+            pl.plot([0, vector.x], [0, vector.y], "-")
+            print(vector.x, vector.y)
+
     def plot_point(self, point: geom.Point):
         pl.plot(point.x, point.y, "+")
+
+    def plot_points(self):
+        print("points")
+        xx = []
+        yy = []
+        for point in self.points:
+            xx.append(point.x)
+            yy.append(point.y)
+            print(point.x, point.y)
+        pl.plot(xx, yy, "+")
 
     def plot_unitary_vector(self, point: geom.Point, angle):
         pl.plot([point.x, point.x+100*np.cos(angle)], [point.y, point.y+100*np.sin(angle)], "-")
@@ -114,6 +132,12 @@ class Table:
 
     def add_edge_point(self, edge: geom.Point):
         self.edges.append(edge)
+
+    def add_vector(self, vector: geom.Vector):
+        self.vectors.append(vector)
+
+    def add_point(self, point: geom.Point):
+        self.points.append(point)
 
     def init_plot(self, ):
         self.fig = pl.figure()
@@ -207,10 +231,14 @@ class Table:
     def translate(self, vector: geom.Vector):
         self.obstacles = [obstacle.translate(vector) for obstacle in self.obstacles]
         self.edges = [vector.apply_to_point(edge_point) for edge_point in self.edges]
+        self.points = [vector.apply_to_point(point) for point in self.points]
+        self.vectors = [vector + table_vector for table_vector in self.vectors]
 
     def rotate(self, angle: float):
         self.obstacles = [obstacle.rotate(angle) for obstacle in self.obstacles]
         self.edges = [edge_point.rotate(angle) for edge_point in self.edges]
+        self.points = [point.rotate(angle) for point in self.points]
+        self.vectors = [vector.rotate(angle) for vector in self.vectors]
 
     def generate_measures(self, robot_point: geom.Point):
         vertices = []
