@@ -99,6 +99,12 @@ class Table:
     def plot_vector(self, vector: geom.Vector):
         pl.plot([0, vector.x], [0, vector.y], "-")
 
+    def plot_point(self, point: geom.Point):
+        pl.plot(point.x, point.y, "+")
+
+    def plot_unitary_vector(self, point: geom.Point, angle):
+        pl.plot([point.x, point.x+100*np.cos(angle)], [point.y, point.y+100*np.sin(angle)], "-")
+
     def plot_vector_from_point(self, point: geom.Point, vector: geom.Vector):
         other_point = vector.apply_to_point(point)
         pl.plot([point.x, other_point.x], [point.y, other_point.y])

@@ -53,9 +53,16 @@ class Vector:
         self.x = point2.x - point1.x
         self.y = point2.y - point1.y
 
+    def set_by_point(self, point):
+        self.x = point.x
+        self.y = point.y
+
     def create_unitary(self, angle):
         self.x = np.cos(angle)
         self.y = np.sin(angle)
+
+    def scalar_product(self, other):
+        return self.x*other.x+self.y*other.y
 
     def compute_angle(self):
         return np.arctan(self.y / self.x)
@@ -97,9 +104,37 @@ class Vector:
             v.set_coordinates(self.x+other.x, self.y+other.y)
             return v
 
-    def multiplat_by(self, a):
+    def __sub__(self, other):
+        if isinstance(other, Vector):
+            v = Vector()
+            v.set_coordinates(self.x-other.x, self.y-other.y)
+            return v
+
+    def __mul__(self, other):
+        if type(other) in [int, float]:
+            v = Vector()
+            v.set_coordinates(self.x*other, self.y*other)
+            return v
+
+    def __rmul__(self, other):
+        if type(other) in [int, float]:
+            v = Vector()
+            v.set_coordinates(self.x*other, self.y*other)
+            return v
+
+    def multiplate_by(self, a):
         self.x *= a
         self.y *= a
+
+    def compute_basis_angle(self):
+        """
+        Computes angle to the (Ox) axis.
+        :return:
+        """
+        vect_basis = Vector()
+        vect_basis.set_coordinates(1, 0)
+
+        return np.arccos(self.scalar_product(vect_basis)/(self.compute_distance()))
 
 
 class Segment:
