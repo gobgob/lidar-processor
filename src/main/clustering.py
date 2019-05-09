@@ -124,7 +124,7 @@ class Cluster:
         # print("solution", solution.x)
         # print("error", solution.fun)
         beacon = None
-        if np.numeric.isclose(solution.fun) < TOLERANCE_FOR_CIRCLE_COHERENCE:
+        if np.isclose(solution.fun[0], 0, atol=TOLERANCE_FOR_CIRCLE_COHERENCE):
             beacon = Beacon()
             beacon.set_parameters(solution.x[0], solution.x[1], FIX_BEACON_RADIUS, 0)
             beacon.set_cluster(self)

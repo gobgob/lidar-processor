@@ -98,6 +98,31 @@ class Table:
     # def add_obstacle(self, obstacle: Obstacle):
     #     self.obstacles.append(obstacle)
 
+
+    def add_square_obstacle(self, obstacle: Square):
+        self.obstacles.append(obstacle)
+
+    def add_edge_point(self, edge: geom.Point):
+        self.edges.append(edge)
+
+    def add_vector(self, vector: geom.Vector):
+        self.vectors.append(vector)
+
+    def add_point(self, point: geom.Point):
+        self.points.append(point)
+
+    def init_plot(self, ):
+        self.fig = pl.figure()
+        ax = self.fig.add_subplot(111)
+        ax.clear()
+        xlimits = 3000
+        y_max_limit = 3000
+        y_min_limit = -2000
+        ax.set_xlim(-xlimits, xlimits)
+        ax.set_ylim(y_min_limit, y_max_limit)
+        ax.axhline(0, 0)
+        ax.axvline(0, 0)
+
     def plot_vector(self, vector: geom.Vector):
         pl.plot([0, vector.x], [0, vector.y], "-")
 
@@ -126,30 +151,6 @@ class Table:
     def plot_vector_from_point(self, point: geom.Point, vector: geom.Vector):
         other_point = vector.apply_to_point(point)
         pl.plot([point.x, other_point.x], [point.y, other_point.y])
-
-    def add_square_obstacle(self, obstacle: Square):
-        self.obstacles.append(obstacle)
-
-    def add_edge_point(self, edge: geom.Point):
-        self.edges.append(edge)
-
-    def add_vector(self, vector: geom.Vector):
-        self.vectors.append(vector)
-
-    def add_point(self, point: geom.Point):
-        self.points.append(point)
-
-    def init_plot(self, ):
-        self.fig = pl.figure()
-        ax = self.fig.add_subplot(111)
-        ax.clear()
-        xlimits = 3000
-        y_max_limit = 3000
-        y_min_limit = -2000
-        ax.set_xlim(-xlimits, xlimits)
-        ax.set_ylim(y_min_limit, y_max_limit)
-        ax.axhline(0, 0)
-        ax.axvline(0, 0)
 
     def plot_obstacles(self):
         for obstacle in self.obstacles:
