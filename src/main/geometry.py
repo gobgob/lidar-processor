@@ -46,6 +46,9 @@ class Point:
         self.y = res[1]
         return Point(self.x, self.y)
 
+    def copy(self):
+        return Point(self.x, self.y)
+
 
 class Vector:
     def __init__(self):
@@ -141,6 +144,11 @@ class Vector:
         vect_basis.set_coordinates(1, 0)
 
         return np.arccos(self.scalar_product(vect_basis)/(self.compute_distance()))
+
+    def copy(self):
+        v = Vector()
+        v.set_coordinates(self.x, self.y)
+        return v
 
 
 class Segment:
