@@ -98,7 +98,6 @@ class Table:
     # def add_obstacle(self, obstacle: Obstacle):
     #     self.obstacles.append(obstacle)
 
-
     def add_square_obstacle(self, obstacle: Square):
         self.obstacles.append(obstacle)
 

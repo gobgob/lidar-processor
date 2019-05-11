@@ -41,7 +41,6 @@ def display_measures(polar_points):
 
 
 def display_polar_measures(polar_points):
-
     for theta, rho in polar_points:
         pl.polar(math.radians(theta), rho, 'r,')
     pl.show()
