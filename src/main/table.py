@@ -290,6 +290,7 @@ class Table:
         #     print(j)
 
 
+# region ++ mains
 def main():
     table = Table()
     # for orange
@@ -475,6 +476,7 @@ def main_5():
     # table.plot_obstacles()
     # table.plot_measures(measure, vectors, robot_vector)
     table.plot()
+# endregion
 
 
 if __name__ == "__main__":
