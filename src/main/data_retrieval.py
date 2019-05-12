@@ -88,7 +88,7 @@ class EncoderThread(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.measuring = True
-        self.measures = queue.Queue(maxsize=10)
+        self.measures = queue.Queue(maxsize=1)
         self.encoder_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.encoder_socket.connect((encoder_host, encoder_port))
         self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))  # sign on odometry b'\xFF\x00\x01\x01'
@@ -171,7 +171,7 @@ class LidarThread(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.measuring = True
-        self.measures = queue.Queue(maxsize=10)
+        self.measures = queue.Queue(maxsize=1)
         self.lidar_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         self.lidar_socket.connect((lidar_host, lidar_port))
