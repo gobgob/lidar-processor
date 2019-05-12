@@ -85,5 +85,5 @@ def take_lidar_and_encoder_measures_05_05_2019(i_measure: int):
 
 
 if __name__ == "__main__":
-    measure_number = 3
+    measure_number = 4
     take_lidar_and_encoder_measures_05_05_2019(measure_number)
