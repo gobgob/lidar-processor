@@ -18,7 +18,7 @@ from threading import Thread
 import queue
 from typing import List
 
-import numpy as np
+# import numpy as np
 
 from main.constants import *
 
@@ -30,30 +30,30 @@ encoder_host = "172.16.0.2"
 encoder_port = 80
 
 
-def from_encoder_position_to_lidar_measure(x, y, theta):
-    """
-    The LiDAR center is not at the rotation center so to compare LiDAR measures and encoder measures,
-    a basis change is needed.
-
-    >>> from_encoder_position_to_lidar_measure(125, 523, np.pi/3)
-    array([ 65.        , 419.07695155,   1.04719755])
-
-    :param x:
-    :param y:
-    :param theta:
-    :return:
-    """
-    return np.array([x-120*np.cos(theta), y-120*np.sin(theta), theta])
-
-
-def distance_array(a, b):
-    diff = a - b
-    return np.sqrt(diff @ diff.T)
-
-
-def are_encoder_measures_and_lidar_measures_different(encoder_measure: np.ndarray, lidar_measure: np.ndarray):
-    return np.abs(encoder_measure[2] - lidar_measure[2]) < too_much_angle_shift or \
-            distance_array(encoder_measure[:2], lidar_measure[:2])
+# def from_encoder_position_to_lidar_measure(x, y, theta):
+#     """
+#     The LiDAR center is not at the rotation center so to compare LiDAR measures and encoder measures,
+#     a basis change is needed.
+#
+#     >>> from_encoder_position_to_lidar_measure(125, 523, np.pi/3)
+#     array([ 65.        , 419.07695155,   1.04719755])
+#
+#     :param x:
+#     :param y:
+#     :param theta:
+#     :return:
+#     """
+#     return np.array([x-120*np.cos(theta), y-120*np.sin(theta), theta])
+#
+#
+# def distance_array(a, b):
+#     diff = a - b
+#     return np.sqrt(diff @ diff.T)
+#
+#
+# def are_encoder_measures_and_lidar_measures_different(encoder_measure: np.ndarray, lidar_measure: np.ndarray):
+#     return np.abs(encoder_measure[2] - lidar_measure[2]) < too_much_angle_shift or \
+#             distance_array(encoder_measure[:2], lidar_measure[:2])
 
 
 def split_turn(turn: List[str]):
@@ -134,7 +134,8 @@ class EncoderThread(Thread):
                 if remaining_to_read == 0:
                     remaining_to_read = 56
                     # self.interpret_bytes(current_measure, )
-                    processed_measure = split_encoder_data(current_measure)
+                    # current_measure[0] is the number of data bytes
+                    processed_measure = split_encoder_data(current_measure[1:])
                     # print(processed_measure)
                     self.measures.put(processed_measure)
                     current_measure = bytearray()
