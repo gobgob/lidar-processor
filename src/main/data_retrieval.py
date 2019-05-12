@@ -64,16 +64,18 @@ def split_encoder_data(encoder_measure: bytes):
     """
     From an encoder measure to the position and orientation of robot with a timestamp.
 
-    >>> measure = b"\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01"
-    >>> x, y, theta, t = split_encoder_data(measure)
+    >>> b = [255, 0, 53, 80, 251, 255, 255, 232, 3, 0, 0, 208, 15, 73, 64, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0]
+
+    >>> bi = bytearray(b[3:])
+    >>> x, y, theta, t = split_encoder_data(bi)
     >>> x
-    16843009
+    -1200
 
     >>> y
-    16843009
+    1000
 
     >>> theta
-    16843009
+    3.141590118408203
 
     :param encoder_measure:
     :return:
