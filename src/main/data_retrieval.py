@@ -80,7 +80,7 @@ def split_encoder_data(encoder_measure: bytes):
     """
     x, = struct.unpack('i', encoder_measure[:4])
     y, = struct.unpack('i', encoder_measure[4:8])
-    orientation, = struct.unpack('i', encoder_measure[8:12])
+    orientation, = struct.unpack('f', encoder_measure[8:12])
     return [x, y, orientation, time.time()]
 
 
