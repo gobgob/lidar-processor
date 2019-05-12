@@ -86,6 +86,45 @@ def split_encoder_data(encoder_measure: bytes):
     return [x, y, orientation, time.time()]
 
 
+def trame_delimiter(content):
+    """
+
+    >>> b = [134, 84, 12, 45, 77, 255, 0, 53, 80, 251, 255, 255, 232, 3, 0, 0, 208, 15, 73, 64, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0]
+    >>> bi = bytearray(b)
+    >>> trame_delimiter(bi+bi+bi)
+    [[-1200, 1000, 3.141590118408203], [-1200, 1000, 3.141590118408203], [-1200, 1000, 3.141590118408203]]
+
+    :param content:
+    :return:
+    """
+    measures = []
+    current_measure = bytearray()
+    remaining_to_read = 56
+    are_robot_position_measures = True
+    for c in content:
+        if remaining_to_read == 56:
+            if c == 255:
+                remaining_to_read -= 1
+        elif remaining_to_read == 55:
+            are_robot_position_measures = c == 0  # b"\x00"
+            if not are_robot_position_measures:
+                remaining_to_read = 56
+            else:
+                remaining_to_read -= 1
+
+        elif are_robot_position_measures and 0 < remaining_to_read <= 54:
+            current_measure.append(c)
+            remaining_to_read -= 1
+
+        if remaining_to_read == 0:
+            remaining_to_read = 56
+            processed_measure = split_encoder_data(current_measure[1:])
+            measures.append(processed_measure)
+            current_measure = bytearray()
+
+    print([i[:3] for i in measures])
+
+
 class EncoderThread(Thread):
     def __init__(self):
         Thread.__init__(self)
