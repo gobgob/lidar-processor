@@ -1,7 +1,7 @@
 
 
 """
-
+To change basis: robot's view <=> table's view
 
 """
 import numpy as np

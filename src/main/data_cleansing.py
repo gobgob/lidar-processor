@@ -1,7 +1,15 @@
 #!/usr/bin/python3
 
 """
+Point
+- Keeps good measure
+- Keeps not too far and not too close measures
 
+Clusters
+- Keeps not too spread
+- Keeps not too few or not too much points
+
+2
 """
 from typing import List, Union
 

@@ -2,7 +2,9 @@
 
 """
 Communication with high level of the robot.
-The protocole is given at https://github.com/gobgob/chariot-elevateur/blob/master/doc/protocole-lidar-hl.txt
+The protocol is given at https://github.com/gobgob/chariot-elevateur/blob/master/doc/protocole-lidar-hl.txt
+
+3
 """
 
 import queue

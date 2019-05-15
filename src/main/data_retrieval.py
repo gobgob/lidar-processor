@@ -8,7 +8,7 @@ Received data must respect the following rules:
 - measures in one turn of measures are separated by ";",
 - one measure is "<angle>:<distance>:<quality>"
 
-
+1
 """
 
 import socket
