@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 
 """
-
+Script used when we only base on encoders to tell our absolute position.
+It can nonetheless return the absolute position of the opponent robots.
 
 """
 
 import time
+import datetime
 import queue
 
 from main.constants import *
@@ -15,11 +17,12 @@ import main.data_cleansing as dacl
 import main.communication as comm
 import main.clustering as clus
 # import main.tracking as trac
-import main.self_locator as sloc
 import main.enemy_locator as eloc
 
 
 __author__ = ["Clément Besnier", ]
+
+logging.basicConfig(filename="lidar_logs"+datetime.datetime.today().ctime()+".txt")
 
 
 def main():

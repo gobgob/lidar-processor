@@ -8,6 +8,7 @@ Inspired by.
 import os
 import sys
 import enum
+import logging
 
 __author__ = "Clément Besnier"
 
@@ -62,8 +63,8 @@ too_much_angle_shift = 2  # in degree
 
 
 class TeamColor(enum.Enum):
-    purple = enum.auto()
-    orange = enum.auto()
+    purple = "purple"
+    orange = "orange"
 
 
 # region start position

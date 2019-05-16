@@ -1,11 +1,14 @@
 #! /usr/bin/python3
 
 """
-Main script to launch before the match
+Main script to launch before the match.
+
+The aim is to follow opponent robots' positions and to calibrate regularly its owb position thanks to immobile beacons.
 
 """
 
 import time
+import datetime
 import queue
 
 from main.constants import *
@@ -19,6 +22,8 @@ import main.self_locator as sloc
 import main.enemy_locator as eloc
 
 __author__ = "Clément Besnier"
+
+logging.basicConfig(filename="lidar_logs"+datetime.datetime.today().ctime()+".txt")
 
 
 def main():
