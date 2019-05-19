@@ -32,7 +32,7 @@ def store_lidar_and_encoder_data_05_05_2019(lidar_thread: LidarThread, encoder_t
     :return:
     """
 
-    measuring_duration = 40
+    measuring_duration = 30
     start_time = time.time()
     now = time.time()
     folder = os.path.join("samples", "05_05_2019")
@@ -85,5 +85,5 @@ def take_lidar_and_encoder_measures_05_05_2019(i_measure: int):
 
 
 if __name__ == "__main__":
-    measure_number = 4
+    measure_number = 7
     take_lidar_and_encoder_measures_05_05_2019(measure_number)
