@@ -26,7 +26,6 @@ except ImportError:
     logging.error("There is no numpy module!!!")
 
 
-
 __author__ = ["Clément Besnier", ]
 
 lidar_host = "172.24.1.1"
@@ -149,50 +148,33 @@ class EncoderThread(Thread):
         print("Connection on {}".format(encoder_port))
         current_measure = bytearray()
         are_robot_position_measures = True
-        remaining_to_read = 5
+        remaining_to_read = 56
         while self.measuring:
             content = self.encoder_socket.recv(100)
-            self.trame_delimiter(content, current_measure, remaining_to_read, are_robot_position_measures)
+            for c in content:
+                if remaining_to_read == 56:
+                    if c == 255:
+                        remaining_to_read -= 1
+                elif remaining_to_read == 55:
+                    are_robot_position_measures = c == 0  # b"\x00"
+                    if not are_robot_position_measures:
+                        remaining_to_read = 56
+                    else:
+                        remaining_to_read -= 1
+
+                elif are_robot_position_measures and 0 < remaining_to_read <= 54:
+                    current_measure.append(c)
+                    remaining_to_read -= 1
+
+                if remaining_to_read == 0:
+                    remaining_to_read = 56
+                    processed_measure = split_encoder_data(current_measure[1:])
+                    self.measures.put(processed_measure.copy(), False)
+                    current_measure = bytearray()
 
             if not self.measuring:
                 break
         print("connexion fermée")
-
-    def trame_delimiter(self, content, current_measure, remaining_to_read, are_robot_position_measures):
-        """
-
-        >>> b = [134, 84, 12, 45, 77, 255, 0, 53, 80, 251, 255, 255, 232, 3, 0, 0, 208, 15, 73, 64, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0]
-        >>> bi = bytearray(b)
-        >>> current_measure = bytearray()
-        >>> are_robot_position_measures = True
-        >>> remaining_to_read = 5
-        >>> t = EncoderThread()
-        >>> t.trame_delimiter(bi+bi+bi, current_measure, remaining_to_read, are_robot_position_measures)
-        [[-1200, 1000, 3.141590118408203], [-1200, 1000, 3.141590118408203], [-1200, 1000, 3.141590118408203]]
-
-        :param content:
-        :return:
-        """
-        for c in content:
-            if remaining_to_read == 56:
-                if c == 255:
-                    remaining_to_read -= 1
-            elif remaining_to_read == 55:
-                are_robot_position_measures = c == 0  # b"\x00"
-                if not are_robot_position_measures:
-                    remaining_to_read = 56
-                else:
-                    remaining_to_read -= 1
-
-            elif are_robot_position_measures and 0 < remaining_to_read <= 54:
-                current_measure.append(c)
-                remaining_to_read -= 1
-
-            if remaining_to_read == 0:
-                remaining_to_read = 56
-                processed_measure = split_encoder_data(current_measure[1:])
-                self.measures.put(processed_measure)
-                current_measure = bytearray()
 
     def get_measuring(self):
         return self.measuring
@@ -205,7 +187,8 @@ class EncoderThread(Thread):
 
     def get_measures(self):
         print("measures of encoder "+str(self.measures.empty()))
-        return self.measures.get()
+        measure = self.measures.get(False)
+        return measure
 
     def send_position_shift(self, position_shift):
         """
