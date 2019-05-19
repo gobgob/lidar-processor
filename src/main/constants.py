@@ -65,6 +65,8 @@ too_much_angle_shift = 2  # in degree
 class TeamColor(enum.Enum):
     purple = "purple"
     orange = "orange"
+    # purple = enum.auto()
+    # orange = enum.auto()
 
 
 # region start position
