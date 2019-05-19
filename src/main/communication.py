@@ -20,6 +20,10 @@ hl_port = 8765
 
 
 class HLThread(Thread):
+    """
+    Communication to the High-Level
+    https://github.com/gobgob/chariot-elevateur/blob/master/high_level/src/main/java/senpai/comm/LidarEth.java
+    """
     def __init__(self):
         Thread.__init__(self)
         self.communicating = True
