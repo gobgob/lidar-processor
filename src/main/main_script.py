@@ -6,7 +6,7 @@ Main script to launch before the match.
 The aim is to follow opponent robots' positions and to calibrate regularly its owb position thanks to immobile beacons.
 
 """
-
+import shutil
 import time
 import datetime
 import queue
@@ -23,7 +23,23 @@ import main.enemy_locator as eloc
 
 __author__ = "Clément Besnier"
 
-logging.basicConfig(filename="lidar_logs"+datetime.datetime.today().ctime().replace(":", "")+".txt")
+# region logs
+last_log_folder = os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last")
+history_log_folder = os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last")
+
+if not os.path.exists(last_log_folder):
+    os.mkdir(last_log_folder)
+
+if not os.path.exists(history_log_folder):
+    os.mkdir(history_log_folder)
+
+if len(os.listdir(last_log_folder)) != 0:
+    shutil.move(last_log_folder + "/*", os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "hitory"))
+
+logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last",
+                                          "lidar_logs" + datetime.datetime.today().ctime().replace(":", "") + ".txt"))
+
+# endregion
 
 
 def main():
