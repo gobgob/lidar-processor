@@ -33,8 +33,10 @@ if not os.path.exists(last_log_folder):
 if not os.path.exists(history_log_folder):
     os.mkdir(history_log_folder)
 
-if len(os.listdir(last_log_folder)) != 0:
-    shutil.move(last_log_folder + "/*", os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "history"))
+log_files = os.listdir(last_log_folder)
+for filename in log_files:
+    shutil.move(os.path.join(last_log_folder, filename),
+                os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "history"))
 
 logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last",
                                           "lidar_logs" + datetime.datetime.today().ctime().replace(":", "") + ".txt"))
