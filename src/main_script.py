@@ -25,7 +25,7 @@ __author__ = "Clément Besnier"
 
 # region logs
 last_log_folder = os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last")
-history_log_folder = os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last")
+history_log_folder = os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "history")
 
 if not os.path.exists(last_log_folder):
     os.mkdir(last_log_folder)
@@ -34,7 +34,7 @@ if not os.path.exists(history_log_folder):
     os.mkdir(history_log_folder)
 
 if len(os.listdir(last_log_folder)) != 0:
-    shutil.move(last_log_folder + "/*", os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "hitory"))
+    shutil.move(last_log_folder + "/*", os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "history"))
 
 logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last",
                                           "lidar_logs" + datetime.datetime.today().ctime().replace(":", "") + ".txt"))
