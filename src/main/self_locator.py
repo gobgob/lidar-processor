@@ -13,7 +13,7 @@ from typing import List
 
 from main.constants import *
 from main.clustering import Cluster, Beacon
-import src.main.geometry as geom
+import main.geometry as geom
 
 __author__ = "Clément Besnier"
 
