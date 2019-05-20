@@ -23,7 +23,7 @@ import main.enemy_locator as eloc
 
 __author__ = "Clément Besnier"
 
-logging.basicConfig(filename="lidar_logs"+datetime.datetime.today().ctime()+".txt")
+logging.basicConfig(filename="lidar_logs"+datetime.datetime.today().ctime().replace(":", "")+".txt")
 
 
 def main():
