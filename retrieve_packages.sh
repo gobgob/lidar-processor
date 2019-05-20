@@ -26,7 +26,7 @@ install_python37()
     sudo ./configure --enable-optimizations
     sudo make altinstall
 }
-install_python37
+#install_python37
 
 install_venv_python37()
 {
@@ -38,13 +38,14 @@ install_venv_python37()
 
 download_packages_for_lidar()
 {
-    mkdir lidar_env
-    pip install --download lidar_env -r requirements.txt
+    mkdir -p lidar_env
+    pip3.7 download -d lidar_env -r requirements.txt
 }
 
+download_packages_for_lidar
 install_packages_for_lidar()
 {
     cd
-    pip install --no-index --find-links=file:/$HOME/.mypypi ipython
+    pip3.7 install --no-index --find-links=file:/$HOME/.mypypi ipython
 
 }
