@@ -62,10 +62,10 @@ def main():
     start_enemy_positions = []
     own_colour_team = None
     computed_opponent_robot_position = False
-    previous_clusters = queue.Queue(3)
-    previous_beacons = queue.Queue(3)
-    previous_opponent_robots = queue.Queue(3)
-    previous_self_positions = queue.Queue(3)
+    previous_clusters = []
+    previous_beacons = []
+    previous_opponent_robots = []
+    previous_self_positions = []
     # endregion
 
     # region # before the match
@@ -109,7 +109,6 @@ def main():
         one_turn_points = dacl.filter_points(t_lidar.get_measures(), THRESHOLD_QUALITY)
         cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
         clusters = clus.clusterize(cartesian_one_turn_measure)
-        previous_clusters.put(clusters)
         # endregion
 
         # region # retrieves position from encoders
@@ -122,10 +121,23 @@ def main():
         robots = eloc.find_robots(clusters)
         # endregion
 
-        previous_clusters.put(clusters.copy())
-        previous_beacons.put(beacons.copy())
-        previous_opponent_robots.put(robots.copy())
-        previous_self_positions.put(own_position.copy())
+        # region # history management
+        previous_clusters.append(clusters.copy())
+        if len(previous_clusters) > 3:
+            previous_clusters.pop(0)
+
+        previous_beacons.append(beacons.copy())
+        if len(previous_beacons) > 3:
+            previous_beacons.pop(0)
+
+        previous_opponent_robots.append(robots.copy())
+        if len(previous_opponent_robots) > 3:
+            previous_opponent_robots.pop(0)
+
+        previous_self_positions.append(own_position.copy())
+        if len(previous_self_positions) > 3:
+            previous_self_positions.pop(0)
+        # endregion
 
         if datr.are_encoder_measures_and_lidar_measures_different(proprioceptive_position, own_position):
             t_ll.send_position_shift(proprioceptive_position - own_position)  # convention
