@@ -26,8 +26,12 @@ __author__ = ["Clément Besnier", ]
 
 
 # region logs
-last_log_folder = os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last")
-history_log_folder = os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last")
+log_folder = os.path.join(os.getenv("HOME"), "lidar-processor", "logs")
+last_log_folder = os.path.join(log_folder, "last")
+history_log_folder = os.path.join(log_folder, "history")
+
+if not os.path.exists(log_folder):
+    os.mkdir(log_folder)
 
 if not os.path.exists(last_log_folder):
     os.mkdir(last_log_folder)
