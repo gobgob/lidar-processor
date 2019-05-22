@@ -198,7 +198,7 @@ class EncoderThread(Thread):
         """
         # x, y, theta = position_shift[0], position_shift[1], position_shift[2]
 
-        self.encoder_socket.send(b'')
+        self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))
 
 
 class LidarThread(Thread):

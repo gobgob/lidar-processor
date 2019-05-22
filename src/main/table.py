@@ -7,7 +7,10 @@ Table with LiDAR obstacles.
 from typing import List
 
 import numpy as np
-import matplotlib.pylab as pl
+try:
+    import matplotlib.pylab as pl
+except ImportError:
+    pl = None
 
 from check_clustering import main_clustering
 import main.data_cleansing as dacl
