@@ -46,9 +46,10 @@ for filename in log_files:
 # log_filename = "lidar_logs" + datetime.datetime.today().ctime().replace(":", "")
 log_filename = ""
 if log_filename:
-    logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last", log_filename + ".txt"))
+    logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last",
+                                              log_filename + ".txt"), level=15)
 else:
-    logging.basicConfig(stream=sys.stdout)
+    logging.basicConfig(stream=sys.stdout, level=5)
 
 # endregion
 
