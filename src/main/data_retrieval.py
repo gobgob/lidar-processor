@@ -200,9 +200,12 @@ class EncoderThread(Thread):
         self.measuring = False
 
     def get_measures(self):
-        print("measures of encoder "+str(self.measures.empty()))
-        measure = self.measures.get(False)
-        return measure
+        if self.encoder_socket:
+            self.logger.debug("measures of encoder "+str(self.measures.empty()))
+            measure = self.measures.get(False)
+            return measure
+        else:
+            return []
 
     def send_position_shift(self, position_shift):
         """
@@ -261,7 +264,10 @@ class LidarThread(Thread):
         self.measuring = False
 
     def get_measures(self):
-        return self.measures.get()
+        if self.lidar_socket:
+            return self.measures.get()
+        else:
+            return []
 
 
 if __name__ == "__main__":
