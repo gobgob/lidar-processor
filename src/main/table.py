@@ -9,10 +9,11 @@ from typing import List
 import numpy as np
 try:
     import matplotlib.pylab as pl
+    from check_clustering import main_clustering
 except ImportError:
     pl = None
+    main_clustering = None
 
-from check_clustering import main_clustering
 import main.data_cleansing as dacl
 from main.clustering import Cluster
 from retrieve_realistic_measures import get_table_measures
