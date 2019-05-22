@@ -52,6 +52,7 @@ else:
 
 def main():
     logger = logging.getLogger(log_filename)
+    logger.info("On a lancé le script de match")
 
     # region # thread initialisation
     t_lidar = datr.LidarThread(log_filename)
