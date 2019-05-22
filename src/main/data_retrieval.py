@@ -147,10 +147,11 @@ class EncoderThread(Thread):
             self.logger.error("Le serveur de codeuses est inaccessible")
             self.encoder_socket = None
 
-        self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))  # sign on odometry b'\xFF\x00\x01\x01'
-        self.encoder_socket.send(bytes([0xFF, 0x01, 0x01, 0x01]))  # sign off info b'\xFF\x01\x01\x00'
-        self.encoder_socket.send(bytes([0xFF, 0x02, 0x01, 0x01]))  # sign off error b'\xFF\x02\x01\x00'
-        # self.encoder_socket.send(bytes([0xFF, 0x80, 0x00]))
+        if self.encoder_socket:
+            self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))  # sign on odometry b'\xFF\x00\x01\x01'
+            self.encoder_socket.send(bytes([0xFF, 0x01, 0x01, 0x01]))  # sign off info b'\xFF\x01\x01\x00'
+            self.encoder_socket.send(bytes([0xFF, 0x02, 0x01, 0x01]))  # sign off error b'\xFF\x02\x01\x00'
+            # self.encoder_socket.send(bytes([0xFF, 0x80, 0x00]))
         time.sleep(1)
         # content = self.encoder_socket.recv(100)
         # print(content)
