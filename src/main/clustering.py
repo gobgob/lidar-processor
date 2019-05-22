@@ -294,49 +294,52 @@ def clusterize(cartesian_measures: List[np.ndarray]):
     :param cartesian_measures: Cartesian coordinates
     :return:
     """
-    n = 0
-    clusters = [[cartesian_measures[0]]]
+    if len(cartesian_measures) > 0:
+        n = 0
+        clusters = [[cartesian_measures[0]]]
 
-    for i in range(1, len(cartesian_measures)-1):
-        if distance(cartesian_measures[i-1], cartesian_measures[i]) > minimum_distance_between_clusters:
-            n += 1
-            clusters.append([])
-        clusters[n].append(cartesian_measures[i])
-    if distance(cartesian_measures[0], cartesian_measures[-1]) <= minimum_distance_between_clusters:
-        clusters[-1].extend(clusters[0])
-        clusters[0] = clusters.pop()
-        n -= 1
-
-    if len(clusters) > 1:
-        j = 0
-        k = 1
-        while k < n:
-            # dist_j = cluster_distance_mean(clusters[j], clusters[k])
-            dist_j = cluster_distance_closest(clusters[j], clusters[k])
-            # if cluster barycenters are close enough to each other, then clusters are merged
-            if dist_j < 200:
-                clusters[j].extend(clusters[k])
-                del clusters[k]
-                n -= 1
-            else:
-                # if the j'th and k'th are far enough, then, they are just different clusters
-                j += 1
-                k += 1
-                # if a cluster has too few points, then it is deleted
-                if len(clusters[j - 1]) < minimum_points_in_cluster:
-                    del clusters[j - 1]
-                    n -= 1
-        # if cluster_distance_mean(clusters[0], clusters[-1]) < 200:
-        if cluster_distance_closest(clusters[0], clusters[-1]) < 200:
+        for i in range(1, len(cartesian_measures)-1):
+            if distance(cartesian_measures[i-1], cartesian_measures[i]) > minimum_distance_between_clusters:
+                n += 1
+                clusters.append([])
+            clusters[n].append(cartesian_measures[i])
+        if distance(cartesian_measures[0], cartesian_measures[-1]) <= minimum_distance_between_clusters:
             clusters[-1].extend(clusters[0])
             clusters[0] = clusters.pop()
+            n -= 1
 
-        means = []
-        for cluster in clusters:
-            mean_cluster = np.sum(cluster, axis=0) / len(cluster)
-            means.append(mean_cluster)
-            # print(mean_cluster)
-        return clusters, means
+        if len(clusters) > 1:
+            j = 0
+            k = 1
+            while k < n:
+                # dist_j = cluster_distance_mean(clusters[j], clusters[k])
+                dist_j = cluster_distance_closest(clusters[j], clusters[k])
+                # if cluster barycenters are close enough to each other, then clusters are merged
+                if dist_j < 200:
+                    clusters[j].extend(clusters[k])
+                    del clusters[k]
+                    n -= 1
+                else:
+                    # if the j'th and k'th are far enough, then, they are just different clusters
+                    j += 1
+                    k += 1
+                    # if a cluster has too few points, then it is deleted
+                    if len(clusters[j - 1]) < minimum_points_in_cluster:
+                        del clusters[j - 1]
+                        n -= 1
+            # if cluster_distance_mean(clusters[0], clusters[-1]) < 200:
+            if cluster_distance_closest(clusters[0], clusters[-1]) < 200:
+                clusters[-1].extend(clusters[0])
+                clusters[0] = clusters.pop()
+
+            means = []
+            for cluster in clusters:
+                mean_cluster = np.sum(cluster, axis=0) / len(cluster)
+                means.append(mean_cluster)
+                # print(mean_cluster)
+            return clusters, means
+        else:
+            return [], []
 
 
 if __name__ == "__main__":
