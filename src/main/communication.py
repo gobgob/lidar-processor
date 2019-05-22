@@ -34,6 +34,7 @@ class HLThread(Thread):
             self.logger = logging.getLogger(logger_name)
         else:
             self.logger = logging.basicConfig(stream=sys.stdout)
+            self.logger = logging.getLogger(__name__)
 
         self.logger.info("On ouvre la socket du haut-niveau.")
         self.hl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
