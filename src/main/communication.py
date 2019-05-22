@@ -42,6 +42,7 @@ class HLThread(Thread):
             self.hl_socket.connect((hl_host, hl_port))
         except OSError:
             self.logger.error("Le serveur du haut-niveau est inaccessible")
+            self.hl_socket = None
 
         self.match_has_begun = False
         self.team_colour = None
@@ -55,33 +56,34 @@ class HLThread(Thread):
         self.hl_socket.send(message_to_send.encode("ascii"))
 
     def run(self):
-        self.logger.info("Connection on {}".format(hl_port))
-        current_measure = []
+        if self.hl_socket:
+            self.logger.info("Connection on {}".format(hl_port))
+            current_measure = []
 
-        while self.communicating:
-            content = self.hl_socket.recv(100).decode("ascii")
-            for c in content:
-                if c == '\n':
-                    current_measure = "".join(current_measure)
-                    if current_measure == "ACK":
-                        # self.messages.put("ACK")
-                        pass
-                    elif current_measure == "INIT VIOLET":
-                        self.team_colour = TeamColor.purple
-                    elif current_measure == "INIT JAUNE":
-                        self.team_colour = TeamColor.orange
-                    elif current_measure == "START":
-                        self.match_has_begun = True
-                    elif current_measure == "STOP":
-                        self.match_stopped = True
+            while self.communicating:
+                content = self.hl_socket.recv(100).decode("ascii")
+                for c in content:
+                    if c == '\n':
+                        current_measure = "".join(current_measure)
+                        if current_measure == "ACK":
+                            # self.messages.put("ACK")
+                            pass
+                        elif current_measure == "INIT VIOLET":
+                            self.team_colour = TeamColor.purple
+                        elif current_measure == "INIT JAUNE":
+                            self.team_colour = TeamColor.orange
+                        elif current_measure == "START":
+                            self.match_has_begun = True
+                        elif current_measure == "STOP":
+                            self.match_stopped = True
 
-                    current_measure = []
-                else:
-                    current_measure.append(c)
-            if not self.communicating:
-                self.logger.info("On arrête la communication avec le haut-niveau")
-                break
-        self.logger.info("connexion fermée")
+                        current_measure = []
+                    else:
+                        current_measure.append(c)
+                if not self.communicating:
+                    self.logger.info("On arrête la communication avec le haut-niveau")
+                    break
+            self.logger.info("connexion fermée")
 
     def get_measuring(self):
         return self.communicating

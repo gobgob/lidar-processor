@@ -139,12 +139,14 @@ class EncoderThread(Thread):
             self.logger = logging.basicConfig(stream=sys.stdout)
             self.logger = logging.getLogger(__name__)
         self.logger.info("On ouvre la socket des codeuses.")
+        self.encoder_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            self.encoder_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+            self.encoder_socket.connect((encoder_host, encoder_port))
         except OSError:
             self.logger.error("Le serveur de codeuses est inaccessible")
+            self.encoder_socket = None
 
-        self.encoder_socket.connect((encoder_host, encoder_port))
         self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))  # sign on odometry b'\xFF\x00\x01\x01'
         self.encoder_socket.send(bytes([0xFF, 0x01, 0x01, 0x01]))  # sign off info b'\xFF\x01\x01\x00'
         self.encoder_socket.send(bytes([0xFF, 0x02, 0x01, 0x01]))  # sign off error b'\xFF\x02\x01\x00'
@@ -154,37 +156,38 @@ class EncoderThread(Thread):
         # print(content)
 
     def run(self):
-        self.logger.info("Connection on {}".format(encoder_port))
-        current_measure = bytearray()
-        are_robot_position_measures = True
-        remaining_to_read = 56
-        while self.measuring:
-            content = self.encoder_socket.recv(100)
-            for c in content:
-                if remaining_to_read == 56:
-                    if c == 255:
+        if self.encoder_socket:
+            self.logger.info("Connection on {}".format(encoder_port))
+            current_measure = bytearray()
+            are_robot_position_measures = True
+            remaining_to_read = 56
+            while self.measuring:
+                content = self.encoder_socket.recv(100)
+                for c in content:
+                    if remaining_to_read == 56:
+                        if c == 255:
+                            remaining_to_read -= 1
+                    elif remaining_to_read == 55:
+                        are_robot_position_measures = c == 0  # b"\x00"
+                        if not are_robot_position_measures:
+                            remaining_to_read = 56
+                        else:
+                            remaining_to_read -= 1
+
+                    elif are_robot_position_measures and 0 < remaining_to_read <= 54:
+                        current_measure.append(c)
                         remaining_to_read -= 1
-                elif remaining_to_read == 55:
-                    are_robot_position_measures = c == 0  # b"\x00"
-                    if not are_robot_position_measures:
+
+                    if remaining_to_read == 0:
                         remaining_to_read = 56
-                    else:
-                        remaining_to_read -= 1
+                        processed_measure = split_encoder_data(current_measure[1:])
+                        self.measures.put(processed_measure.copy(), False)
+                        current_measure = bytearray()
 
-                elif are_robot_position_measures and 0 < remaining_to_read <= 54:
-                    current_measure.append(c)
-                    remaining_to_read -= 1
-
-                if remaining_to_read == 0:
-                    remaining_to_read = 56
-                    processed_measure = split_encoder_data(current_measure[1:])
-                    self.measures.put(processed_measure.copy(), False)
-                    current_measure = bytearray()
-
-            if not self.measuring:
-                self.logger.info("On arrête la récupération des mesures des codeuses")
-                break
-        self.logger.info("connexion fermée")
+                if not self.measuring:
+                    self.logger.info("On arrête la récupération des mesures des codeuses")
+                    break
+            self.logger.info("connexion fermée")
 
     def get_measuring(self):
         return self.measuring
@@ -216,7 +219,6 @@ class LidarThread(Thread):
         Thread.__init__(self)
         self.measuring = True
         self.measures = queue.LifoQueue()
-        self.lidar_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         if logger_name:
             self.logger = logging.getLogger(logger_name)
@@ -224,27 +226,31 @@ class LidarThread(Thread):
             self.logger = logging.basicConfig(stream=sys.stdout)
             self.logger = logging.getLogger(__name__)
         self.logger.info("On se connecte au LiDAR")
+
+        self.lidar_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.lidar_socket.connect((lidar_host, lidar_port))
         except OSError:
             self.logger.error("Le serveur du LiDAR est inaccessible")
+            self.lidar_socket = None
 
     def run(self):
-        self.logger.info("Connection on {}".format(lidar_port))
-        current_measure = []
-        while self.measuring:
-            content = self.lidar_socket.recv(500).decode("utf-8")
-            for c in content:
-                if c == 'M':
-                    a = split_turn(current_measure)
-                    self.measures.put(a)
-                    current_measure = []
-                    # self.close()
-                else:
-                    current_measure.append(c)
-            if not self.measuring:
-                break
-        self.logger.info("connexion fermée")
+        if self.lidar_socket:
+            self.logger.info("Connection on {}".format(lidar_port))
+            current_measure = []
+            while self.measuring:
+                content = self.lidar_socket.recv(500).decode("utf-8")
+                for c in content:
+                    if c == 'M':
+                        a = split_turn(current_measure)
+                        self.measures.put(a)
+                        current_measure = []
+                        # self.close()
+                    else:
+                        current_measure.append(c)
+                if not self.measuring:
+                    break
+            self.logger.info("connexion fermée")
 
     def get_measuring(self):
         return self.measuring
