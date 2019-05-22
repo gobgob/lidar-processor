@@ -43,22 +43,30 @@ for filename in log_files:
     shutil.move(os.path.join(last_log_folder, filename),
                 os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "history"))
 
-logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last",
-                                          "lidar_logs" + datetime.datetime.today().ctime().replace(":", "") + ".txt"))
+# log_filename = "lidar_logs" + datetime.datetime.today().ctime().replace(":", "")
+log_filename = ""
+if log_filename:
+    logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last", log_filename + ".txt"))
+else:
+    logging.basicConfig(stream=sys.stdout)
 
 # endregion
 
 
 def main():
+    logger = logging.getLogger(log_filename)
+
     # region # thread initialisation
-    t_lidar = datr.LidarThread()
+    t_lidar = datr.LidarThread(log_filename)
     t_lidar.start()
 
-    t_ll = datr.EncoderThread()
+    t_ll = datr.EncoderThread(log_filename)
     t_ll.start()
 
-    t_hl = comm.HLThread()
+    t_hl = comm.HLThread(log_filename)
     t_hl.start()
+
+    logger.info("Fils de communication lancés")
 
     time.sleep(3)
     # endregion
@@ -85,11 +93,13 @@ def main():
                 start_enemy_positions = eloc.find_robots_in_purple_zone(one_turn_clusters)
                 computed_opponent_robot_position = True
                 own_colour_team = TeamColor.purple
+                logger.info("On est violet")
 
             elif t_hl.get_team_colour() == TeamColor.orange:
                 start_enemy_positions = eloc.find_robot_in_orange_zone(one_turn_clusters)
                 computed_opponent_robot_position = True
                 own_colour_team = TeamColor.orange
+                logger.info("On est orange")
 
             # retrieves and filters measures
             one_turn_points = dacl.filter_points(t_lidar.get_measures(), 50)
@@ -107,6 +117,7 @@ def main():
                 for enemy_position in start_enemy_positions:
                     t_hl.send_robot_position(*enemy_position)
     # endregion
+    logger.info("Le match vient de commencer")
 
     # region # match
     while not t_hl.has_match_stopped():
@@ -148,10 +159,13 @@ def main():
             t_ll.send_position_shift(proprioceptive_position - own_position)  # convention
         time.sleep(1)
     # endregion
-
+    logger.info("Le match est fini")
     # region # end of match
     t_lidar.close_connection()
+    t_hl.close_connection()
+    t_ll.close_connection()
     time.sleep(3)
+    logger.info("On a fermé les connexions")
     # sys.exit(0)
     # endregion
 

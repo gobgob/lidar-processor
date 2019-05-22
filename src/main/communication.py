@@ -24,17 +24,27 @@ class HLThread(Thread):
     Communication to the High-Level
     https://github.com/gobgob/chariot-elevateur/blob/master/high_level/src/main/java/senpai/comm/LidarEth.java
     """
-    def __init__(self):
+    def __init__(self, logger_name=None):
         Thread.__init__(self)
+
+        self.logger = logging.getLogger(logger_name)
         self.communicating = True
-        self.messages = queue.Queue(maxsize=1)
+        self.messages = queue.LifoQueue()
+        if logger_name:
+            self.logger = logging.getLogger(logger_name)
+        else:
+            self.logger = logging.basicConfig(stream=sys.stdout)
+
+        self.logger.info("On ouvre la socket du haut-niveau.")
         self.hl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.hl_socket.connect((hl_host, hl_port))
+        try:
+            self.hl_socket.connect((hl_host, hl_port))
+        except OSError:
+            self.logger.error("Le serveur du haut-niveau est inaccessible")
 
         self.match_has_begun = False
         self.team_colour = None
         self.match_stopped = False
-        # self.
 
     def ask_status(self):
         self.hl_socket.send("ASK_STATUS\n".encode("ascii"))
@@ -44,7 +54,7 @@ class HLThread(Thread):
         self.hl_socket.send(message_to_send.encode("ascii"))
 
     def run(self):
-        print("Connection on {}".format(hl_port))
+        self.logger.info("Connection on {}".format(hl_port))
         current_measure = []
 
         while self.communicating:
@@ -67,7 +77,10 @@ class HLThread(Thread):
                     current_measure = []
                 else:
                     current_measure.append(c)
-        print("connexion fermée")
+            if not self.communicating:
+                self.logger.info("On arrête la communication avec le haut-niveau")
+                break
+        self.logger.info("connexion fermée")
 
     def get_measuring(self):
         return self.communicating

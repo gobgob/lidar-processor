@@ -10,7 +10,6 @@ Received data must respect the following rules:
 
 1
 """
-import sys
 import socket
 import struct
 import time
@@ -130,11 +129,20 @@ def trame_delimiter(content):
 
 
 class EncoderThread(Thread):
-    def __init__(self):
+    def __init__(self, logger_name=None):
         Thread.__init__(self)
         self.measuring = True
         self.measures = queue.LifoQueue()
-        self.encoder_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if logger_name:
+            self.logger = logging.getLogger(logger_name)
+        else:
+            self.logger = logging.basicConfig(stream=sys.stdout)
+        self.logger.info("On ouvre la socket des codeuses.")
+        try:
+            self.encoder_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        except OSError:
+            self.logger.error("Le serveur de codeuses est inaccessible")
+
         self.encoder_socket.connect((encoder_host, encoder_port))
         self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))  # sign on odometry b'\xFF\x00\x01\x01'
         self.encoder_socket.send(bytes([0xFF, 0x01, 0x01, 0x01]))  # sign off info b'\xFF\x01\x01\x00'
@@ -145,7 +153,7 @@ class EncoderThread(Thread):
         # print(content)
 
     def run(self):
-        print("Connection on {}".format(encoder_port))
+        self.logger.info("Connection on {}".format(encoder_port))
         current_measure = bytearray()
         are_robot_position_measures = True
         remaining_to_read = 56
@@ -173,8 +181,9 @@ class EncoderThread(Thread):
                     current_measure = bytearray()
 
             if not self.measuring:
+                self.logger.info("On arrête la récupération des mesures des codeuses")
                 break
-        print("connexion fermée")
+        self.logger.info("connexion fermée")
 
     def get_measuring(self):
         return self.measuring
@@ -202,16 +211,24 @@ class EncoderThread(Thread):
 
 
 class LidarThread(Thread):
-    def __init__(self):
+    def __init__(self, logger_name=None):
         Thread.__init__(self)
         self.measuring = True
         self.measures = queue.LifoQueue()
         self.lidar_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        self.lidar_socket.connect((lidar_host, lidar_port))
+        if logger_name:
+            self.logger = logging.getLogger(logger_name)
+        else:
+            self.logger = logging.basicConfig(stream=sys.stdout)
+        self.logger.info("On se connecte au LiDAR")
+        try:
+            self.lidar_socket.connect((lidar_host, lidar_port))
+        except OSError:
+            self.logger.error("Le serveur du LiDAR est inaccessible")
 
     def run(self):
-        print("Connection on {}".format(lidar_port))
+        self.logger.info("Connection on {}".format(lidar_port))
         current_measure = []
         while self.measuring:
             content = self.lidar_socket.recv(500).decode("utf-8")
@@ -225,7 +242,7 @@ class LidarThread(Thread):
                     current_measure.append(c)
             if not self.measuring:
                 break
-        print("connexion fermée")
+        self.logger.info("connexion fermée")
 
     def get_measuring(self):
         return self.measuring
