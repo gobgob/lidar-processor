@@ -30,11 +30,11 @@ def find_robots_in_zone(zone: ta.Rectangle, clusters: List[Cluster]):
     opponent_robots = [cluster for cluster in clusters_in_purple_zone if cluster.is_an_opponent_robot_beacon()]
     for i, opponent_robot in enumerate(opponent_robots):
         params = opponent_robot.is_a_circle(OPPONENT_ROBOT_BEACON_RADIUS)
-        robot_paramters.append([params.x[0], params.x[1], OPPONENT_ROBOT_BEACON_RADIUS, i, int(time.time())])
+        robot_paramters.append([params.x[0], params.x[1], i, int(time.time())])
     return robot_paramters
 
 
-def find_robots_in_purple_zone(clusters: List[Cluster]) -> np.ndarray:
+def find_robots_in_purple_zone(clusters: List[Cluster]):
     """
 
     :param clusters:
@@ -44,7 +44,7 @@ def find_robots_in_purple_zone(clusters: List[Cluster]) -> np.ndarray:
     return find_robots_in_zone(purple_zone, clusters)
 
 
-def find_robot_in_orange_zone(clusters: List[Cluster]) -> np.ndarray:
+def find_robot_in_orange_zone(clusters: List[Cluster]):
     """
 
     :param clusters:

@@ -9,6 +9,7 @@ The protocol is given at https://github.com/gobgob/chariot-elevateur/blob/master
 
 import queue
 import socket
+import time
 from threading import Thread
 
 from main.constants import *
@@ -47,12 +48,17 @@ class HLThread(Thread):
         self.match_has_begun = False
         self.team_colour = None
         self.match_stopped = False
+        self.shift = [0, 0, 0]
 
     def ask_status(self):
         self.hl_socket.send("ASK_STATUS\n".encode("ascii"))
 
-    def send_robot_position(self, x: int, y: int, radius: int, robot_id: int, timestamp: int):
-        message_to_send = "OBSTACLE "+str(x)+" "+str(y)+" "+str(radius)+" "+str(robot_id)+" "+str(timestamp)+"\n"
+    def send_robot_position(self, x: int, y: int,  robot_id: int, timestamp: int):
+        message_to_send = "OBSTACLE "+str(x)+" "+str(y)+" "+str(robot_id)+" "+str(timestamp)+"\n"
+        self.hl_socket.send(message_to_send.encode("ascii"))
+
+    def send_shift(self):
+        message_to_send = "DECALAGE "+str(self.shift[0])+" "+str(self.shift[1])+" "+str(self.shift[2])
         self.hl_socket.send(message_to_send.encode("ascii"))
 
     def run(self):
@@ -77,9 +83,13 @@ class HLThread(Thread):
                         elif current_measure == "STOP":
                             self.match_stopped = True
 
+                        elif current_measure == "CORRECTION_ODO":
+                            self.send_shift()
+
                         current_measure = []
                     else:
                         current_measure.append(c)
+                time.sleep(0.1)
                 if not self.communicating:
                     self.logger.info("On arrête la communication avec le haut-niveau")
                     break
@@ -100,3 +110,11 @@ class HLThread(Thread):
 
     def has_match_stopped(self):
         return self.match_stopped
+
+    def set_recalibration(self, delta: list):
+        """
+
+        :param delta:
+        :return:
+        """
+        self.shift = delta

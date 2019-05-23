@@ -5,6 +5,8 @@ Main script to launch before the match.
 
 The aim is to follow opponent robots' positions and to calibrate regularly its owb position thanks to immobile beacons.
 
+/home/pi/lidar-processor/lidar_env/bin/python /home/pi/lidar-processor/src/main_script.py
+
 """
 import shutil
 import time
@@ -158,7 +160,7 @@ def main():
         # endregion
 
         if datr.are_encoder_measures_and_lidar_measures_different(proprioceptive_position, own_position):
-            t_ll.send_position_shift(proprioceptive_position - own_position)  # convention
+            t_hl.set_recalibration(proprioceptive_position - own_position)  # convention
         time.sleep(1)
     # endregion
     logger.info("Le match est fini")

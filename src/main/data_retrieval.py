@@ -207,16 +207,6 @@ class EncoderThread(Thread):
         else:
             return []
 
-    def send_position_shift(self, position_shift):
-        """
-
-        :param: position_shift
-        :return:
-        """
-        # x, y, theta = position_shift[0], position_shift[1], position_shift[2]
-
-        self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))
-
 
 class LidarThread(Thread):
     def __init__(self, logger_name=None):
