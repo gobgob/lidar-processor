@@ -44,6 +44,7 @@ class HLThread(Thread):
         except OSError:
             self.logger.error("Le serveur du haut-niveau est inaccessible")
             self.hl_socket = None
+            sys.exit(1)
 
         self.match_has_begun = False
         self.team_colour = None

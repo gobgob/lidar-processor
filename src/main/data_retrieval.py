@@ -146,6 +146,7 @@ class EncoderThread(Thread):
         except OSError:
             self.logger.error("Le serveur de codeuses est inaccessible")
             self.encoder_socket = None
+            sys.exit(1)
 
         if self.encoder_socket:
             self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))  # sign on odometry b'\xFF\x00\x01\x01'
@@ -227,6 +228,7 @@ class LidarThread(Thread):
         except OSError:
             self.logger.error("Le serveur du LiDAR est inaccessible")
             self.lidar_socket = None
+            sys.exit(1)
 
     def run(self):
         if self.lidar_socket:
