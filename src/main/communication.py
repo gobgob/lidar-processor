@@ -100,8 +100,8 @@ class HLThread(Thread):
         return self.communicating
 
     def close_connection(self):
-        self.hl_socket.close()
         self.communicating = False
+        self.hl_socket.close()
 
     def has_match_begun(self):
         return self.match_has_begun

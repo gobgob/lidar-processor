@@ -195,10 +195,10 @@ class EncoderThread(Thread):
         return self.measuring
 
     def close_connection(self):
+        self.measuring = False
         self.encoder_socket.send(b'\xFF\x00\x01\x00')
         time.sleep(1)
         self.encoder_socket.close()
-        self.measuring = False
 
     def get_measures(self):
         if self.encoder_socket:
@@ -252,8 +252,8 @@ class LidarThread(Thread):
         return self.measuring
 
     def close_connection(self):
-        self.lidar_socket.close()
         self.measuring = False
+        self.lidar_socket.close()
 
     def get_measures(self):
         if self.lidar_socket:
