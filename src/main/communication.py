@@ -72,22 +72,27 @@ class HLThread(Thread):
             current_measure = []
 
             while self.communicating:
-                content = self.hl_socket.recv(100).decode("ascii")
-                if content.startswith("ACK"):
-                    # self.messages.put("ACK")
-                    pass
-                elif content.startswith("INIT VIOLET"):
-                    self.team_colour = TeamColor.purple
-                elif content.startswith("INIT JAUNE"):
-                    self.team_colour = TeamColor.orange
-                elif content.startswith("START"):
-                    self.match_has_begun = True
-                elif content.startswith("STOP"):
-                    self.match_stopped = True
-                elif content.startswith("CORRECTION_ODO"):
-                    self.send_shift()
-                else:
-                    self.logger.error("Message mal formé du HL: "+content)
+                for c in content:
+                    if c == '\n':
+                        current_measure = "".join(current_measure)
+                        if current_measure == "ACK":
+                            # self.messages.put("ACK")
+                            pass
+                        elif current_measure == "INIT VIOLET":
+                            self.team_colour = TeamColor.purple
+                        elif current_measure == "INIT JAUNE":
+                            self.team_colour = TeamColor.orange
+                        elif current_measure == "START":
+                            self.match_has_begun = True
+                        elif current_measure == "STOP":
+                            self.match_stopped = True
+
+                        elif current_measure == "CORRECTION_ODO":
+                            self.send_shift()
+
+                        current_measure = []
+                    else:
+                        current_measure.append(c)
 
                 time.sleep(0.1)
             self.logger.info("On arrête la communication avec le haut-niveau")
