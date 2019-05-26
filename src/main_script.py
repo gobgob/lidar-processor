@@ -86,40 +86,55 @@ def main():
     # endregion
 
     # region # before the match
+    logger.info("Premières mesures")
     one_turn_points = dacl.filter_points(t_lidar.get_measures(), 50)
-    one_turn_clusters = clus.clusterize(one_turn_points)
+    print(one_turn_points[0])
+    one_turn_clusters = clus.polar_clusterize(one_turn_points)
+    print(len(one_turn_clusters))
+    print(one_turn_clusters[0])
+
+    logger.info("Match a commencé : "+str(t_hl.has_match_begun()))
+    logger.info("taille clusters : "+str(len(one_turn_clusters)))
 
     while not t_hl.has_match_begun():
         # team colour
+        logger.info(t_hl.get_team_colour())
         if t_hl.get_team_colour() is not None:
             # computes the position
-            if t_hl.get_team_colour() == TeamColor.purple:
+            if t_hl.get_team_colour() == TeamColor.purple.value:
                 start_enemy_positions = eloc.find_robots_in_purple_zone(one_turn_clusters)
                 computed_opponent_robot_position = True
                 own_colour_team = TeamColor.purple
                 logger.info("On est violet")
+                # beacons should be at
 
-            elif t_hl.get_team_colour() == TeamColor.orange:
+            elif t_hl.get_team_colour() == TeamColor.orange.value:
                 start_enemy_positions = eloc.find_robot_in_orange_zone(one_turn_clusters)
                 computed_opponent_robot_position = True
                 own_colour_team = TeamColor.orange
                 logger.info("On est orange")
+                # beacons should be at
 
             # retrieves and filters measures
             one_turn_points = dacl.filter_points(t_lidar.get_measures(), 50)
             cartesian_one_turn_points = outr.one_turn_to_cartesian_points(one_turn_points)
-            one_turn_clusters = clus.clusterize(cartesian_one_turn_points)
+            one_turn_clusters, means = clus.clusterize(cartesian_one_turn_points)
+
+            for mean in means:
+                logger.info("moyenne cluster : ", mean)
 
             # find beacons position
             beacon_positions = sloc.find_beacons(one_turn_clusters)
             # find own position
             self_position = sloc.find_own_position(beacon_positions, own_colour_team)
-            t_ll.send_position_shift(self_position)
+
+            logger.info(self_position)
 
             # send the positions of the opponent robots
             if computed_opponent_robot_position:
                 for enemy_position in start_enemy_positions:
                     t_hl.send_robot_position(*enemy_position)
+        time.sleep(1)
     # endregion
     logger.info("Le match vient de commencer")
 
