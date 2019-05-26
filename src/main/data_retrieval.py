@@ -60,7 +60,7 @@ if "numpy" in sys.modules:
 
 
 def split_turn(turn: List[str]):
-    return [measure.split(":") for measure in "".join(turn).split(";") if measure]
+    return [[float(i) for i in measure.split(":")] for measure in "".join(turn).split(";") if measure]
 
 
 def split_encoder_data(encoder_measure: bytes):
@@ -257,7 +257,9 @@ class LidarThread(Thread):
 
     def get_measures(self):
         if self.lidar_socket:
-            return self.measures.get()
+            res = self.measures.get()
+            # self.logger.info("measure "+ str(res))
+            return res
         else:
             return []
 
