@@ -41,8 +41,8 @@ class HLThread(Thread):
         self.hl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.hl_socket.connect((hl_host, hl_port))
-        except OSError:
-            self.logger.error("Le serveur du haut-niveau est inaccessible")
+        except OSError as e:
+            self.logger.error("Le serveur du haut-niveau est inaccessible : "+str(e))
             self.hl_socket = None
             sys.exit(1)
 
@@ -72,6 +72,7 @@ class HLThread(Thread):
             current_measure = []
 
             while self.communicating:
+                content = self.hl_socket.recv(100).decode("ascii")
                 for c in content:
                     if c == '\n':
                         current_measure = "".join(current_measure)
@@ -109,6 +110,7 @@ class HLThread(Thread):
         return self.match_has_begun
 
     def get_team_colour(self):
+        # return TeamColor.purple.value
         return self.team_colour
 
     def has_match_stopped(self):
