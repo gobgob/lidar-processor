@@ -70,7 +70,7 @@ class HLThread(Thread):
         if self.hl_socket:
             self.logger.info("Connection on {}".format(hl_port))
             current_measure = []
-
+            content = self.hl_socket.recv(100).decode("ascii")
             while self.communicating:
                 for c in content:
                     if c == '\n':
