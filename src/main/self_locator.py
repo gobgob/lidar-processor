@@ -14,11 +14,33 @@ from typing import List
 from main.constants import *
 from main.clustering import Cluster, Beacon
 import main.geometry as geom
+import main.table as table
 
 __author__ = "Clément Besnier"
+p_beacons_orange = [[geom.Point(point[0], point[1]) for point in limits]for limits in beacons_orange]
+p_beacons_purple = [[geom.Point(point[0], point[1]) for point in limits]for limits in beacons_purple]
 
 
-def find_beacons(cluster: List[Cluster]):
+def define_point_beacons(own_colour: TeamColor):
+    if own_colour.value == TeamColor.orange.value:
+        bo1 = table.Rectangle(p_beacons_orange[0]).get_center()
+        print(bo1)
+        bo2 = table.Rectangle(p_beacons_orange[1]).get_center()
+        print(bo2)
+        bo3 = table.Rectangle(p_beacons_orange[2]).get_center()
+        print(bo3)
+        return bo1, bo2, bo3
+    elif own_colour.value == TeamColor.purple.value:
+        bp1 = table.Rectangle(p_beacons_purple[0]).get_center()
+        print(bp1)
+        bp2 = table.Rectangle(p_beacons_purple[1]).get_center()
+        print(bp2)
+        bp3 = table.Rectangle(p_beacons_purple[2]).get_center()
+        print(bp3)
+        return bp1, bp2, bp3
+
+
+def find_beacons(cluster: List[Cluster]) -> List[Beacon]:
     """
     
     :param cluster: 
@@ -32,6 +54,17 @@ def find_beacons(cluster: List[Cluster]):
     return fix_beacons
 
 
+def find_relative_point_beacons(beacons: List[geom.Point], robot_position: geom.Point, robot_orientation: float):
+    """
+    >>> beacons = list(define_point_beacons(TeamColor.orange))
+    >>> find_relative_point_beacons(beacons, geom.Point(), 0)
+    :param beacons:
+    :param robot_position:
+    :param robot_orientation:
+    :return:
+    """
+
+
 def find_own_position(beacons: List[Beacon], own_colour_team: TeamColor):
     """
 
@@ -42,13 +75,15 @@ def find_own_position(beacons: List[Beacon], own_colour_team: TeamColor):
     index of the robot, timestamp]
     """
 
+    b1, b2, b3 = define_point_beacons(own_colour_team)
+
     for beacon in beacons:
         # TODO improve it, because I need to get polar coordinates to do it correctly
-        if own_colour_team == TeamColor.orange:
+        if own_colour_team.value == TeamColor.orange.value:
             x = beacons_orange[beacon.index][0] - beacon.cluster
             y = beacons_orange[beacon.index][1]
             print(x, y)
-        elif own_colour_team == TeamColor.purple:
+        elif own_colour_team.value == TeamColor.purple.value:
             x = beacons_purple[beacon.index][0]
             y = beacons_purple[beacon.index][1]
             print(x, y)
@@ -58,6 +93,7 @@ def find_own_position(beacons: List[Beacon], own_colour_team: TeamColor):
 
     beacon_2 = Beacon()
     beacon_2.set_by_upper_left_and_lower_right(beacons_purple[1][0], beacons_purple[1][1])
+
     beacon_3 = Beacon()
     beacon_3.set_by_upper_left_and_lower_right(beacons_purple[2][0], beacons_purple[2][1])
 
