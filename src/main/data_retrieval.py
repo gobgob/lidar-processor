@@ -86,7 +86,7 @@ def split_encoder_data(encoder_measure: bytes):
     x, = struct.unpack('i', encoder_measure[:4])
     y, = struct.unpack('i', encoder_measure[4:8])
     orientation, = struct.unpack('f', encoder_measure[8:12])
-    return [x, y, orientation, time.time()]
+    return [int(x), int(y), float(orientation), time.time()]
 
 
 def trame_delimiter(content):
