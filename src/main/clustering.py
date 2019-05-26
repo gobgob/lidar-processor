@@ -7,7 +7,7 @@ Clustering module.
 """
 from typing import List
 
-import math
+
 import numpy as np
 from scipy.optimize import root
 
@@ -178,13 +178,9 @@ class Cluster:
 
 
 def distance(point, other):
-    res = 0
-    for i in range(len(point)):
-        res += (point[i] - other[i]) ** 2
-    return math.sqrt(res)
-#    diff = point - other
-#    res = np.sqrt(diff @ diff.T)
-#    return res
+    diff = point - other
+    res = np.sqrt(diff @ diff.T)
+    return res
 
 
 def distance_al_kashi(angle1, distance1, angle2, distance2):
