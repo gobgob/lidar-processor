@@ -5,8 +5,7 @@ Clustering module.
 
 3
 """
-from typing import List
-
+from typing import List, Tuple
 
 import numpy as np
 from scipy.optimize import root
@@ -74,6 +73,7 @@ class Cluster:
         pass
 
     def compute_mean(self):
+        print("taille moyenne ", len(self.points))
         self.mean = np.sum(self.points, axis=0)/len(self.points)
 
     def get_mean(self):
@@ -134,6 +134,7 @@ class Cluster:
 
     def is_an_opponent_robot_beacon(self):
         initial_guess = self.get_mean()
+        print(initial_guess)
         # print(type(initial_guess))
         # initial_guess = 0
         solution = root(self._adverse_objective_function, initial_guess, method="lm")
@@ -141,8 +142,12 @@ class Cluster:
         # print("solution", solution.x)
         # print("error", solution.fun)
         beacon = None
-        if solution.fun < TOLERANCE_FOR_CIRCLE_COHERENCE:
+        print(solution.fun)
+        print(len(solution.fun))
+        if solution.fun[0] < TOLERANCE_FOR_CIRCLE_COHERENCE:
             beacon = Beacon()
+            print(len(solution.x))
+            print(solution.x)
             beacon.set_parameters(solution.x[0], solution.x[1], OPPONENT_ROBOT_BEACON_RADIUS, 0)
         return beacon
 
@@ -175,6 +180,11 @@ class Cluster:
 
     def _adverse_objective_function(self, pos):
         return self._objective_function(pos, self.adverse_robot_radius)
+
+    def new_cluster_by_points(self, points: List):
+        new_cluster = Cluster()
+        new_cluster.points = points
+        return new_cluster
 
 
 def distance(point, other):
@@ -237,58 +247,66 @@ def cluster_polar_distance_closest(cluster, other):
     return min([dist1, dist2])
 
 
-def polar_clusterize(polar_measures):
+def polar_clusterize(polar_measures)-> Tuple[List, List]:
     """
 
     :param polar_measures: Polar coordinates
     :return:
     """
-    n = 0
-    clusters = [[polar_measures[0]]]
+    if len(polar_measures) > 0:
+        n = 0
+        clusters = [[polar_measures[0]]]
 
-    for i in range(1, len(polar_measures) - 1):
-        if polar_distance(polar_measures[i - 1], polar_measures[i]) > minimum_distance_between_clusters:
-            n += 1
-            clusters.append([])
-        clusters[n].append(polar_measures[i])
-    if polar_distance(polar_measures[0], polar_measures[-1]) <= minimum_distance_between_clusters:
-        clusters[-1].extend(clusters[0])
-        clusters[0] = clusters.pop()
-        n -= 1
-
-    if len(clusters) > 1:
-        j = 0
-        k = 1
-        while k < n:
-            # dist_j = cluster_distance_mean(clusters[j], clusters[k])
-            dist_j = cluster_polar_distance_closest(clusters[j], clusters[k])
-            # if cluster barycenters are close enough to each other, then clusters are merged
-            if dist_j < 200:
-                clusters[j].extend(clusters[k])
-                del clusters[k]
-                n -= 1
-            else:
-                # if the j'th and k'th are far enough, then, they are just different clusters
-                j += 1
-                k += 1
-                # if a cluster has too few points, then it is deleted
-                if len(clusters[j - 1]) < minimum_points_in_cluster:
-                    del clusters[j - 1]
-                    n -= 1
-        # if cluster_distance_mean(clusters[0], clusters[-1]) < 200:
-        if cluster_polar_distance_closest(clusters[0], clusters[-1]) < 200:
+        for i in range(1, len(polar_measures) - 1):
+            if polar_distance(polar_measures[i - 1], polar_measures[i]) > minimum_distance_between_clusters:
+                n += 1
+                clusters.append([])
+            clusters[n].append(polar_measures[i])
+        if polar_distance(polar_measures[0], polar_measures[-1]) <= minimum_distance_between_clusters:
             clusters[-1].extend(clusters[0])
             clusters[0] = clusters.pop()
+            n -= 1
 
-        means = []
-        for cluster in clusters:
-            mean_cluster = np.sum(cluster, axis=0) / len(cluster)
-            means.append(mean_cluster)
-            # print(mean_cluster)
-        return clusters, means
+        if len(clusters) > 1:
+            j = 0
+            k = 1
+            while k < n:
+                # dist_j = cluster_distance_mean(clusters[j], clusters[k])
+                dist_j = cluster_polar_distance_closest(clusters[j], clusters[k])
+                # if cluster barycenters are close enough to each other, then clusters are merged
+                if dist_j < 200:
+                    clusters[j].extend(clusters[k])
+                    del clusters[k]
+                    n -= 1
+                else:
+                    # if the j'th and k'th are far enough, then, they are just different clusters
+                    j += 1
+                    k += 1
+                    # if a cluster has too few points, then it is deleted
+                    if len(clusters[j - 1]) < minimum_points_in_cluster:
+                        del clusters[j - 1]
+                        n -= 1
+            # if cluster_distance_mean(clusters[0], clusters[-1]) < 200:
+            if cluster_polar_distance_closest(clusters[0], clusters[-1]) < 200:
+                clusters[-1].extend(clusters[0])
+                clusters[0] = clusters.pop()
+
+            means = []
+            for cluster in clusters:
+                mean_cluster = np.sum(cluster, axis=0) / len(cluster)
+                means.append(mean_cluster)
+                # print(mean_cluster)
+            new_clusters = []
+            for cluster in clusters:
+                new_cluster = Cluster()
+                new_cluster.new_cluster_by_points(cluster)
+                new_clusters.append(new_cluster)
+            return clusters, means
+    else:
+        return [], []
 
 
-def clusterize(cartesian_measures: List[np.ndarray]):
+def clusterize(cartesian_measures: List[np.ndarray]) -> Tuple[List, List]:
     """
 
     :param cartesian_measures: Cartesian coordinates
@@ -337,7 +355,13 @@ def clusterize(cartesian_measures: List[np.ndarray]):
                 mean_cluster = np.sum(cluster, axis=0) / len(cluster)
                 means.append(mean_cluster)
                 # print(mean_cluster)
-            return clusters, means
+
+            new_clusters = []
+            for cluster in clusters:
+                new_cluster = Cluster()
+                new_cluster.new_cluster_by_points(cluster)
+                new_clusters.append(new_cluster)
+            return new_clusters, means
         else:
             return [], []
 
