@@ -4,7 +4,7 @@
 Table with LiDAR obstacles.
 """
 
-from typing import List
+from typing import List, Union
 
 import numpy as np
 try:
@@ -31,15 +31,33 @@ class Obstacle:
 class Rectangle:
     def __init__(self, limits: List[geom.Point]):
         self.upper_left, self.lower_right = limits
+        center = geom.Point(0, 0)
+        for position in limits:
+            center = center + position
+        self.center = center.multiply_by(1 / 2.)
 
-    def is_point_in_rectangle(self, point: geom.Point):
-        return self.upper_left.x <= point.x <= self.lower_right.x and\
-               self.lower_right.y <= point.y <= self.upper_left.y
+    def get_center(self):
+        return self.center
 
-    def is_cluster_in_rectangle(self, cluster: Cluster):
-        for point in cluster.points:
-            if not self.is_point_in_rectangle(geom.Point(point[0], point[1])):
-                return False
+    def is_point_in_rectangle(self, point: Union[geom.Point, np.ndarray]):
+        print(point)
+        if isinstance(point, geom.Point):
+            return self.upper_left.x <= point.x <= self.lower_right.x and\
+                   self.lower_right.y <= point.y <= self.upper_left.y
+        elif isinstance(point, np.ndarray):
+            return self.upper_left.x <= point[0] <= self.lower_right.x and \
+                   self.lower_right.y <= point[1] <= self.upper_left.y
+
+    def is_cluster_in_rectangle(self, cluster: Union[Cluster, List]):
+        if isinstance(cluster, Cluster):
+            for point in cluster.points:
+                if not self.is_point_in_rectangle(geom.Point(point.x, point.y)):
+                    return False
+        elif type(cluster) == list:
+            for point in cluster:
+                print(point)
+                if not self.is_point_in_rectangle(geom.Point(point[0], point[1])):
+                    return False
         return True
 
 
@@ -290,199 +308,3 @@ class Table:
         # print(len(vertices))
         # for j in vertices:
         #     print(j)
-
-
-# region ++ mains
-def main():
-    table = Table()
-    # for orange
-    beacon_1 = Square([geom.Point(-1500 - 100, 2000), geom.Point(-1500, 2000), geom.Point(-1500, 2000 - 100),
-                       geom.Point(-1500 - 100, 2000 - 100)])
-    beacon_2 = Square([geom.Point(1500, 1000 + 50), geom.Point(1500 + 100, 1000 + 50),
-                       geom.Point(1500 + 100, 1000 - 50), geom.Point(1500, 1000 - 50)])
-    beacon_3 = Square([geom.Point(-1500 - 100, 0 + 100), geom.Point(-1500, 0 + 100), geom.Point(-1500, 0),
-                       geom.Point(-1500 - 100, 0)])
-
-    table.add_square_obstacle(beacon_1)
-    table.add_square_obstacle(beacon_2)
-    table.add_square_obstacle(beacon_3)
-
-    table.add_edge_point(geom.Point(-1500, 0))
-    table.add_edge_point(geom.Point(1500, 0))
-    table.add_edge_point(geom.Point(1500, 2000))
-    table.add_edge_point(geom.Point(-1500, 2000))
-
-    measure = geom.Point(-1000, 1100)
-
-    vectors, robot_vector = table.simulate_measure(measure, 0.5, 200)
-
-    table.init_plot()
-    table.plot_edges()
-    table.plot_obstacles()
-    table.plot_measures(measure, vectors, robot_vector)
-    table.plot()
-
-
-def main_2():
-    table = Table()
-    # for orange
-    beacon_1 = Square([geom.Point(-1500 - 100, 2000), geom.Point(-1500, 2000), geom.Point(-1500, 2000 - 100),
-                       geom.Point(-1500 - 100, 2000 - 100)])
-    beacon_2 = Square([geom.Point(1500, 1000 + 50), geom.Point(1500 + 100, 1000 + 50),
-                       geom.Point(1500 + 100, 1000 - 50), geom.Point(1500, 1000 - 50)])
-    beacon_3 = Square([geom.Point(-1500 - 100, 0 + 100), geom.Point(-1500, 0 + 100), geom.Point(-1500, 0),
-                       geom.Point(-1500 - 100, 0)])
-
-    table.add_square_obstacle(beacon_1)
-    table.add_square_obstacle(beacon_2)
-    table.add_square_obstacle(beacon_3)
-
-    table.add_edge_point(geom.Point(-1500, 0))
-    table.add_edge_point(geom.Point(1500, 0))
-    table.add_edge_point(geom.Point(1500, 2000))
-    table.add_edge_point(geom.Point(-1500, 2000))
-
-    translation_vector = geom.Vector()
-    translation_vector.set_coordinates(+1000, -1100)
-    table.translate(translation_vector)
-
-    # rotation_angle = np.pi / 3
-    rotation_angle = 0.5
-    table.rotate(rotation_angle)
-
-    measure = geom.Point(-1000, 1100)
-    measure = translation_vector.apply_to_point(measure)
-    measure.rotate(rotation_angle)
-    vectors, robot_vector = table.simulate_measure(measure, 0, 200)
-
-    table.init_plot()
-    table.plot_edges()
-    table.plot_obstacles()
-    table.plot_measures(measure, vectors, robot_vector)
-    table.plot()
-
-
-def main_3():
-    table = Table()
-    # for orange
-    beacon_1 = Square([geom.Point(-1500 - 100, 2000), geom.Point(-1500, 2000), geom.Point(-1500, 2000 - 100),
-                       geom.Point(-1500 - 100, 2000 - 100)])
-    beacon_2 = Square([geom.Point(1500, 1000 + 50), geom.Point(1500 + 100, 1000 + 50),
-                       geom.Point(1500 + 100, 1000 - 50), geom.Point(1500, 1000 - 50)])
-    beacon_3 = Square([geom.Point(-1500 - 100, 0 + 100), geom.Point(-1500, 0 + 100), geom.Point(-1500, 0),
-                       geom.Point(-1500 - 100, 0)])
-
-    table.add_square_obstacle(beacon_1)
-    table.add_square_obstacle(beacon_2)
-    table.add_square_obstacle(beacon_3)
-
-    table.add_edge_point(geom.Point(-1500, 0))
-    table.add_edge_point(geom.Point(1500, 0))
-    table.add_edge_point(geom.Point(1500, 2000))
-    table.add_edge_point(geom.Point(-1500, 2000))
-
-    # translation_vector = geom.Vector()
-    # translation_vector.set_coordinates(+1000, -1100)
-    # table.translate(translation_vector)
-
-    # rotation_angle = np.pi / 3
-    # rotation_angle = 0.5
-    # table.rotate(rotation_angle)
-
-    measure = geom.Point(-300, 1400)
-    # measure = translation_vector.apply_to_point(measure)
-    # measure.rotate(rotation_angle)
-    # vectors, robot_vector = table.simulate_measure(measure, 0, 200)
-
-    table.init_plot()
-    table.plot_edges()
-    # table.plot_obstacles()
-    # table.plot_measures(measure, vectors, robot_vector)
-    table.generate_measures(measure)
-    table.plot()
-
-
-def main_4():
-    table = Table()
-    # for orange
-    beacon_1 = Square([geom.Point(-1500 - 100, 2000), geom.Point(-1500, 2000), geom.Point(-1500, 2000 - 100),
-                       geom.Point(-1500 - 100, 2000 - 100)])
-    beacon_2 = Square([geom.Point(1500, 1000 + 50), geom.Point(1500 + 100, 1000 + 50),
-                       geom.Point(1500 + 100, 1000 - 50), geom.Point(1500, 1000 - 50)])
-    beacon_3 = Square([geom.Point(-1500 - 100, 0 + 100), geom.Point(-1500, 0 + 100), geom.Point(-1500, 0),
-                       geom.Point(-1500 - 100, 0)])
-
-    table.add_square_obstacle(beacon_1)
-    table.add_square_obstacle(beacon_2)
-    table.add_square_obstacle(beacon_3)
-
-    table.add_edge_point(geom.Point(-1500, 0))
-    table.add_edge_point(geom.Point(1500, 0))
-    table.add_edge_point(geom.Point(1500, 2000))
-    table.add_edge_point(geom.Point(-1500, 2000))
-
-    # translation_vector = geom.Vector()
-    # translation_vector.set_coordinates(+1000, -1100)
-    # table.translate(translation_vector)
-
-    # rotation_angle = np.pi / 3
-    # rotation_angle = 0.5
-    # table.rotate(rotation_angle)
-
-    measure = geom.Point(-300, 1400)
-    # measure = translation_vector.apply_to_point(measure)
-    # measure.rotate(rotation_angle)
-
-    clusters = main_clustering()
-    # print("clusters", clusters)
-
-    table.init_plot()
-    table.plot_edges()
-    table.plot_clusters(clusters)
-    # table.plot_obstacles()
-    # table.plot_measures(measure, vectors, robot_vector)
-    table.generate_measures(measure)
-    table.plot()
-
-
-def main_5():
-    table = Table()
-
-    table.add_edge_point(geom.Point(-1500, 0))
-    table.add_edge_point(geom.Point(1500, 0))
-    table.add_edge_point(geom.Point(1500, 2000))
-    table.add_edge_point(geom.Point(-1500, 2000))
-
-    samples = ["0_-1820_pi_over_2", "1210_1400_pi"]
-    measures = get_table_measures(samples[0])
-    for i in range(len(measures)):
-        one_turn_measure = dacl.keep_good_measures(measures[i], 100)
-        # one_turn_measure = dacl.keep_not_too_far_or_not_too_close(one_turn_measure)
-
-    translation_vector = geom.Vector()
-    translation_vector.set_coordinates(+1000, -1100)
-    table.translate(translation_vector)
-
-    # rotation_angle = np.pi / 3
-    rotation_angle = 0.5
-    table.rotate(rotation_angle)
-
-    # measure = geom.Point(0, 1800)
-    # measure = translation_vector.apply_to_point(measure)
-    # measure.rotate(rotation_angle)
-
-    table.init_plot()
-    table.plot_edges()
-    # table.plot_measures()
-
-    # table.plot_obstacles()
-    # table.plot_measures(measure, vectors, robot_vector)
-    table.plot()
-# endregion
-
-
-if __name__ == "__main__":
-    # main()
-    # main_2()
-    # main_3()
-    main_4()
