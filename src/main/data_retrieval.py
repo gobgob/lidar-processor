@@ -60,7 +60,7 @@ if "numpy" in sys.modules:
 
 
 def split_turn(turn: List[str]):
-    return [measure.split(":") for measure in "".join(turn).split(";") if measure]
+    return [list(map(float,measure.split(":"))) for measure in "".join(turn).split(";") if measure]
 
 
 def split_encoder_data(encoder_measure: bytes):
@@ -86,7 +86,7 @@ def split_encoder_data(encoder_measure: bytes):
     x, = struct.unpack('i', encoder_measure[:4])
     y, = struct.unpack('i', encoder_measure[4:8])
     orientation, = struct.unpack('f', encoder_measure[8:12])
-    return [int(x), int(y), float(orientation), time.time()]
+    return [x, y, orientation, time.time()]
 
 
 def trame_delimiter(content):
