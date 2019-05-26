@@ -60,7 +60,7 @@ if "numpy" in sys.modules:
 
 
 def split_turn(turn: List[str]):
-    return [list(map(float,measure.split(":"))) for measure in "".join(turn).split(";") if measure]
+    return np.array([list(map(float,measure.split(":"))) for measure in "".join(turn).split(";") if measure])
 
 
 def split_encoder_data(encoder_measure: bytes):
