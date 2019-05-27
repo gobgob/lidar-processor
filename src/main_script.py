@@ -81,60 +81,70 @@ def main():
     computed_opponent_robot_position = False
     previous_clusters = []
     previous_beacons = []
-    previous_opponent_robots = []
+    # previous_opponent_robots = []
     previous_self_positions = []
     # endregion
 
     # region # before the match
     logger.info("Premières mesures")
-    one_turn_points = dacl.filter_points(t_lidar.get_measures(), 50)
-    print(one_turn_points[0])
-    one_turn_clusters = clus.polar_clusterize(one_turn_points)
-    print(len(one_turn_clusters))
-    print(one_turn_clusters[0])
+    one_turn_points = dacl.filter_points(t_lidar.get_measures(), QUALITY_THRESHOLD)
+    cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
+    # print(one_turn_points[0])
+    one_turn_clusters, means = clus.polar_clusterize(cartesian_one_turn_measure)
+    one_turn_clusters = clus.Cluster.to_clusters(one_turn_clusters)
+
+    print("Il y a ", len(one_turn_clusters), "clusters.")
 
     logger.info("Match a commencé : "+str(t_hl.has_match_begun()))
     logger.info("taille clusters : "+str(len(one_turn_clusters)))
 
     while not t_hl.has_match_begun():
         # team colour
-        logger.info(t_hl.get_team_colour())
+        if t_hl.get_team_colour():
+            logger.info("La couleur : "+t_hl.get_team_colour().name)
+        else:
+            logger.warning("Pas de couleur")
         if t_hl.get_team_colour() is not None:
             # computes the position
-            if t_hl.get_team_colour() == TeamColor.purple.value:
-                start_enemy_positions = eloc.find_robots_in_purple_zone(one_turn_clusters)
+            if t_hl.get_team_colour().value == TeamColor.purple.value:
+                start_enemy_positions = eloc.find_robot_in_orange_zone(one_turn_clusters)
                 computed_opponent_robot_position = True
                 own_colour_team = TeamColor.purple
                 logger.info("On est violet")
                 # beacons should be at
 
-            elif t_hl.get_team_colour() == TeamColor.orange.value:
-                start_enemy_positions = eloc.find_robot_in_orange_zone(one_turn_clusters)
+            elif t_hl.get_team_colour().value == TeamColor.orange.value:
+                start_enemy_positions = eloc.find_robots_in_purple_zone(one_turn_clusters)
                 computed_opponent_robot_position = True
                 own_colour_team = TeamColor.orange
                 logger.info("On est orange")
                 # beacons should be at
 
             # retrieves and filters measures
-            one_turn_points = dacl.filter_points(t_lidar.get_measures(), 50)
+            one_turn_points = dacl.filter_points(t_lidar.get_measures(), QUALITY_THRESHOLD)
             cartesian_one_turn_points = outr.one_turn_to_cartesian_points(one_turn_points)
             one_turn_clusters, means = clus.clusterize(cartesian_one_turn_points)
+            one_turn_clusters = clus.Cluster.to_clusters(one_turn_clusters)
+            print("Il y a ", len(one_turn_clusters), "clusters.")
 
-            for mean in means:
-                logger.info("moyenne cluster : ", mean)
+            # for mean in means:
+            #     logger.info("moyenne cluster : "+str(type(mean))+" "+str(mean))
 
             # find beacons position
-            beacon_positions = sloc.find_beacons(one_turn_clusters)
+            # beacon_positions = sloc.find_beacons(one_turn_clusters)
+            # logger.debug("nombre de balises : "+str(len(beacon_positions)))
+            # sloc.print_beacons(beacon_positions)
             # find own position
-            self_position = sloc.find_own_position(beacon_positions, own_colour_team)
-
-            logger.info(self_position)
+            # self_position = sloc.find_own_position(beacon_positions, own_colour_team)
+            # logger.info(self_position)
+            if own_colour_team:
+                found_b1, found_b2, found_b3 = sloc.find_starting_beacons(own_colour_team, one_turn_clusters)
 
             # send the positions of the opponent robots
             if computed_opponent_robot_position:
                 for enemy_position in start_enemy_positions:
                     t_hl.send_robot_position(*enemy_position)
-        time.sleep(1)
+        time.sleep(10)
     # endregion
     logger.info("Le match vient de commencer")
 
@@ -143,39 +153,45 @@ def main():
         # region # measures
         one_turn_points = dacl.filter_points(t_lidar.get_measures(), THRESHOLD_QUALITY)
         cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
-        clusters = clus.clusterize(cartesian_one_turn_measure)
+        clusters, means = clus.clusterize(cartesian_one_turn_measure)
+        one_turn_clusters = clus.Cluster.to_clusters(clusters)
         # endregion
 
         # region # retrieves position from encoders
-        proprioceptive_position = datr.from_encoder_position_to_lidar_measure(*t_ll.get_measures())
+        proprioceptive_position = datr.from_encoder_position_to_lidar_measure(*t_ll.get_measures()[:3])
+        print(proprioceptive_position)
         # endregion
 
         # region # estimations of positions
-        beacons = sloc.find_beacons(clusters)
+        beacons = sloc.find_beacons(one_turn_clusters)
+        print(len(beacons))
         own_position = sloc.find_own_position(beacons, own_colour_team)
-        robots = eloc.find_robots(clusters)
+        # robots = eloc.find_robots(clusters)
         # endregion
 
         # region # history management
-        previous_clusters.append(clusters.copy())
-        if len(previous_clusters) > 3:
-            previous_clusters.pop(0)
+        if one_turn_clusters:
+            previous_clusters.append(one_turn_clusters.copy())
+            if len(previous_clusters) > 3:
+                previous_clusters.pop(0)
 
-        previous_beacons.append(beacons.copy())
-        if len(previous_beacons) > 3:
-            previous_beacons.pop(0)
+        if beacons:
+            previous_beacons.append(beacons.copy())
+            if len(previous_beacons) > 3:
+                previous_beacons.pop(0)
 
-        previous_opponent_robots.append(robots.copy())
-        if len(previous_opponent_robots) > 3:
-            previous_opponent_robots.pop(0)
-
-        previous_self_positions.append(own_position.copy())
-        if len(previous_self_positions) > 3:
-            previous_self_positions.pop(0)
+        # previous_opponent_robots.append(robots.copy())
+        # if len(previous_opponent_robots) > 3:
+        #     previous_opponent_robots.pop(0)
+        if own_position:
+            previous_self_positions.append(own_position.copy())
+            if len(previous_self_positions) > 3:
+                previous_self_positions.pop(0)
         # endregion
 
-        if datr.are_encoder_measures_and_lidar_measures_different(proprioceptive_position, own_position):
-            t_hl.set_recalibration(proprioceptive_position - own_position)  # convention
+        if own_position:
+            if datr.are_encoder_measures_and_lidar_measures_different(proprioceptive_position, own_position):
+                t_hl.set_recalibration(proprioceptive_position - own_position)  # convention
         time.sleep(1)
     # endregion
     logger.info("Le match est fini")
