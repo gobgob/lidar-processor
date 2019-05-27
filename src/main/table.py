@@ -14,9 +14,9 @@ except ImportError:
     pl = None
     main_clustering = None
 
-import main.data_cleansing as dacl
+from main.constants import *
 from main.clustering import Cluster
-from retrieve_realistic_measures import get_table_measures
+import main.data_retrieval as dr
 import main.geometry as geom
 
 
@@ -40,25 +40,60 @@ class Rectangle:
         return self.center
 
     def is_point_in_rectangle(self, point: Union[geom.Point, np.ndarray]):
-        print(point)
         if isinstance(point, geom.Point):
-            return self.upper_left.x <= point.x <= self.lower_right.x and\
-                   self.lower_right.y <= point.y <= self.upper_left.y
+            return self.upper_left.x-SOFT_THRESHOLD_RECTANGLE <= point.x <= self.lower_right.x+SOFT_THRESHOLD_RECTANGLE and \
+                   self.lower_right.y-SOFT_THRESHOLD_RECTANGLE <= point.y <= self.upper_left.y+SOFT_THRESHOLD_RECTANGLE
         elif isinstance(point, np.ndarray):
-            return self.upper_left.x <= point[0] <= self.lower_right.x and \
-                   self.lower_right.y <= point[1] <= self.upper_left.y
+            return self.upper_left.x-SOFT_THRESHOLD_RECTANGLE <= point[0] <= self.lower_right.x+SOFT_THRESHOLD_RECTANGLE and \
+                   self.lower_right.y-SOFT_THRESHOLD_RECTANGLE <= point[1] <= self.upper_left.y+SOFT_THRESHOLD_RECTANGLE
+
+    def is_close_enough(self, cluster: Cluster):
+        return dr.distance_array(cluster.get_mean(), self.center.to_array()) < 400
 
     def is_cluster_in_rectangle(self, cluster: Union[Cluster, List]):
         if isinstance(cluster, Cluster):
             for point in cluster.points:
-                if not self.is_point_in_rectangle(geom.Point(point.x, point.y)):
+                if not self.is_point_in_rectangle(point):
                     return False
+            return len(cluster.points) > 0
         elif type(cluster) == list:
             for point in cluster:
                 print(point)
                 if not self.is_point_in_rectangle(geom.Point(point[0], point[1])):
                     return False
-        return True
+            return len(cluster) > 0
+        return False
+
+    def rotate(self, angle: float):
+        """
+
+        :param angle:
+        :return:
+        """
+        rotation_matrix = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
+
+        ul = rotation_matrix @ self.upper_left.to_array().T
+        lr = rotation_matrix @ self.lower_right.to_array().T
+        return Rectangle([geom.Point(ul[0], ul[1]), geom.Point(lr[0], lr[1])])
+
+    def translate(self, point: geom.Point):
+        """
+
+        :param point:
+        :return:
+        """
+        return Rectangle([self.upper_left + point, self.lower_right + point])
+
+    def m_translate(self, point: geom.Point):
+        """
+        m for minus
+        :param point:
+        :return:
+        """
+        return Rectangle([self.upper_left - point, self.lower_right - point])
+
+    def __str__(self):
+        return str(self.center)
 
 
 class Square(Obstacle):
