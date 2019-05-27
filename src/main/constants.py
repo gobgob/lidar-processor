@@ -51,7 +51,7 @@ maximum_distance = 3500  # in mm
 minimum_distance_between_clusters = 80
 tmaxsel = 500
 tminsel = 500
-minimum_points_in_cluster = 5
+minimum_points_in_cluster = 3
 maximum_points_in_cluster = 50
 
 TOLERANCE_FOR_CIRCLE_COHERENCE = 100
@@ -121,3 +121,8 @@ beacon_3_purple = [[1500, 100],  # upper left
                    ]
 
 beacons_purple = [beacon_1_purple, beacon_2_purple, beacon_3_purple]
+
+
+SOFT_THRESHOLD_RECTANGLE = 50
+
+QUALITY_THRESHOLD = 150
