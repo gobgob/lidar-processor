@@ -52,11 +52,18 @@ class HLThread(Thread):
         self.shift = None
 
     def ask_status(self):
-        self.hl_socket.send("ASK_STATUS\n".encode("ascii"))
+        try:
+            self.hl_socket.send("ASK_STATUS\n".encode("ascii"))
+        except BrokenPipeError as e:
+            self.logger.warning("La communication avec le haut-niveau est fini.")
 
     def send_robot_position(self, x: int, y: int,  robot_id: int, timestamp: int):
         message_to_send = "OBSTACLE "+str(int(x))+" "+str(int(y))+" "+str(int(robot_id))+" "+str(int(timestamp))+"\n"
-        self.hl_socket.send(message_to_send.encode("ascii"))
+        self.logger.debug("message envoyé au haut-niveau "+message_to_send)
+        try:
+            self.hl_socket.send(message_to_send.encode("ascii"))
+        except BrokenPipeError as e:
+            self.logger.warning("La communication avec le haut-niveau est fini.")
 
     def send_shift(self):
         if self.shift:
@@ -64,7 +71,10 @@ class HLThread(Thread):
             self.shift = None
         else:
             message_to_send = "DECALAGE_ERREUR\n"
-        self.hl_socket.send(message_to_send.encode("ascii"))
+        try:
+            self.hl_socket.send(message_to_send.encode("ascii"))
+        except BrokenPipeError as e:
+            self.logger.warning("La communication avec le haut-niveau est fini.")
 
     def run(self):
         if self.hl_socket:
@@ -72,7 +82,8 @@ class HLThread(Thread):
             current_measure = []
 
             while self.communicating:
-                content = self.hl_socket.recv(100).decode("ascii")
+                self.ask_status()
+                content = self.hl_socket.recv(500).decode("ascii")
                 for c in content:
                     if c == '\n':
                         current_measure = "".join(current_measure)
