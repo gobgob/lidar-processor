@@ -49,6 +49,9 @@ class Point:
     def copy(self):
         return Point(self.x, self.y)
 
+    def to_array(self) -> np.ndarray:
+        return np.array([self.x, self.y])
+
 
 class Vector:
     def __init__(self):
@@ -244,3 +247,25 @@ class Segment:
         #     return numerator < denominator
         # else:
         #     return False
+
+
+def from_lidar_to_table(point: Point, robot_position: Point, robot_orientation: float) -> Point:
+    """
+
+    :param point: cartesian coordinates
+    :param robot_position: cartesian coordinates
+    :param robot_orientation:
+    :return:
+    """
+    return point.rotate(robot_orientation) + robot_position
+
+
+def from_theoretical_table_to_lidar(point: Point, robot_position: Point, robot_orientation: float) -> Point:
+    return (point - robot_position).rotate(np.pi/2 - robot_orientation)
+
+
+def from_real_table_to_lidar(point: Point, robot_position: Point, robot_orientation: float) -> Point:
+    return (point - robot_position).rotate(robot_orientation)
+
+# def from_table_to_lidar(point: Point, robot_position: Point, robot_orientation: float) -> Point:
+#     return (point - robot_position).rotate(np.pi/2 - robot_orientation)
