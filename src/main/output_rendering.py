@@ -7,7 +7,7 @@ lines are detected. If an 8 cm line is found, then it is one of the three immobi
 The immobile beacons are used to change basis from the robot's to the table's.
 """
 
-from typing import List
+from typing import List, Union
 import math
 import numpy as np
 from collections import defaultdict
@@ -15,14 +15,14 @@ from collections import defaultdict
 __author__ = "Clément Besnier"
 
 
-def polar_to_x(measure: List):
-    angle, distance = measure
-    return distance*math.cos(math.radians(angle))
+def polar_to_x(measure: Union[List, np.ndarray]):
+    angle, distance = measure[0], measure[1]
+    return distance*math.cos(angle)
 
 
-def polar_to_y(measure: List):
-    angle, distance = measure
-    return distance*math.sin(math.radians(angle))
+def polar_to_y(measure: Union[List, np.ndarray]):
+    angle, distance = measure[0], measure[1]
+    return distance*math.sin(angle)
 
 
 def cartesian_to_polar(cartesian):
@@ -46,7 +46,7 @@ def cartesian_to_polar(cartesian):
 
 
 def one_turn_to_cartesian_points(turn: List):
-    return [(polar_to_x(measure), polar_to_y(measure)) for measure in turn]
+    return [np.array([polar_to_x(measure), polar_to_y(measure)]) for measure in turn]
 
 
 # def cartesian_points_to_array(cartesian_points):
