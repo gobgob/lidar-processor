@@ -73,12 +73,17 @@ class Cluster:
         pass
 
     def compute_mean(self):
-        print("taille moyenne ", len(self.points))
-        self.mean = np.sum(self.points, axis=0)/len(self.points)
+        if len(self.points) > 0:
+            self.mean = np.sum(self.points, axis=0)/len(self.points)
+        else:
+            self.mean = np.array([0, 0])
 
     def get_mean(self):
-        self.compute_mean()
-        return self.mean
+        if len(self.points) > 0:
+            self.compute_mean()
+            return self.mean
+        else:
+            return None
 
     def add_point(self, point):
         self.points.append(point)
@@ -133,23 +138,13 @@ class Cluster:
         return beacon
 
     def is_an_opponent_robot_beacon(self):
-        initial_guess = self.get_mean()
-        print(initial_guess)
-        # print(type(initial_guess))
-        # initial_guess = 0
-        solution = root(self._adverse_objective_function, initial_guess, method="lm")
-
-        # print("solution", solution.x)
-        # print("error", solution.fun)
-        beacon = None
-        print(solution.fun)
-        print(len(solution.fun))
-        if solution.fun[0] < TOLERANCE_FOR_CIRCLE_COHERENCE:
-            beacon = Beacon()
-            print(len(solution.x))
-            print(solution.x)
-            beacon.set_parameters(solution.x[0], solution.x[1], OPPONENT_ROBOT_BEACON_RADIUS, 0)
-        return beacon
+        """
+        Should check that the point is in table ?
+        :return:
+        """
+        cluster_mean = self.get_mean()
+        if cluster_mean:
+            pass
 
     def is_a_circle(self, radius):
         def objective_function(pos):
@@ -185,6 +180,20 @@ class Cluster:
         new_cluster = Cluster()
         new_cluster.points = points
         return new_cluster
+
+    @staticmethod
+    def to_clusters(clusters):
+        """
+
+        :param clusters: list of lists of 2D points
+        :return: list of clusters
+        """
+        real_clusters = []
+        for cluster in clusters:
+            new_cluster = Cluster()
+            new_cluster.add_points(cluster)
+            real_clusters.append(new_cluster)
+        return real_clusters
 
 
 def distance(point, other):
@@ -295,12 +304,6 @@ def polar_clusterize(polar_measures)-> Tuple[List, List]:
             for cluster in clusters:
                 mean_cluster = np.sum(cluster, axis=0) / len(cluster)
                 means.append(mean_cluster)
-                # print(mean_cluster)
-            new_clusters = []
-            for cluster in clusters:
-                new_cluster = Cluster()
-                new_cluster.new_cluster_by_points(cluster)
-                new_clusters.append(new_cluster)
             return clusters, means
     else:
         return [], []
@@ -354,14 +357,7 @@ def clusterize(cartesian_measures: List[np.ndarray]) -> Tuple[List, List]:
             for cluster in clusters:
                 mean_cluster = np.sum(cluster, axis=0) / len(cluster)
                 means.append(mean_cluster)
-                # print(mean_cluster)
-
-            new_clusters = []
-            for cluster in clusters:
-                new_cluster = Cluster()
-                new_cluster.new_cluster_by_points(cluster)
-                new_clusters.append(new_cluster)
-            return new_clusters, means
+            return clusters, means
         else:
             return [], []
 
