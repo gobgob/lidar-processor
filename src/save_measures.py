@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-
+import datetime
 import os
 import time
 import json
@@ -7,8 +7,9 @@ from main.data_retrieval import LidarThread, EncoderThread
 
 
 def store_lidar_data(t):
-    for i in range(20):
-        with open(os.path.join("samples", "data_"+str(i)+".json"), "w") as f:
+    for i in range(5):
+        with open(os.path.join("samples", "data_"+datetime.datetime.today().ctime().replace(":", "")+".json"), "w")\
+                as f:
             data = t.get_measures()
             json.dump(data, f)
         time.sleep(2)
@@ -72,4 +73,5 @@ def take_lidar_and_encoder_measures():
 
 
 if __name__ == "__main__":
-    take_lidar_and_encoder_measures()
+    # take_lidar_and_encoder_measures()
+    take_lidar_measure()

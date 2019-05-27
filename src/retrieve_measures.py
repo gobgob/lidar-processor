@@ -17,5 +17,15 @@ def get_data():
     return measures
 
 
+def get_27052019_measures():
+    measures = []
+    print(os.getcwd())
+    for filename in os.listdir("C:\\Users\\Clément\\PycharmProjects\\lidar-processor\\samples"):
+        with open(os.path.join("C:\\Users\\Clément\\PycharmProjects\\lidar-processor\\samples", filename), "r") as f:
+            data = json.load(f)
+            measures.append([[float(k) for k in j][:2] for j in data])
+    return measures
+
+
 if __name__ == "__main__":
     get_data()

@@ -6,12 +6,13 @@ Display measures
 """
 
 import math
+import numpy as np
 import matplotlib.pylab as pl
 
 from main.constants import *
 
 import main.output_rendering as outr
-
+import retrieve_measures
 
 __author__ = ["Clément Besnier", ]
 
@@ -27,6 +28,7 @@ def display_measures(polar_points):
     ax.axvline(0, 0)
     # pl.grid()
 
+    polar_points = [[90 - theta, rho] for theta, rho in polar_points]
     points = outr.one_turn_to_cartesian_points(polar_points)
 
     xx = []
@@ -47,4 +49,6 @@ def display_polar_measures(polar_points):
 
 
 if __name__ == "__main__":
-    pass
+    measures = retrieve_measures.get_27052019_measures()
+    # print(measures[0])
+    display_measures(measures[0])
