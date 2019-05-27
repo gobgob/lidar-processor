@@ -13,6 +13,8 @@ Clusters
 """
 from typing import List, Union
 
+import numpy as np
+
 from main.constants import *
 from main.clustering import Cluster
 
@@ -46,8 +48,15 @@ def keep_not_too_far_or_not_too_close(one_turn: List) -> List:
     return [measure for measure in one_turn if filter_keep_not_too_far_or_not_too_close(measure)]
 
 
-def filter_points(one_turn: List, threshold: Union[int, float]) -> List:
-    return [measure[:2] for measure in one_turn if filter_keep_not_too_far_or_not_too_close(measure) and
+def filter_points(one_turn: List, threshold: Union[int, float]) -> List[np.ndarray]:
+    """
+
+    :param one_turn: measures in cartesian coordinates and rotates so that angle measures are normalized
+    :param threshold:
+    :return:
+    """
+    return [np.array([np.pi/2 - np.deg2rad(measure[0]), measure[1]]) for measure in one_turn
+            if filter_keep_not_too_far_or_not_too_close(measure) and
             filter_keep_good_measure(measure, threshold)]
 
 
