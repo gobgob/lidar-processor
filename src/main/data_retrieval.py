@@ -49,7 +49,7 @@ if "numpy" in sys.modules:
         return np.array([x-120*np.cos(theta), y-120*np.sin(theta), theta])
 
 
-    def distance_array(a, b):
+    def distance_array(a: np.ndarray, b: np.ndarray):
         diff = a - b
         return np.sqrt(diff @ diff.T)
 
@@ -149,13 +149,14 @@ class EncoderThread(Thread):
             sys.exit(1)
 
         if self.encoder_socket:
-            self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))  # sign on odometry b'\xFF\x00\x01\x01'
-            self.encoder_socket.send(bytes([0xFF, 0x01, 0x01, 0x01]))  # sign off info b'\xFF\x01\x01\x00'
-            self.encoder_socket.send(bytes([0xFF, 0x02, 0x01, 0x01]))  # sign off error b'\xFF\x02\x01\x00'
-            # self.encoder_socket.send(bytes([0xFF, 0x80, 0x00]))
+            try:
+                self.encoder_socket.send(bytes([0xFF, 0x00, 0x01, 0x01]))  # sign on odometry b'\xFF\x00\x01\x01'
+                self.encoder_socket.send(bytes([0xFF, 0x01, 0x01, 0x01]))  # sign off info b'\xFF\x01\x01\x00'
+                self.encoder_socket.send(bytes([0xFF, 0x02, 0x01, 0x01]))  # sign off error b'\xFF\x02\x01\x00'
+                # self.encoder_socket.send(bytes([0xFF, 0x80, 0x00]))
+            except BrokenPipeError as e:
+                self.logger.warning("La communication avec le bas-niveau s'est fini trop tôt")
         time.sleep(1)
-        # content = self.encoder_socket.recv(100)
-        # print(content)
 
     def run(self):
         if self.encoder_socket:
@@ -202,7 +203,7 @@ class EncoderThread(Thread):
 
     def get_measures(self):
         if self.encoder_socket:
-            self.logger.debug("measures of encoder "+str(self.measures.empty()))
+            self.logger.debug("measures of encoder, empty ?"+str(self.measures.empty()))
             measure = self.measures.get(False)
             return measure
         else:
