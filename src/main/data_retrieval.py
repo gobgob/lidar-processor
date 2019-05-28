@@ -48,6 +48,21 @@ if "numpy" in sys.modules:
         """
         return np.array([x-120*np.cos(theta), y-120*np.sin(theta), theta])
 
+    def from_lidar_measure_to_encoder_position(x, y, theta):
+        """
+        The LiDAR center is not at the rotation center so to compare LiDAR measures and encoder measures,
+        a basis change is needed.
+
+        >>> from_lidar_measure_to_encoder_position(125, 523, np.pi/3)
+        array([ 185.        ,  626.92304845,    1.04719755])
+
+        :param x:
+        :param y:
+        :param theta:
+        :return:
+        """
+        return np.array([x+120*np.cos(theta), y+120*np.sin(theta), theta])
+
 
     def distance_array(a: np.ndarray, b: np.ndarray):
         diff = a - b
