@@ -76,15 +76,60 @@ def find_starting_beacons(own_colour: TeamColor, clusters: List[Cluster]):
     return found_b1, found_b2, found_b3
 
 
-def find_beacons(cluster: List[Cluster]) -> List[Beacon]:
+def find_beacons_with_odometry(clusters: List[Cluster], odometry_state, own_colour: TeamColor):
+
+    """
+    Function which uses raw estimation of encoders for robot's position to find a priori positions of beacons.
+
+    :param clusters:
+    :param odometry_state:
+    :param own_colour:
+    :return:
+    """
+
+    odometry_position = geom.Point(odometry_state[0], odometry_state[1])
+    odometry_orientation = odometry_state[2]
+    b1, b2, b3 = define_point_beacons(own_colour)
+
+    p_b1_lidar = geom.from_theoretical_table_to_lidar(b1, odometry_position, odometry_orientation)
+    p_b2_lidar = geom.from_theoretical_table_to_lidar(b2, odometry_position, odometry_orientation)
+    p_b3_lidar = geom.from_theoretical_table_to_lidar(b3, odometry_position, odometry_orientation)
+
+    # print("b1 vu du LiDAR"+str(p_b1_lidar))
+    # print("b2 vu du LiDAR"+str(p_b2_lidar))
+    # print("b3 vu du LiDAR"+str(p_b3_lidar))
+
+    found_b1, found_b2, found_b3 = None, None, None
+
+    for cluster in clusters:
+        mean = cluster.get_mean()
+        if mean is not None:
+            d1 = dr.distance_array(mean, p_b1_lidar.to_array())
+            d2 = dr.distance_array(mean, p_b2_lidar.to_array())
+            d3 = dr.distance_array(mean, p_b3_lidar.to_array())
+
+            if d1 < 200:
+                found_b1 = mean.copy()
+                print("mean et b1 : ", mean, p_b1_lidar)
+            if d2 < 200:
+                found_b2 = mean.copy()
+                print("mean et b2 : ", mean, p_b2_lidar)
+            if d3 < 200:
+                found_b3 = mean.copy()
+                print("mean et b3 : ", mean, p_b3_lidar)
+
+    return found_b1, found_b2, found_b3
+
+
+def find_beacons(clusters: List[Cluster]) -> List[Beacon]:
     """
     
-    :param cluster: 
+    :param clusters: 
     :return: 
     """""
     fix_beacons = []
-    for cluster in cluster:
-        beacon = cluster.is_a_fix_beacon()
+    for clusters in clusters:
+        beacon = clusters.is_a_fix_beacon()
         if beacon:
             fix_beacons.append(beacon)
     return fix_beacons
@@ -92,11 +137,14 @@ def find_beacons(cluster: List[Cluster]) -> List[Beacon]:
 
 def print_beacons(beacons: List[Beacon]):
     for b in beacons:
-        print("Beacon")
-        print("* center: ", b.center)
-        print("* index: ", b.index)
-        print("* x", b.x_center)
-        print("* y", b.y_center)
+        if b is not None:
+            print("Beacon")
+            print("* center: ", b.center)
+            print("* index: ", b.index)
+            print("* x", b.x_center)
+            print("* y", b.y_center)
+        else:
+            print("pas de mesure pour lui")
 
 
 def find_relative_point_beacons(beacons: List[geom.Point], robot_position: geom.Point, robot_orientation: float):
@@ -108,6 +156,40 @@ def find_relative_point_beacons(beacons: List[geom.Point], robot_position: geom.
     :param robot_orientation:
     :return:
     """
+
+
+def compute_own_state(beacons: List[np.ndarray], own_colour: TeamColor):
+    """
+    The ultimate function which computes the position of the robot with the LiDAR!
+
+    :param beacons:
+    :param own_colour:
+    :return:
+    """
+    b1, b2, b3 = define_point_beacons(own_colour)
+
+    if beacons[0] is not None and beacons[2] is not None:
+
+        beacon1, beacon3 = beacons[0], beacons[2]
+        print(beacon1, beacon3)
+        d13 = dr.distance_array(beacon1, beacon3)
+        d1 = np.sqrt(beacon1 @ beacon1.T)
+        d3 = np.sqrt(beacon3 @ beacon3.T)
+        print("d1 d3 d13", d1, d3, d13)
+        angle1 = np.arccos((d1 ** 2 + d13 ** 2 - d3 ** 2) / (2 * d1 * d13))
+        angle3 = np.arccos((d3 ** 2 + d13 ** 2 - d1 ** 2) / (2 * d3 * d13))
+
+        # theta_r = np.pi/2 - angle3 +
+
+        if own_colour == TeamColor.purple:
+            print(geom.Point(b1.x-np.sin(angle1)*d1, b1.y - np.cos(angle1)*d1))
+            return geom.Point(b3.x-np.sin(angle3)*d3, b3.y + np.cos(angle3)*d3)
+
+        elif own_colour == TeamColor.orange:
+            print(geom.Point(b1.x + np.sin(angle1) * d1, b1.y - np.cos(angle1) * d1))
+            return geom.Point(b3.x + np.sin(angle3) * d3, b3.y + np.cos(angle3) * d3)
+    else:
+        return None
 
 
 def find_own_position(beacons: List[Beacon], own_colour_team: TeamColor):
