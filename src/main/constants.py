@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/home/pi/lidar-processor/lidar_env/bin/python
 
 """
 Log configuration
@@ -124,5 +124,4 @@ beacons_purple = [beacon_1_purple, beacon_2_purple, beacon_3_purple]
 
 
 SOFT_THRESHOLD_RECTANGLE = 50
-
 QUALITY_THRESHOLD = 150

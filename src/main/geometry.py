@@ -1,8 +1,9 @@
-#!/usr/bin/python3
+#!/home/pi/lidar-processor/lidar_env/bin/python
 
 """
 Geometry module.
 """
+from typing import Union
 
 __author__ = ["Clément Besnier", ]
 
@@ -51,6 +52,10 @@ class Point:
 
     def to_array(self) -> np.ndarray:
         return np.array([self.x, self.y])
+
+    @staticmethod
+    def from_array(point: Union[np.ndarray]):
+        return Point(point[0], point[1])
 
 
 class Vector:
@@ -134,7 +139,7 @@ class Vector:
             v.set_coordinates(self.x*other, self.y*other)
             return v
 
-    def multiplate_by(self, a):
+    def multiplicate_by(self, a):
         self.x *= a
         self.y *= a
 
@@ -151,6 +156,12 @@ class Vector:
     def copy(self):
         v = Vector()
         v.set_coordinates(self.x, self.y)
+        return v
+
+    @staticmethod
+    def from_array(a: np.ndarray):
+        v = Vector()
+        v.set_coordinates(a[0], a[1])
         return v
 
 
@@ -261,15 +272,35 @@ def from_lidar_to_table(point: Point, robot_position: Point, robot_orientation: 
 
 
 def from_theoretical_table_to_lidar(point: Point, robot_position: Point, robot_orientation: float) -> Point:
+    """
+
+    :param point:
+    :param robot_position:
+    :param robot_orientation:
+    :return:
+    """
     return (point - robot_position).rotate(np.pi/2 - robot_orientation)
 
 
 def from_real_table_to_lidar(point: Point, robot_position: Point, robot_orientation: float) -> Point:
+    """
+
+    :param point:
+    :param robot_position:
+    :param robot_orientation:
+    :return:
+    """
     return (point - robot_position).rotate(robot_orientation)
 
 
 def from_measured_and_expected_beacon_position_to_actual_robot_position(measured_position: Point,
                                                                         expected_position: Point):
+    """
+
+    :param measured_position:
+    :param expected_position:
+    :return:
+    """
     angle = np.arctan(measured_position.y / measured_position.x)
     robot_position = expected_position - measured_position.rotate(angle)
     return robot_position.x, robot_position.y, angle

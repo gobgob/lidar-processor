@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/home/pi/lidar-processor/lidar_env/bin/python
 
 """
 Works with https://github.com/gobgob/rplidar_a3 which is the server
@@ -33,7 +33,7 @@ encoder_host = "172.16.0.2"
 encoder_port = 80
 
 if "numpy" in sys.modules:
-    def from_encoder_position_to_lidar_measure(x, y, theta):
+    def from_encoder_position_to_lidar_measure(x, y, theta) -> np.ndarray:
         """
         The LiDAR center is not at the rotation center so to compare LiDAR measures and encoder measures,
         a basis change is needed.
@@ -48,7 +48,7 @@ if "numpy" in sys.modules:
         """
         return np.array([x-120*np.cos(theta), y-120*np.sin(theta), theta])
 
-    def from_lidar_measure_to_encoder_position(x, y, theta):
+    def from_lidar_measure_to_encoder_position(x, y, theta) -> np.ndarray:
         """
         The LiDAR center is not at the rotation center so to compare LiDAR measures and encoder measures,
         a basis change is needed.
@@ -64,7 +64,7 @@ if "numpy" in sys.modules:
         return np.array([x+120*np.cos(theta), y+120*np.sin(theta), theta])
 
 
-    def distance_array(a: np.ndarray, b: np.ndarray):
+    def distance_array(a: np.ndarray, b: np.ndarray) -> np.ndarray:
         diff = a - b
         return np.sqrt(diff @ diff.T)
 
@@ -74,11 +74,11 @@ if "numpy" in sys.modules:
                 distance_array(encoder_measure[:2], lidar_measure[:2])
 
 
-def split_turn(turn: List[str]):
+def split_turn(turn: List[str]) -> List[List[float]]:
     return [[float(i) for i in measure.split(":")] for measure in "".join(turn).split(";") if measure]
 
 
-def split_encoder_data(encoder_measure: bytes):
+def split_encoder_data(encoder_measure: bytes) -> List[int, int, float, float]:
     """
     From an encoder measure to the position and orientation of robot with a timestamp.
 
@@ -153,7 +153,7 @@ class EncoderThread(Thread):
         else:
             self.logger = logging.basicConfig(stream=sys.stdout)
             self.logger = logging.getLogger(__name__)
-        self.logger.info("On ouvre la socket des codeuses.")
+        self.logger.info("On ouvre la connexion aux codeuses.")
         self.encoder_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
 
@@ -170,12 +170,12 @@ class EncoderThread(Thread):
                 self.encoder_socket.send(bytes([0xFF, 0x02, 0x01, 0x01]))  # sign off error b'\xFF\x02\x01\x00'
                 # self.encoder_socket.send(bytes([0xFF, 0x80, 0x00]))
             except BrokenPipeError as e:
-                self.logger.warning("La communication avec le bas-niveau s'est fini trop tôt")
+                self.logger.warning("La communication avec le bas-niveau s'est fini trop tôt :"+str(e))
         time.sleep(1)
 
     def run(self):
         if self.encoder_socket:
-            self.logger.info("Connection on {}".format(encoder_port))
+            self.logger.info("Connexion au port {}".format(encoder_port))
             current_measure = bytearray()
             are_robot_position_measures = True
             remaining_to_read = 56
@@ -205,9 +205,9 @@ class EncoderThread(Thread):
                 if not self.measuring:
                     self.logger.info("On arrête la récupération des mesures des codeuses")
                     break
-            self.logger.info("connexion fermée")
+            self.logger.info("Connexion aux codeuses fermée")
 
-    def get_measuring(self):
+    def get_measuring(self) -> bool:
         return self.measuring
 
     def close_connection(self):
@@ -216,9 +216,9 @@ class EncoderThread(Thread):
         time.sleep(1)
         self.encoder_socket.close()
 
-    def get_measures(self):
+    def get_measures(self) -> List:
         if self.encoder_socket:
-            self.logger.debug("measures of encoder, empty ?"+str(self.measures.empty()))
+            self.logger.debug("Measures of encoder, empty ?"+str(self.measures.empty()))
             measure = self.measures.get(False)
             return measure
         else:
@@ -248,7 +248,7 @@ class LidarThread(Thread):
 
     def run(self):
         if self.lidar_socket:
-            self.logger.info("Connection on {}".format(lidar_port))
+            self.logger.info("Connection au port {}".format(lidar_port))
             current_measure = []
             while self.measuring:
                 content = self.lidar_socket.recv(500).decode("utf-8")
@@ -262,16 +262,16 @@ class LidarThread(Thread):
                         current_measure.append(c)
                 if not self.measuring:
                     break
-            self.logger.info("connexion fermée")
+            self.logger.info("Connexion au LiDAR fermée")
 
-    def get_measuring(self):
+    def get_measuring(self) -> bool:
         return self.measuring
 
     def close_connection(self):
         self.measuring = False
         self.lidar_socket.close()
 
-    def get_measures(self):
+    def get_measures(self) -> List:
         if self.lidar_socket:
             res = self.measures.get()
             # self.logger.info("measure "+ str(res))

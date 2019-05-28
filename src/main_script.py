@@ -1,9 +1,9 @@
-#! /usr/bin/python3
+#!/home/pi/lidar-processor/lidar_env/bin/python
 
 """
 Main script to launch before the match.
 
-The aim is to follow opponent robots' positions and to calibrate regularly its owb position thanks to immobile beacons.
+The aim is to follow opponent robots' positions and to calibrate regularly our position thanks to immobile beacons.
 
 /home/pi/lidar-processor/lidar_env/bin/python /home/pi/lidar-processor/src/main_script.py
 

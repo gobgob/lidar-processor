@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/home/pi/lidar-processor/lidar_env/bin/python
 
 """
 The idea is to get a turn of measures, converts them into cartesian coordinates and apply a Hough transform so that

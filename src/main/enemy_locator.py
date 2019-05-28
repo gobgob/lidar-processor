@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#!/home/pi/lidar-processor/lidar_env/bin/python
 
 """
 Opponent robots are located thanks to their specific beacons on their top.

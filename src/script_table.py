@@ -1,8 +1,12 @@
+#!/home/pi/lidar-processor/lidar_env/bin/python
+
 """
 
 """
 
 from main.table import *
+from retrieve_realistic_measures import get_table_measures
+import main.data_cleansing as dacl
 
 __author__ = "Clément Besnier"
 
