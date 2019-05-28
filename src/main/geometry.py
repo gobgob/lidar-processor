@@ -267,5 +267,13 @@ def from_theoretical_table_to_lidar(point: Point, robot_position: Point, robot_o
 def from_real_table_to_lidar(point: Point, robot_position: Point, robot_orientation: float) -> Point:
     return (point - robot_position).rotate(robot_orientation)
 
+
+def from_measured_and_expected_beacon_position_to_actual_robot_position(measured_position: Point,
+                                                                        expected_position: Point):
+    angle = np.arctan(measured_position.y / measured_position.x)
+    robot_position = expected_position - measured_position.rotate(angle)
+    return robot_position.x, robot_position.y, angle
+
+
 # def from_table_to_lidar(point: Point, robot_position: Point, robot_orientation: float) -> Point:
 #     return (point - robot_position).rotate(np.pi/2 - robot_orientation)
