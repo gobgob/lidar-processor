@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/home/pi/lidar-processor/lidar_env/bin/python
 
 """
 
@@ -7,6 +7,9 @@ At the beginning, we know the position of the robot and immobile beacons.
 We can follow the immobile beacons as the robot moves.
 
 If we know where the beacons are, we know where the robot is so we get a precise measure of its current position.
+
+It is also possible to use the encoders' measures as the first estimation of the new robot state. Then two closest
+clusters to the expected positions of beacons are searched.
 """
 
 from typing import List
@@ -25,6 +28,11 @@ p_beacons_purple = [[geom.Point(point[0], point[1]) for point in limits]for limi
 
 
 def define_point_beacons(own_colour: TeamColor):
+    """
+    Gets the positions of the beacons according to our colour in the table basis.
+    :param own_colour:
+    :return:
+    """
     if own_colour.value == TeamColor.orange.value:
         bo1 = table.Rectangle(p_beacons_orange[0]).get_center()
         bo2 = table.Rectangle(p_beacons_orange[1]).get_center()
@@ -45,6 +53,8 @@ def find_starting_beacons(own_colour: TeamColor, clusters: List[Cluster]):
     elif own_colour.value == TeamColor.purple.value:
         starting_position = geom.Point(1210, 1400)
         starting_orientation = np.pi
+    else:
+        return [None, None, None]
 
     p_b1_lidar = geom.from_theoretical_table_to_lidar(b1, starting_position, starting_orientation)
     p_b2_lidar = geom.from_theoretical_table_to_lidar(b2, starting_position, starting_orientation)
@@ -73,7 +83,7 @@ def find_starting_beacons(own_colour: TeamColor, clusters: List[Cluster]):
                 found_b3 = mean.copy()
                 print("mean et b3 : ", mean, p_b3_lidar)
 
-    return found_b1, found_b2, found_b3
+    return [found_b1, found_b2, found_b3]
 
 
 def find_beacons_with_odometry(clusters: List[Cluster], odometry_state, own_colour: TeamColor):
@@ -118,7 +128,7 @@ def find_beacons_with_odometry(clusters: List[Cluster], odometry_state, own_colo
                 found_b3 = mean.copy()
                 print("mean et b3 : ", mean, p_b3_lidar)
 
-    return found_b1, found_b2, found_b3
+    return [found_b1, found_b2, found_b3]
 
 
 def find_beacons(clusters: List[Cluster]) -> List[Beacon]:
@@ -147,7 +157,8 @@ def print_beacons(beacons: List[Beacon]):
             print("pas de mesure pour lui")
 
 
-def find_relative_point_beacons(beacons: List[geom.Point], robot_position: geom.Point, robot_orientation: float):
+def find_relative_point_beacons(beacons: List[geom.Point],
+                                robot_position: geom.Point, robot_orientation: float):
     """
     >>> beacons = list(define_point_beacons(TeamColor.orange))
     >>> find_relative_point_beacons(beacons, geom.Point(), 0)
@@ -156,6 +167,7 @@ def find_relative_point_beacons(beacons: List[geom.Point], robot_position: geom.
     :param robot_orientation:
     :return:
     """
+    pass
 
 
 def compute_own_state(beacons: List[np.ndarray], own_colour: TeamColor):
@@ -195,7 +207,6 @@ def compute_own_state(beacons: List[np.ndarray], own_colour: TeamColor):
 def find_own_position(beacons: List[Beacon], own_colour_team: TeamColor):
     """
 
-
     :param beacons: list of the 3 beacons.
     :param own_colour_team:
     :return: [first space coordinate of the robot, second space coordinate of the robot, radius of the robot,
@@ -227,6 +238,13 @@ def find_own_position(beacons: List[Beacon], own_colour_team: TeamColor):
 
 
 def change_basis(rp: geom.Point, ori: float, measures: List):
+    """
+
+    :param rp: robot position
+    :param ori: robot orietation
+    :param measures: list of angles and distances
+    :return:
+    """
     # measures = outr.one_turn_to_cartesian_points(measures)
     new_measures = []
     for measure in measures:
