@@ -22,7 +22,7 @@ import main.clustering as clus
 # import main.tracking as trac
 import main.self_locator as sloc
 import main.enemy_locator as eloc
-
+import numpy as np
 __author__ = "Clément Besnier"
 
 # region logs
@@ -45,8 +45,8 @@ for filename in log_files:
     shutil.move(os.path.join(last_log_folder, filename),
                 os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "history"))
 
-# log_filename = "lidar_logs" + datetime.datetime.today().ctime().replace(":", "")
-log_filename = ""
+log_filename = "lidar_logs" + datetime.datetime.today().ctime().replace(":", "")
+# log_filename = ""
 if log_filename:
     logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last",
                                               log_filename + ".txt"), level=15)
@@ -79,10 +79,10 @@ def main():
     start_enemy_positions = []
     own_colour_team = None
     computed_opponent_robot_position = False
-    previous_clusters = []
-    previous_beacons = []
+    # previous_clusters = []
+    # previous_beacons = []
     # previous_opponent_robots = []
-    previous_self_positions = []
+    # previous_self_positions = []
     # endregion
 
     # region # before the match
@@ -144,7 +144,7 @@ def main():
             if computed_opponent_robot_position:
                 for enemy_position in start_enemy_positions:
                     t_hl.send_robot_position(*enemy_position)
-        time.sleep(10)
+        time.sleep(3)
     # endregion
     logger.info("Le match vient de commencer")
 
@@ -159,39 +159,49 @@ def main():
 
         # region # retrieves position from encoders
         proprioceptive_position = datr.from_encoder_position_to_lidar_measure(*t_ll.get_measures()[:3])
-        print(proprioceptive_position)
+        # print("odometry position", proprioceptive_position)
         # endregion
 
         # region # estimations of positions
-        beacons = sloc.find_beacons(one_turn_clusters)
-        print(len(beacons))
-        own_position = sloc.find_own_position(beacons, own_colour_team)
+        beacons = sloc.find_beacons_with_odometry(one_turn_clusters, proprioceptive_position, own_colour_team)
+        # beacons = sloc.find_beacons(one_turn_clusters)
+        # print("Le nombre de balises trouvé : ", len(beacons))
+        # print("On affiche la position des balises trouvées", beacons)
+        # print("-------------------------")
+        own_state = sloc.compute_own_state(beacons, own_colour_team)
+        if own_state is None:
+            logger.warning("On n'a pas pu trouver les balises nécessaires à la localisation du robot.")
+
+        hl_own_state = np.array([own_state[0], own_state[1], proprioceptive_position[2]])
+        t_hl.set_recalibration(proprioceptive_position - hl_own_state)
+        # own_position = sloc.find_own_position(beacons, own_colour_team)
         # robots = eloc.find_robots(clusters)
+        # print(own_state)
         # endregion
 
         # region # history management
-        if one_turn_clusters:
-            previous_clusters.append(one_turn_clusters.copy())
-            if len(previous_clusters) > 3:
-                previous_clusters.pop(0)
-
-        if beacons:
-            previous_beacons.append(beacons.copy())
-            if len(previous_beacons) > 3:
-                previous_beacons.pop(0)
+        # if one_turn_clusters:
+        #     previous_clusters.append(one_turn_clusters.copy())
+        #     if len(previous_clusters) > 3:
+        #         previous_clusters.pop(0)
+        #
+        # if beacons:
+        #     previous_beacons.append(beacons.copy())
+        #     if len(previous_beacons) > 3:
+        #         previous_beacons.pop(0)
 
         # previous_opponent_robots.append(robots.copy())
         # if len(previous_opponent_robots) > 3:
         #     previous_opponent_robots.pop(0)
-        if own_position:
-            previous_self_positions.append(own_position.copy())
-            if len(previous_self_positions) > 3:
-                previous_self_positions.pop(0)
-        # endregion
-
-        if own_position:
-            if datr.are_encoder_measures_and_lidar_measures_different(proprioceptive_position, own_position):
-                t_hl.set_recalibration(proprioceptive_position - own_position)  # convention
+        # if own_state:
+        #     previous_self_positions.append(own_state.copy())
+        #     if len(previous_self_positions) > 3:
+        #         previous_self_positions.pop(0)
+        # # endregion
+        #
+        # if own_state:
+        #     if datr.are_encoder_measures_and_lidar_measures_different(proprioceptive_position, own_state):
+        #         t_hl.set_recalibration(proprioceptive_position - own_state)  # convention
         time.sleep(1)
     # endregion
     logger.info("Le match est fini")
