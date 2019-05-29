@@ -31,6 +31,7 @@ class HLThread(Thread):
 
         self.logger = logging.getLogger(logger_name)
         self.communicating = True
+        self.expecting_shift = False
         self.messages = queue.LifoQueue()
         if logger_name:
             self.logger = logging.getLogger(logger_name)
@@ -79,6 +80,7 @@ class HLThread(Thread):
             self.logger.warning('DECALAGE_ERREUR')
         try:
             self.hl_socket.send(message_to_send.encode("ascii"))
+            self.expecting_shift = False
         except BrokenPipeError as e:
             self.logger.warning("La communication avec le haut-niveau est finie : "+str(e))
 
@@ -105,7 +107,7 @@ class HLThread(Thread):
                         elif current_measure == "STOP":
                             self.match_stopped = True
                         elif current_measure == "CORRECTION_ODO":
-                            self.send_shift()
+                            self.expecting_shift = True
                         self.logger.debug("reçu : "+current_measure)
 
                         current_measure = []
