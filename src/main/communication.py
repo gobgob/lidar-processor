@@ -18,6 +18,7 @@ __author__ = ["Clément Besnier", "PF"]
 
 hl_host = "127.0.0.1"
 hl_port = 8765
+socket.setdefaulttimeout(3)
 
 
 class HLThread(Thread):
@@ -37,14 +38,15 @@ class HLThread(Thread):
             self.logger = logging.basicConfig(stream=sys.stdout)
             self.logger = logging.getLogger(__name__)
 
-        self.logger.info("On ouvre la connxion au haut-niveau.")
+        self.logger.info("On ouvre la connexion au haut-niveau.")
         self.hl_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            self.hl_socket.connect((hl_host, hl_port))
-        except OSError as e:
-            self.logger.error("Le serveur du haut-niveau est inaccessible : "+str(e))
-            self.hl_socket = None
-            sys.exit(1)
+
+        while True:
+            try:
+                self.hl_socket.connect((hl_host, hl_port))
+                break
+            except OSError as e:
+                pass
 
         self.match_has_begun = False
         self.team_colour = None
@@ -66,9 +68,11 @@ class HLThread(Thread):
             self.logger.warning("La communication avec le haut-niveau est finie : "+str(e))
 
     def send_shift(self):
-        if self.shift:
+        if self.shift is not None:
+            # assert isinstance(self.shift, np.ndarray)
             message_to_send = "DECALAGE %s %s %s\n" % (str(int(self.shift[0])), str(int(self.shift[1])),
                                                        str(float(self.shift[2])))
+            self.logger.debug(message_to_send)
             self.shift = None
         else:
             message_to_send = "DECALAGE_ERREUR\n"
@@ -102,6 +106,7 @@ class HLThread(Thread):
                             self.match_stopped = True
                         elif current_measure == "CORRECTION_ODO":
                             self.send_shift()
+                        self.logger.debug("reçu : "+current_measure)
 
                         current_measure = []
                     else:
@@ -128,7 +133,7 @@ class HLThread(Thread):
     def has_match_stopped(self):
         return self.match_stopped
 
-    def set_recalibration(self, delta: list):
+    def set_recalibration(self, delta):
         """
 
         :param delta:
