@@ -34,22 +34,23 @@ if not os.path.exists(log_folder):
     os.mkdir(log_folder)
 
 if not os.path.exists(last_log_folder):
-
     os.mkdir(last_log_folder)
 
 if not os.path.exists(history_log_folder):
     os.mkdir(history_log_folder)
 
 log_files = os.listdir(last_log_folder)
-for filename in log_files:
-    shutil.move(os.path.join(last_log_folder, filename),
-                os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "history"))
+# for filename in log_files:
+#     shutil.move(os.path.join(last_log_folder, filename),
+#                 os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "history"))
 
-log_filename = "lidar_logs" + datetime.datetime.today().ctime().replace(":", "")
+log_filename = "lidar_logs"  # + datetime.datetime.today().ctime().replace(":", "")
+if os.path.exists(os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last", log_filename + ".txt")):
+    os.remove(os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last", log_filename + ".txt"))
 # log_filename = ""
 if log_filename:
     logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last",
-                                              log_filename + ".txt"), level=15)
+                                              log_filename + ".txt"), level=5, filemode='w')
 else:
     logging.basicConfig(stream=sys.stdout, level=5)
 
@@ -150,6 +151,7 @@ def main():
 
     # region # match
     while not t_hl.has_match_stopped():
+
         # region # measures
         one_turn_points = dacl.filter_points(t_lidar.get_measures(), THRESHOLD_QUALITY)
         cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
@@ -158,24 +160,34 @@ def main():
         # endregion
 
         # region # retrieves position from encoders
-        proprioceptive_position = datr.from_encoder_position_to_lidar_measure(*t_ll.get_measures()[:3])
-        # print("odometry position", proprioceptive_position)
+        odo_measure = t_ll.get_measures()[:3]
+        logger.debug("raw measure of odometry "+str(odo_measure))
+        proprioceptive_position = datr.from_encoder_position_to_lidar_measure(*odo_measure)
+        logger.debug("odometry position from lidar "+str(proprioceptive_position))
         # endregion
 
+        # for enemy_position in eloc.find_robots(one_turn_clusters):
+        #     t_hl.send_robot_position(*enemy_position)
+
         # region # estimations of positions
-        beacons = sloc.find_beacons_with_odometry(one_turn_clusters, proprioceptive_position, own_colour_team)
+        beacons = sloc.find_beacons_with_odometry(one_turn_clusters, proprioceptive_position, own_colour_team,
+                                                  log_filename)
         # beacons = sloc.find_beacons(one_turn_clusters)
         # print("Le nombre de balises trouvé : ", len(beacons))
         # print("On affiche la position des balises trouvées", beacons)
         # print("-------------------------")
-        own_state = sloc.compute_own_state(beacons, own_colour_team)
-        if own_state is None:
+        estimated_position, estimated_orientation = sloc.compute_own_state(beacons, own_colour_team, log_filename)
+        if estimated_position is None or estimated_orientation is None:
             logger.warning("On n'a pas pu trouver les balises nécessaires à la localisation du robot.")
-
-        hl_own_state = np.array([own_state[0], own_state[1], proprioceptive_position[2]])
-        t_hl.set_recalibration(proprioceptive_position - hl_own_state)
+        else:
+            logger.info("Notre position corrigée : "+str(estimated_position))
+            logger.info("Notre orientation corrigée : "+str(estimated_orientation))
+            hl_own_state = np.array([estimated_position.x, estimated_position.y, estimated_orientation])
+            logger.debug("lidar : "+str(hl_own_state))
+            logger.debug("odo : "+str(proprioceptive_position))
+            t_hl.set_recalibration(hl_own_state - proprioceptive_position)
         # own_position = sloc.find_own_position(beacons, own_colour_team)
-        # robots = eloc.find_robots(clusters)
+        # robots = eloc.find_robots(clyhnb usters)
         # print(own_state)
         # endregion
 
