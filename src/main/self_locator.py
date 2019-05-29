@@ -65,28 +65,31 @@ def find_starting_beacons(own_colour: TeamColor, clusters: List[Cluster]):
     # print("b3 vu du LiDAR"+str(p_b3_lidar))
 
     found_b1, found_b2, found_b3 = None, None, None
+    min_d_cluster_beacon1 = 3000
+    min_d_cluster_beacon2 = 3000
+    min_d_cluster_beacon3 = 3000
 
-    threshold_closest_beacon = 200
-
-    # TODO find the closest cluster for each beacon.
-    # TODO choose the closest and below a specified threshold
+    threshold_closest_beacon = 500
 
     for cluster in clusters:
         mean = cluster.get_mean()
         if mean is not None:
-            d1 = dr.distance_array(mean, p_b1_lidar.to_array())
-            d2 = dr.distance_array(mean, p_b2_lidar.to_array())
-            d3 = dr.distance_array(mean, p_b3_lidar.to_array())
+            d_cluster_beacon1 = dr.distance_array(mean, p_b1_lidar.to_array())
+            d_cluster_beacon2 = dr.distance_array(mean, p_b2_lidar.to_array())
+            d_cluster_beacon3 = dr.distance_array(mean, p_b3_lidar.to_array())
 
-            if d1 < threshold_closest_beacon:
+            if d_cluster_beacon1 < min_d_cluster_beacon1 and d_cluster_beacon1 < threshold_closest_beacon:
+                min_d_cluster_beacon1 = d_cluster_beacon1
                 found_b1 = mean.copy()
-                print("mean et b1 : ", mean, p_b1_lidar)
-            if d2 < threshold_closest_beacon:
+                print("mean et b1 et distance trouvée : ", mean, p_b1_lidar, min_d_cluster_beacon1)
+            if d_cluster_beacon2 < min_d_cluster_beacon2 and d_cluster_beacon2 < threshold_closest_beacon:
+                min_d_cluster_beacon1 = d_cluster_beacon2
                 found_b2 = mean.copy()
-                print("mean et b2 : ", mean, p_b2_lidar)
-            if d3 < threshold_closest_beacon:
+                print("mean et b2 et distance trouvée : ", mean, p_b2_lidar, min_d_cluster_beacon2)
+            if d_cluster_beacon3 < min_d_cluster_beacon3 and d_cluster_beacon3 < threshold_closest_beacon:
+                min_d_cluster_beacon1 = d_cluster_beacon3
                 found_b3 = mean.copy()
-                print("mean et b3 : ", mean, p_b3_lidar)
+                print("mean et b3 et distance trouvée : ", mean, p_b3_lidar, min_d_cluster_beacon3)
 
     return [found_b1, found_b2, found_b3]
 
