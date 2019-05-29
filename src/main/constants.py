@@ -56,7 +56,7 @@ maximum_points_in_cluster = 50
 
 TOLERANCE_FOR_CIRCLE_COHERENCE = 100
 
-FIX_BEACON_RADIUS = 100
+FIX_BEACON_RADIUS = 50  # in mm
 OPPONENT_ROBOT_BEACON_RADIUS = 80
 
 too_much_angle_shift = 2  # in degree
@@ -121,7 +121,6 @@ beacon_3_purple = [[1500, 100],  # upper left
                    ]
 
 beacons_purple = [beacon_1_purple, beacon_2_purple, beacon_3_purple]
-
 
 SOFT_THRESHOLD_RECTANGLE = 50
 QUALITY_THRESHOLD = 150
