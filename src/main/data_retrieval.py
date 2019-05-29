@@ -78,7 +78,7 @@ def split_turn(turn: List[str]) -> List[List[float]]:
     return [[float(i) for i in measure.split(":")] for measure in "".join(turn).split(";") if measure]
 
 
-def split_encoder_data(encoder_measure: bytes) -> List[int, int, float, float]:
+def split_encoder_data(encoder_measure: bytes) -> List:
     """
     From an encoder measure to the position and orientation of robot with a timestamp.
 
@@ -155,13 +155,12 @@ class EncoderThread(Thread):
             self.logger = logging.getLogger(__name__)
         self.logger.info("On ouvre la connexion aux codeuses.")
         self.encoder_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-
-            self.encoder_socket.connect((encoder_host, encoder_port))
-        except OSError:
-            self.logger.error("Le serveur de codeuses est inaccessible")
-            self.encoder_socket = None
-            sys.exit(1)
+        while True:
+            try:
+                self.encoder_socket.connect((encoder_host, encoder_port))
+                break
+            except OSError as e:
+                pass
 
         if self.encoder_socket:
             try:
@@ -239,12 +238,12 @@ class LidarThread(Thread):
         self.logger.info("On se connecte au LiDAR")
 
         self.lidar_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            self.lidar_socket.connect((lidar_host, lidar_port))
-        except OSError:
-            self.logger.error("Le serveur du LiDAR est inaccessible")
-            self.lidar_socket = None
-            sys.exit(1)
+        while True:
+            try:
+                self.lidar_socket.connect((lidar_host, lidar_port))
+                break
+            except OSError as e:
+                pass
 
     def run(self):
         if self.lidar_socket:
