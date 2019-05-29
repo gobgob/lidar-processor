@@ -143,8 +143,7 @@ class Cluster:
         :return:
         """
         cluster_mean = self.get_mean()
-        if cluster_mean:
-            pass
+        return cluster_mean
 
     def is_a_circle(self, radius):
         def objective_function(pos):
