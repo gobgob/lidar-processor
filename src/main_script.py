@@ -19,7 +19,6 @@ import main.data_retrieval as datr
 import main.data_cleansing as dacl
 import main.communication as comm
 import main.clustering as clus
-# import main.tracking as trac
 import main.self_locator as sloc
 import main.enemy_locator as eloc
 import numpy as np
@@ -80,17 +79,12 @@ def main():
     start_enemy_positions = []
     own_colour_team = None
     computed_opponent_robot_position = False
-    # previous_clusters = []
-    # previous_beacons = []
-    # previous_opponent_robots = []
-    # previous_self_positions = []
     # endregion
 
     # region # before the match
     logger.info("Premières mesures")
     one_turn_points = dacl.filter_points(t_lidar.get_measures(), QUALITY_THRESHOLD)
     cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
-    # print(one_turn_points[0])
     one_turn_clusters, means = clus.polar_clusterize(cartesian_one_turn_measure)
     one_turn_clusters = clus.Cluster.to_clusters(one_turn_clusters)
 
@@ -151,71 +145,53 @@ def main():
 
     # region # match
     while not t_hl.has_match_stopped():
-        if t_hl.expecting_shift:
+        if own_colour_team is None:
+            logger.debug('On n\'a pas reçu de couleur donc le script lidar ne fait rien')
+            time.sleep(1)
+        else:
+            if t_hl.expecting_shift:
 
-            # region # measures
-            one_turn_points = dacl.filter_points(t_lidar.get_measures(), THRESHOLD_QUALITY)
-            cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
-            clusters, means = clus.clusterize(cartesian_one_turn_measure)
-            one_turn_clusters = clus.Cluster.to_clusters(clusters)
-            # endregion
+                # region # measures
+                one_turn_points = dacl.filter_points(t_lidar.get_measures(), THRESHOLD_QUALITY)
+                cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
+                clusters, means = clus.clusterize(cartesian_one_turn_measure)
+                one_turn_clusters = clus.Cluster.to_clusters(clusters)
+                # endregion
 
-            # region # retrieves position from encoders
-            odo_measure = t_ll.get_measures()[:3]
-            logger.debug("raw measure of odometry "+str(odo_measure))
-            proprioceptive_position = datr.from_encoder_position_to_lidar_measure(*odo_measure)
-            logger.debug("odometry position from lidar "+str(proprioceptive_position))
-            # endregion
+                # region # retrieves position from encoders
+                odo_measure = t_ll.get_measures()[:3]
+                logger.debug("raw measure of odometry "+str(odo_measure))
+                proprioceptive_position = datr.from_encoder_position_to_lidar_measure(*odo_measure)
+                logger.debug("odometry position from lidar "+str(proprioceptive_position))
+                # endregion
 
-            # for enemy_position in eloc.find_robots(one_turn_clusters):
-            #     t_hl.send_robot_position(*enemy_position)
+                # region # enemy position
+                # for enemy_position in eloc.find_robots(one_turn_clusters):
+                #     t_hl.send_robot_position(*enemy_position)
+                # endregion
 
-            # region # estimations of positions
-            beacons = sloc.find_beacons_with_odometry(one_turn_clusters, proprioceptive_position, own_colour_team,
-                                                      log_filename)
-            # beacons = sloc.find_beacons(one_turn_clusters)
-            # print("Le nombre de balises trouvé : ", len(beacons))
-            # print("On affiche la position des balises trouvées", beacons)
-            # print("-------------------------")
-            estimated_position, estimated_orientation = sloc.compute_own_state(beacons, own_colour_team, log_filename)
-            if estimated_position is None or estimated_orientation is None:
-                logger.warning("On n'a pas pu trouver les balises nécessaires à la localisation du robot.")
-            else:
-                logger.info("Notre position corrigée : "+str(estimated_position))
-                logger.info("Notre orientation corrigée : "+str(estimated_orientation))
-                hl_own_state = np.array([estimated_position.x, estimated_position.y, estimated_orientation])
-                logger.debug("lidar : "+str(hl_own_state))
-                logger.debug("odo : "+str(proprioceptive_position))
-                t_hl.set_recalibration(hl_own_state - proprioceptive_position)
-            t_hl.send_shift()
-        # own_position = sloc.find_own_position(beacons, own_colour_team)
-        # robots = eloc.find_robots(clyhnb usters)
-        # print(own_state)
-        # endregion
+                # region # estimations of positions
+                beacons = sloc.find_beacons_with_odometry(one_turn_clusters, proprioceptive_position, own_colour_team,
+                                                          log_filename)
+                estimated_position, estimated_orientation = sloc.compute_own_state(beacons, own_colour_team, log_filename)
+                if estimated_position is None or estimated_orientation is None:
+                    logger.warning("On n'a pas pu trouver les balises nécessaires à la localisation du robot.")
+                else:
+                    logger.info("Notre position corrigée : "+str(estimated_position))
+                    logger.info("Notre orientation corrigée : "+str(estimated_orientation))
+                    hl_own_state = np.array([estimated_position.x, estimated_position.y, estimated_orientation])
+                    logger.debug("lidar : "+str(hl_own_state))
+                    logger.debug("odo : "+str(proprioceptive_position))
+                    t_hl.set_recalibration(hl_own_state - proprioceptive_position)
+                t_hl.send_shift()
 
-        # region # history management
-        # if one_turn_clusters:
-        #     previous_clusters.append(one_turn_clusters.copy())
-        #     if len(previous_clusters) > 3:
-        #         previous_clusters.pop(0)
-        #
-        # if beacons:
-        #     previous_beacons.append(beacons.copy())
-        #     if len(previous_beacons) > 3:
-        #         previous_beacons.pop(0)
+                # region enemy position
+                # for enemy_position in eloc.find_robots(one_turn_clusters):
+                #     t_hl.send_robot_position(*enemy_position)
+                # endregion
 
-        # previous_opponent_robots.append(robots.copy())
-        # if len(previous_opponent_robots) > 3:
-        #     previous_opponent_robots.pop(0)
-        # if own_state:
-        #     previous_self_positions.append(own_state.copy())
-        #     if len(previous_self_positions) > 3:
-        #         previous_self_positions.pop(0)
-        # # endregion
-        #
-        # if own_state:
-        #     if datr.are_encoder_measures_and_lidar_measures_different(proprioceptive_position, own_state):
-        #         t_hl.set_recalibration(proprioceptive_position - own_state)  # convention
+                # endregion
+
         time.sleep(0.05)
     # endregion
     logger.info("Le match est fini")
