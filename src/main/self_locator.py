@@ -12,7 +12,7 @@ It is also possible to use the encoders' measures as the first estimation of the
 clusters to the expected positions of beacons are searched.
 """
 
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Iterable
 
 import numpy as np
 
@@ -328,3 +328,18 @@ def change_basis(rp: geom.Point, ori: float, measures: List):
         new_measure = p + rp
         new_measures.append([new_measure.x, new_measure.y])
     return new_measures
+
+
+def choose_median_state(states: Iterable):
+    """
+    >>> choose_median_state([np.array([1, 2, 3]), np.array([4, 5, 6]), np.array([7, 8, 9])])
+    array([ 4.,  5.,  6.])
+
+    >>> choose_median_state([np.array([1, 2, 9]), np.array([4, 8, 6]), np.array([7, 5, 3])])
+    array([ 4.,  5.,  6.])
+
+    :param states:
+    :return:
+    """
+
+    return np.median(np.row_stack(states), axis=0)

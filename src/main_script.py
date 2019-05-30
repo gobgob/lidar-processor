@@ -150,39 +150,42 @@ def main():
             time.sleep(1)
         else:
             if t_hl.expecting_shift:
+                last_states = []
+                for i in range(n_measures_for_meadian):
+                    # region # measures
+                    one_turn_points = dacl.filter_points(t_lidar.get_measures(), THRESHOLD_QUALITY)
+                    cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
+                    clusters, means = clus.clusterize(cartesian_one_turn_measure)
+                    one_turn_clusters = clus.Cluster.to_clusters(clusters)
+                    # endregion
 
-                # region # measures
-                one_turn_points = dacl.filter_points(t_lidar.get_measures(), THRESHOLD_QUALITY)
-                cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
-                clusters, means = clus.clusterize(cartesian_one_turn_measure)
-                one_turn_clusters = clus.Cluster.to_clusters(clusters)
-                # endregion
+                    # region # retrieves position from encoders
+                    odo_measure = t_ll.get_measures()[:3]
+                    logger.debug("raw measure of odometry "+str(odo_measure))
+                    proprioceptive_position = datr.from_encoder_position_to_lidar_measure(*odo_measure)
+                    logger.debug("odometry position from lidar "+str(proprioceptive_position))
+                    # endregion
 
-                # region # retrieves position from encoders
-                odo_measure = t_ll.get_measures()[:3]
-                logger.debug("raw measure of odometry "+str(odo_measure))
-                proprioceptive_position = datr.from_encoder_position_to_lidar_measure(*odo_measure)
-                logger.debug("odometry position from lidar "+str(proprioceptive_position))
-                # endregion
+                    # region # enemy position
+                    # for enemy_position in eloc.find_robots(one_turn_clusters):
+                    #     t_hl.send_robot_position(*enemy_position)
+                    # endregion
 
-                # region # enemy position
-                # for enemy_position in eloc.find_robots(one_turn_clusters):
-                #     t_hl.send_robot_position(*enemy_position)
-                # endregion
-
-                # region # estimations of positions
-                beacons = sloc.find_beacons_with_odometry(one_turn_clusters, proprioceptive_position, own_colour_team,
-                                                          log_filename)
-                estimated_position, estimated_orientation = sloc.compute_own_state(beacons, own_colour_team, log_filename)
-                if estimated_position is None or estimated_orientation is None:
-                    logger.warning("On n'a pas pu trouver les balises nécessaires à la localisation du robot.")
-                else:
-                    logger.info("Notre position corrigée : "+str(estimated_position))
-                    logger.info("Notre orientation corrigée : "+str(estimated_orientation))
-                    hl_own_state = np.array([estimated_position.x, estimated_position.y, estimated_orientation])
-                    logger.debug("lidar : "+str(hl_own_state))
-                    logger.debug("odo : "+str(proprioceptive_position))
-                    t_hl.set_recalibration(hl_own_state - proprioceptive_position)
+                    # region # estimations of positions
+                    beacons = sloc.find_beacons_with_odometry(one_turn_clusters, proprioceptive_position, own_colour_team,
+                                                              log_filename)
+                    estimated_position, estimated_orientation = sloc.compute_own_state(beacons, own_colour_team, log_filename)
+                    if estimated_position is None or estimated_orientation is None:
+                        logger.warning("On n'a pas pu trouver les balises nécessaires à la localisation du robot.")
+                    else:
+                        logger.info("Notre position corrigée : "+str(estimated_position))
+                        logger.info("Notre orientation corrigée : "+str(estimated_orientation))
+                        hl_own_state = np.array([estimated_position.x, estimated_position.y, estimated_orientation])
+                        logger.debug("lidar : "+str(hl_own_state))
+                        logger.debug("odo : "+str(proprioceptive_position))
+                        last_states.append(hl_own_state - proprioceptive_position)
+                median_shifts = sloc.choose_median_state(last_states)
+                t_hl.set_recalibration(median_shifts)
                 t_hl.send_shift()
 
                 # region enemy position
