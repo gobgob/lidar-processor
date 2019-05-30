@@ -184,9 +184,15 @@ def main():
                         logger.debug("lidar : "+str(hl_own_state))
                         logger.debug("odo : "+str(proprioceptive_position))
                         last_states.append(hl_own_state - proprioceptive_position)
-                median_shifts = sloc.choose_median_state(last_states)
-                t_hl.set_recalibration(median_shifts)
-                t_hl.send_shift()
+                    time.sleep(0.1)
+                if len(last_states) > 0:
+                    last_states = sloc.crop_angles(last_states)
+                    median_shifts = sloc.choose_median_state(last_states)
+                    t_hl.set_recalibration(median_shifts)
+                    t_hl.send_shift()
+                else:
+                    logger.debug('Aucun recalage possible.')
+                    t_hl.set_recalibration(None)
 
                 # region enemy position
                 # for enemy_position in eloc.find_robots(one_turn_clusters):

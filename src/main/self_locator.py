@@ -343,3 +343,21 @@ def choose_median_state(states: Iterable):
     """
 
     return np.median(np.row_stack(states), axis=0)
+
+
+def crop_angles(last_states: Iterable):
+    """
+    >>> crop_angles([np.array([1, 2, 3*np.pi/2]), np.array([4, 5, 4*np.pi/5]), np.array([7, 8, -2*np.pi])])
+    [array([ 1.        ,  2.        , -1.57079633]), array([ 4.        ,  5.        ,  2.51327412]), array([ 7.,  8.,  0.])]
+
+    :param last_states:
+    :return: returns angles between -pi and pi
+    """
+    def fix_angle(angle):
+        if angle > np.pi:
+            angle -= 2*np.pi
+        elif angle <= -np.pi:
+            angle += 2*np.pi
+        return angle
+
+    return [np.array([state[0], state[1], fix_angle(state[2])]) for state in last_states]
