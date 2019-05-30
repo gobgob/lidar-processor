@@ -91,6 +91,5 @@ def find_robots(clusters: List[Cluster]):
     robots = []
     for cluster in clusters:
         solution = cluster.get_mean()
-        # if np.numeric.isclose(solution.fun, 0.0001):
         robots.append([solution[0], solution[1], time.time()])
     return robots

@@ -129,7 +129,6 @@ class HLThread(Thread):
         return self.match_has_begun
 
     def get_team_colour(self):
-        # return TeamColor.purple.value
         return self.team_colour
 
     def has_match_stopped(self):

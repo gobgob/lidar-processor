@@ -221,7 +221,7 @@ class Table:
 
     def plot_clusters(self, clusters):
         """
-        TODO
+
         :return:
         """
         xx = []

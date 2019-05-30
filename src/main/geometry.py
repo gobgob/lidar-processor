@@ -231,16 +231,12 @@ class Segment:
         :return:
         """
         false_segment = Segment(self.p1, other.p1)
-        # print(false_segment)
 
         numerator = (false_segment.get_x_difference() * other.get_y_difference() -
                      false_segment.get_y_difference() * other.get_x_difference())
 
         denominator = (self.get_x_difference() * other.get_y_difference() -
                        self.get_y_difference() * other.get_x_difference())
-
-        # print(numerator)
-        # print(denominator)
         t = numerator / denominator
         # print("t", t)
         if 0 <= t <= 1:

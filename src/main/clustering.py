@@ -66,7 +66,6 @@ class Cluster:
 
     def is_linear(self):
         """
-        TODO
         Hough transform or RANSAC
         :return:
         """
@@ -124,12 +123,8 @@ class Cluster:
         """
 
         initial_guess = self.get_mean()
-        # print(type(initial_guess))
-        # initial_guess = 0
         solution = root(self._beacons_objective_function, initial_guess, method="lm")
 
-        # print("solution", solution.x)
-        # print("error", solution.fun)
         beacon = None
         if np.isclose(solution.fun[0], 0, atol=TOLERANCE_FOR_CIRCLE_COHERENCE):
             beacon = Beacon()
@@ -153,12 +148,8 @@ class Cluster:
                 dist_sum += (distance(point, circle_position) - radius) ** 2
             return dist_sum, 0
         initial_guess = self.get_mean()
-        # print(type(initial_guess))
-        # initial_guess = 0
         solution = root(objective_function, initial_guess, method="lm")
 
-        # print("solution", solution.x)
-        # print("error", solution.fun)
         return solution
 
     def _beacons_objective_function(self, pos):
@@ -279,7 +270,6 @@ def polar_clusterize(polar_measures)-> Tuple[List, List]:
             j = 0
             k = 1
             while k < n:
-                # dist_j = cluster_distance_mean(clusters[j], clusters[k])
                 dist_j = cluster_polar_distance_closest(clusters[j], clusters[k])
                 # if cluster barycenters are close enough to each other, then clusters are merged
                 if dist_j < 200:
@@ -332,7 +322,6 @@ def clusterize(cartesian_measures: List[np.ndarray]) -> Tuple[List, List]:
             j = 0
             k = 1
             while k < n:
-                # dist_j = cluster_distance_mean(clusters[j], clusters[k])
                 dist_j = cluster_distance_closest(clusters[j], clusters[k])
                 # if cluster barycenters are close enough to each other, then clusters are merged
                 if dist_j < 200:

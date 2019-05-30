@@ -23,6 +23,8 @@ import main.data_retrieval as dr
 import main.table as table
 
 __author__ = "Clément Besnier"
+
+
 p_beacons_orange = [[geom.Point(point[0], point[1]) for point in limits]for limits in beacons_orange]
 p_beacons_purple = [[geom.Point(point[0], point[1]) for point in limits]for limits in beacons_purple]
 
@@ -60,10 +62,6 @@ def find_starting_beacons(own_colour: TeamColor, clusters: List[Cluster]):
     p_b2_lidar = geom.from_theoretical_table_to_lidar(b2, starting_position, starting_orientation)
     p_b3_lidar = geom.from_theoretical_table_to_lidar(b3, starting_position, starting_orientation)
 
-    # print("b1 vu du LiDAR"+str(p_b1_lidar))
-    # print("b2 vu du LiDAR"+str(p_b2_lidar))
-    # print("b3 vu du LiDAR"+str(p_b3_lidar))
-
     found_b1, found_b2, found_b3 = None, None, None
     min_d_cluster_beacon1 = 3000
     min_d_cluster_beacon2 = 3000
@@ -81,15 +79,12 @@ def find_starting_beacons(own_colour: TeamColor, clusters: List[Cluster]):
             if d_cluster_beacon1 < min_d_cluster_beacon1 and d_cluster_beacon1 < threshold_closest_beacon:
                 min_d_cluster_beacon1 = d_cluster_beacon1
                 found_b1 = mean.copy()
-                print("mean et b1 et distance trouvée : ", mean, p_b1_lidar, min_d_cluster_beacon1)
             if d_cluster_beacon2 < min_d_cluster_beacon2 and d_cluster_beacon2 < threshold_closest_beacon:
                 min_d_cluster_beacon1 = d_cluster_beacon2
                 found_b2 = mean.copy()
-                print("mean et b2 et distance trouvée : ", mean, p_b2_lidar, min_d_cluster_beacon2)
             if d_cluster_beacon3 < min_d_cluster_beacon3 and d_cluster_beacon3 < threshold_closest_beacon:
                 min_d_cluster_beacon1 = d_cluster_beacon3
                 found_b3 = mean.copy()
-                print("mean et b3 et distance trouvée : ", mean, p_b3_lidar, min_d_cluster_beacon3)
 
     return [found_b1, found_b2, found_b3]
 
@@ -123,10 +118,6 @@ def find_beacons_with_odometry(clusters: List[Cluster], odometry_state, own_colo
     logger.debug("position balise 2 lidar : " + str(p_b2_lidar))
     logger.debug("position balise 3 lidar : " + str(p_b3_lidar))
 
-    # print("b1 vu du LiDAR"+str(p_b1_lidar))
-    # print("b2 vu du LiDAR"+str(p_b2_lidar))
-    # print("b3 vu du LiDAR"+str(p_b3_lidar))
-
     found_b1, found_b2, found_b3 = None, None, None
 
     for cluster in clusters:
@@ -138,13 +129,13 @@ def find_beacons_with_odometry(clusters: List[Cluster], odometry_state, own_colo
 
             if d1 < 200:
                 found_b1 = mean.copy()
-                print("mean et b1 : ", mean, p_b1_lidar)
+                # print("mean et b1 : ", mean, p_b1_lidar)
             if d2 < 200:
                 found_b2 = mean.copy()
-                print("mean et b2 : ", mean, p_b2_lidar)
+                # print("mean et b2 : ", mean, p_b2_lidar)
             if d3 < 200:
                 found_b3 = mean.copy()
-                print("mean et b3 : ", mean, p_b3_lidar)
+                # print("mean et b3 : ", mean, p_b3_lidar)
 
     return [found_b1, found_b2, found_b3]
 
@@ -226,10 +217,10 @@ def compute_own_state(beacons: List[np.ndarray], own_colour: TeamColor, logger_n
         # theta_r = np.pi/2 - angle3 +
 
         if own_colour == TeamColor.purple:
-            # robot_x = b1.x - np.sin(angle1)*d1
-            # robot_y = b1.y + np.cos(angle1)*d1
+            # robot_x = b3.x - np.sin(angle3)*d3
+            # robot_y = b3.y + np.cos(angle3)*d3
             #
-            # print("From b1", geom.Point(robot_x, robot_y))
+            # print("From b3", geom.Point(robot_x, robot_y))
 
             logger.debug("b1 : x et y" + str(b1.x) + " " + str(b1.y))
             logger.debug("b3 : x et y" + str(b3.x) + " " + str(b3.y))
@@ -249,7 +240,7 @@ def compute_own_state(beacons: List[np.ndarray], own_colour: TeamColor, logger_n
         elif own_colour == TeamColor.orange:
             robot_x = b1.x + np.sin(angle1) * d1
             robot_y = b1.y - np.cos(angle1) * d1
-            #
+
             # print("From b1", geom.Point(robot_x, robot_y))
 
             # robot_x = b3.x + np.sin(angle3) * d3
@@ -265,8 +256,6 @@ def compute_own_state(beacons: List[np.ndarray], own_colour: TeamColor, logger_n
         v_table_beacons = geom.Vector()
         v_table_beacons.set_by_points(b1, b3)
 
-        # table_beacons_angle = np.pi / 2
-
         v_lidar_beacons = geom.Vector()
         v_lidar_beacons.set_by_points(p_beacon1 - robot_position, p_beacon3 - robot_position)
 
@@ -277,7 +266,6 @@ def compute_own_state(beacons: List[np.ndarray], own_colour: TeamColor, logger_n
         # logger.debug("angle lidar beacons angle "+str(np.rad2deg(lidar_beacons_angle)))
         # logger.debug("angle lidar beacons angle rad"+str(lidar_beacons_angle))
 
-        # robot_orientation = (table_beacons_angle - lidar_beacons_angle - np.pi/2) % 2*np.pi
         robot_orientation = lidar_beacons_angle % (2*np.pi)
         logger.debug("Orientation du robot : "+str(robot_orientation))
         # endregion

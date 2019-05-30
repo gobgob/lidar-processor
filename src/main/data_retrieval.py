@@ -256,7 +256,6 @@ class LidarThread(Thread):
                         a = split_turn(current_measure)
                         self.measures.put(a)
                         current_measure = []
-                        # self.close()
                     else:
                         current_measure.append(c)
                 if not self.measuring:
@@ -273,7 +272,6 @@ class LidarThread(Thread):
     def get_measures(self) -> List:
         if self.lidar_socket:
             res = self.measures.get()
-            # self.logger.info("measure "+ str(res))
             return res
         else:
             return []
