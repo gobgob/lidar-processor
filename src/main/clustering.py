@@ -12,7 +12,7 @@ from scipy.optimize import root
 
 import main.geometry as geom
 from main.constants import *
-
+import main.output_rendering as outr
 
 __author__ = "Clément Besnier"
 
@@ -60,6 +60,7 @@ class Cluster:
         self.mean = None
         self.beacon_radius = FIX_BEACON_RADIUS
         self.adverse_robot_radius = OPPONENT_ROBOT_BEACON_RADIUS
+        self.closest_to_robot = None
 
     def get_std(self):
         return np.std(self.points)
@@ -172,24 +173,54 @@ class Cluster:
         return new_cluster
 
     @staticmethod
-    def to_clusters(clusters):
+    def to_clusters(clusters, closest_points=None):
         """
 
         :param clusters: list of lists of 2D points
+        :param closest_points:
         :return: list of clusters
         """
         real_clusters = []
-        for cluster in clusters:
+        for i, cluster in enumerate(clusters):
             new_cluster = Cluster()
+            if closest_points is not None:
+                new_cluster.set_closest_to_robot(closest_points[i])
             new_cluster.add_points(cluster)
             real_clusters.append(new_cluster)
         return real_clusters
+
+    def polar_to_cartesian(self):
+        """
+
+        :return:
+        """
+        self.points = [[outr.polar_to_x(point), outr.polar_to_y(point)] for point in self.points]
+
+    def set_closest_to_robot(self, point):
+        self.closest_to_robot = point
+
+    def compute_closest_to_robot(self):
+        min_dist = 4000
+        closest_point = self.points[0]
+        for point in self.points:
+            current_norm = norm(point)
+            if current_norm < min_dist:
+                closest_point = point
+                min_dist = current_norm
+        self.set_closest_to_robot(closest_point)
+
+    def get_closest_point_to_robot(self) -> np.ndarray:
+        return np.array(self.closest_to_robot)
 
 
 def distance(point, other):
     diff = point - other
     res = np.sqrt(diff @ diff.T)
     return res
+
+
+def norm(point):
+    return np.sqrt(point * point)
 
 
 def distance_al_kashi(angle1, distance1, angle2, distance2):
@@ -246,7 +277,7 @@ def cluster_polar_distance_closest(cluster, other):
     return min([dist1, dist2])
 
 
-def polar_clusterize(polar_measures)-> Tuple[List, List]:
+def polar_clusterize(polar_measures)-> Tuple[List, List, List]:
     """
 
     :param polar_measures: Polar coordinates
@@ -293,12 +324,24 @@ def polar_clusterize(polar_measures)-> Tuple[List, List]:
             for cluster in clusters:
                 mean_cluster = np.sum(cluster, axis=0) / len(cluster)
                 means.append(mean_cluster)
-            return clusters, means
+
+            closest_points = []
+
+            for cluster in clusters:
+                min_dist = 4000
+                closest_point = cluster[0]
+                for point in cluster:
+                    if point[1] < min_dist:
+                        closest_point = point
+                        min_dist = point[1]
+                closest_points.append(closest_point)
+
+            return clusters, means, closest_points
     else:
-        return [], []
+        return [], [], []
 
 
-def clusterize(cartesian_measures: List[np.ndarray]) -> Tuple[List, List]:
+def clusterize(cartesian_measures: List[np.ndarray]) -> Tuple[List, List, List]:
     """
 
     :param cartesian_measures: Cartesian coordinates
@@ -345,9 +388,22 @@ def clusterize(cartesian_measures: List[np.ndarray]) -> Tuple[List, List]:
             for cluster in clusters:
                 mean_cluster = np.sum(cluster, axis=0) / len(cluster)
                 means.append(mean_cluster)
-            return clusters, means
+
+            closest_points = []
+
+            for cluster in clusters:
+                min_dist = 4000
+                closest_point = cluster[0]
+                for point in cluster:
+                    current_norm = norm(point)
+                    if current_norm < min_dist:
+                        closest_point = point
+                        min_dist = current_norm
+                closest_points.append(closest_point)
+
+            return clusters, means, closest_points
         else:
-            return [], []
+            return [], [], []
 
 
 if __name__ == "__main__":

@@ -82,8 +82,8 @@ def main():
     logger.info("Premières mesures")
     one_turn_points = dacl.filter_points(t_lidar.get_measures(), QUALITY_THRESHOLD)
     cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
-    one_turn_clusters, means = clus.polar_clusterize(cartesian_one_turn_measure)
-    one_turn_clusters = clus.Cluster.to_clusters(one_turn_clusters)
+    one_turn_clusters, means, closest_points = clus.clusterize(cartesian_one_turn_measure)
+    one_turn_clusters = clus.Cluster.to_clusters(one_turn_clusters, closest_points)
 
     print("Il y a ", len(one_turn_clusters), "clusters.")
 
@@ -119,8 +119,8 @@ def main():
 
                         # region lidar data processing
                         cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
-                        clusters, means = clus.clusterize(cartesian_one_turn_measure)
-                        one_turn_clusters = clus.Cluster.to_clusters(clusters)
+                        clusters, means, closest_points = clus.clusterize(cartesian_one_turn_measure)
+                        one_turn_clusters = clus.Cluster.to_clusters(clusters, closest_points)
                         # endregion
 
                         t2 = time.time()
@@ -193,8 +193,8 @@ def main():
 
                     # region lidar data processing
                     cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_points)
-                    clusters, means = clus.clusterize(cartesian_one_turn_measure)
-                    one_turn_clusters = clus.Cluster.to_clusters(clusters)
+                    clusters, means, closest_points = clus.clusterize(cartesian_one_turn_measure)
+                    one_turn_clusters = clus.Cluster.to_clusters(clusters, closest_points)
                     # endregion
 
                     t2 = time.time()

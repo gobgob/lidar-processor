@@ -70,21 +70,21 @@ def find_starting_beacons(own_colour: TeamColor, clusters: List[Cluster]):
     threshold_closest_beacon = 500
 
     for cluster in clusters:
-        mean = cluster.get_mean()
-        if mean is not None:
-            d_cluster_beacon1 = dr.distance_array(mean, p_b1_lidar.to_array())
-            d_cluster_beacon2 = dr.distance_array(mean, p_b2_lidar.to_array())
-            d_cluster_beacon3 = dr.distance_array(mean, p_b3_lidar.to_array())
+        closest = cluster.get_closest_point_to_robot()
+        if closest is not None:
+            d_cluster_beacon1 = dr.distance_array(closest, p_b1_lidar.to_array())
+            d_cluster_beacon2 = dr.distance_array(closest, p_b2_lidar.to_array())
+            d_cluster_beacon3 = dr.distance_array(closest, p_b3_lidar.to_array())
 
             if d_cluster_beacon1 < min_d_cluster_beacon1 and d_cluster_beacon1 < threshold_closest_beacon:
                 min_d_cluster_beacon1 = d_cluster_beacon1
-                found_b1 = mean.copy()
+                found_b1 = closest.copy()
             if d_cluster_beacon2 < min_d_cluster_beacon2 and d_cluster_beacon2 < threshold_closest_beacon:
                 min_d_cluster_beacon1 = d_cluster_beacon2
-                found_b2 = mean.copy()
+                found_b2 = closest.copy()
             if d_cluster_beacon3 < min_d_cluster_beacon3 and d_cluster_beacon3 < threshold_closest_beacon:
                 min_d_cluster_beacon1 = d_cluster_beacon3
-                found_b3 = mean.copy()
+                found_b3 = closest.copy()
 
     return [found_b1, found_b2, found_b3]
 
@@ -121,20 +121,21 @@ def find_beacons_with_odometry(clusters: List[Cluster], odometry_state, own_colo
     found_b1, found_b2, found_b3 = None, None, None
 
     for cluster in clusters:
-        mean = cluster.get_mean()
-        if mean is not None:
-            d1 = dr.distance_array(mean, p_b1_lidar.to_array())
-            d2 = dr.distance_array(mean, p_b2_lidar.to_array())
-            d3 = dr.distance_array(mean, p_b3_lidar.to_array())
+
+        closest = cluster.get_closest_point_to_robot()
+        if closest is not None:
+            d1 = dr.distance_array(closest, p_b1_lidar.to_array())
+            d2 = dr.distance_array(closest, p_b2_lidar.to_array())
+            d3 = dr.distance_array(closest, p_b3_lidar.to_array())
 
             if d1 < 200:
-                found_b1 = mean.copy()
+                found_b1 = closest.copy()
                 # print("mean et b1 : ", mean, p_b1_lidar)
             if d2 < 200:
-                found_b2 = mean.copy()
+                found_b2 = closest.copy()
                 # print("mean et b2 : ", mean, p_b2_lidar)
             if d3 < 200:
-                found_b3 = mean.copy()
+                found_b3 = closest.copy()
                 # print("mean et b3 : ", mean, p_b3_lidar)
 
     return [found_b1, found_b2, found_b3]
@@ -252,7 +253,7 @@ def compute_own_state(beacons: List[np.ndarray], own_colour: TeamColor, logger_n
             logger.debug("La couleur donnée n'est pas bonne")
             return None, None
 
-        # region computes robot orientation
+        # region # computes robot orientation
         v_table_beacons = geom.Vector()
         v_table_beacons.set_by_points(b1, b3)
 
