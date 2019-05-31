@@ -125,4 +125,4 @@ beacons_purple = [beacon_1_purple, beacon_2_purple, beacon_3_purple]
 SOFT_THRESHOLD_RECTANGLE = 50
 QUALITY_THRESHOLD = 150
 
-n_measures_for_meadian = 5
+n_measures_for_median = 3
