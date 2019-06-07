@@ -10,9 +10,9 @@ from typing import List, Tuple
 import numpy as np
 from scipy.optimize import root
 
-import main.geometry as geom
-from main.constants import *
-import main.output_rendering as outr
+import lidarproc.main.geometry as geom
+from lidarproc.main.constants import *
+
 
 __author__ = "Clément Besnier"
 

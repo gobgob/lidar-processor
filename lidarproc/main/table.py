@@ -14,10 +14,10 @@ except ImportError:
     pl = None
     main_clustering = None
 
-from main.constants import *
-from main.clustering import Cluster
-import main.data_retrieval as dr
-import main.geometry as geom
+from lidarproc.main.constants import *
+from lidarproc.main.clustering import Cluster
+import lidarproc.main.data_retrieval as dr
+import lidarproc.main.geometry as geom
 
 
 __author__ = "Clément Besnier"
@@ -114,6 +114,7 @@ class Square(Obstacle):
 
     def take_symmetric(self):
         self.positions = [geom.Point(-position.x, position.y) for position in self.positions]
+        self.center = geom.Point(-self.center.x, self.center.y)
 
     def translate(self, vector: geom.Vector):
         return Square([vector.apply_to_point(position) for position in self.positions])
@@ -277,6 +278,7 @@ class Table:
     def plot_measures(measure_point: geom.Point, vectors: List[geom.Vector], robot_vector: geom.Vector):
         for vector in vectors:
             res = vector.apply_to_point(measure_point)
+            # print([measure_point.x, res.x], [measure_point.y, res.y])
             pl.plot([measure_point.x, res.x], [measure_point.y, res.y], "b-")
 
         robot_vector.apply_to_point(measure_point)

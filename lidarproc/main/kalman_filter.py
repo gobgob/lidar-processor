@@ -8,7 +8,7 @@ from numpy import array, eye
 from math import cos, sin
 from numpy.linalg import inv
 
-from main.constants import *
+from lidarproc.main.constants import *
 
 __author__ = ["https://github.com/hermes-project/lidar", ]
 

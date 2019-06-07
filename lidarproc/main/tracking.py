@@ -4,7 +4,7 @@
 """
 from typing import List
 
-from main.clustering import Cluster
+from lidarproc.main.clustering import Cluster
 
 __author__ = "Clément Besnier"
 

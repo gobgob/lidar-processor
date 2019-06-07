@@ -16,11 +16,11 @@ from typing import List, Tuple, Union, Iterable
 
 import numpy as np
 
-from main.constants import *
-from main.clustering import Cluster, Beacon
-import main.geometry as geom
-import main.data_retrieval as dr
-import main.table as table
+from lidarproc.main.constants import *
+from lidarproc.main.clustering import Cluster, Beacon
+import lidarproc.main.geometry as geom
+import lidarproc.main.data_retrieval as dr
+import lidarproc.main.table as table
 
 __author__ = "Clément Besnier"
 

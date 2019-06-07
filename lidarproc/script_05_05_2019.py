@@ -1,28 +1,26 @@
 #!/home/pi/lidar-processor/lidar_env/bin/python
 
 """
-Display measures
+Display measures of a trajectory
 """
 
-import numpy as np
+import lidarproc.main.data_cleansing as dacl
+from lidarproc.main.geometry import Point, Vector
+from lidarproc.main.table import Table, Square
+from lidarproc.plot_measures import display_polar_measures
+from lidarproc.retrieve_realistic_measures import get_05_05_2019_lidar_measures
 
-import main.data_cleansing as dacl
-from main.geometry import Point, Vector
-from main.table import Table, Square
-from plot_measures import display_polar_measures
-from retrieve_realistic_measures import get_table_measures
-
-import main.output_rendering as outr
+import lidarproc.main.output_rendering as outr
 
 __author__ = "Clément Besnier"
 
 
 def display_just_measures():
-    samples = ["0_-1820_pi_over_2", "1210_1400_pi", "-1210_1400_0"]
-    measures = get_table_measures(samples[1])
-    for i in range(len(measures)):
-        one_turn_measure = dacl.keep_good_measures(measures[i], 100)
-        one_turn_measure = dacl.keep_not_too_far_or_not_too_close(one_turn_measure)
+    samples = ["3"]
+    measures = get_05_05_2019_lidar_measures(samples[0])
+    # for i in range(len(measures)):
+    for i in range(1):
+        one_turn_measure = dacl.filter_points(measures[i], 100)
         display_polar_measures(one_turn_measure)
 
 
@@ -40,9 +38,9 @@ def display_measures_and_table():
     translation_vectors = [v1, v2, v3]
 
     # measures retrieval
-    samples = ["0_-1820_pi_over_2", "1210_1400_pi", "-1210_1400_0"]
+    samples = ["3"]
 
-    measures = get_table_measures(samples[identifier])
+    measures = get_05_05_2019_lidar_measures(samples[identifier])
     one_turn_measures = []
     for i in range(len(measures)):
         one_turn_measure = dacl.keep_good_measures(measures[i], 100)
