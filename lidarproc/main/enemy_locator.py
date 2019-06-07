@@ -11,10 +11,10 @@ from typing import List
 
 import numpy as np
 
-import main.geometry as geom
-from main.constants import *
-from main.clustering import Cluster
-import main.table as ta
+import lidarproc.main.geometry as geom
+from lidarproc.main.constants import *
+from lidarproc.main.clustering import Cluster
+import lidarproc.main.table as ta
 
 __author__ = "Clément Besnier"
 

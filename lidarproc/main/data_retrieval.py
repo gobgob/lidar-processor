@@ -17,7 +17,7 @@ from threading import Thread
 import queue
 from typing import List
 
-from main.constants import *
+from lidarproc.main.constants import *
 
 try:
     import numpy as np

@@ -14,10 +14,10 @@ except ImportError:
     pl = None
     main_clustering = None
 
-from main.constants import *
-from main.clustering import Cluster
-import main.data_retrieval as dr
-import main.geometry as geom
+from lidarproc.main.constants import *
+from lidarproc.main.clustering import Cluster
+import lidarproc.main.data_retrieval as dr
+import lidarproc.main.geometry as geom
 
 
 __author__ = "Clément Besnier"

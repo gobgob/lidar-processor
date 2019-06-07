@@ -7,11 +7,11 @@
 import numpy as np
 import matplotlib.pyplot as pl
 
-from main.constants import *
-import main.clustering as clus
-import main.output_rendering as outr
-import main.data_cleansing as dacl
-from retrieve_realistic_measures import get_realistic_data
+from lidarproc.main.constants import *
+import lidarproc.main.clustering as clus
+import lidarproc.main.output_rendering as outr
+import lidarproc.main.data_cleansing as dacl
+from lidarproc.retrieve_realistic_measures import get_realistic_data
 
 __author__ = "Clément Besnier"
 

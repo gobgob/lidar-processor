@@ -1,10 +1,9 @@
-#
 import numpy as np
 import matplotlib.pyplot as pl
 
-import main.geometry as geom
+import lidarproc.main.geometry as geom
 
-import main.table as ta
+import lidarproc.main.table as ta
 
 __author__ = "Clément Besnier"
 

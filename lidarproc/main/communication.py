@@ -12,7 +12,7 @@ import socket
 import time
 from threading import Thread
 
-from main.constants import *
+from lidarproc.main.constants import *
 
 __author__ = ["Clément Besnier", "PF"]
 
