@@ -1,9 +1,10 @@
 from setuptools import setup
+from setuptools import find_packages
 
 setup(
     name='lidarproc',
     version='1.0.0',
-    packages=['data', 'main', 'scripts'],
+    packages=find_packages(),
     package_dir={'': 'src'},
     url='https://www.clementbesnier.fr/projets/cdr2019',
     license='',
