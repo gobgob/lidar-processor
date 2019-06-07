@@ -10,11 +10,11 @@ import numpy as np
 from skimage import io as skio
 import matplotlib.pylab as pl
 
-from main.constants import *
+from lidarproc.main.constants import *
 
-import main.output_rendering as outr
-import main.data_cleansing as dacl
-import retrieve_realistic_measures as retrm
+import lidarproc.main.output_rendering as outr
+import lidarproc.main.data_cleansing as dacl
+import lidarproc.retrieve_realistic_measures as retrm
 
 __author__ = ["Clément Besnier", ]
 

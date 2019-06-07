@@ -8,7 +8,7 @@ import os
 import sys
 import time
 import json
-from main.data_retrieval import LidarThread, EncoderThread
+from lidarproc.main.data_retrieval import LidarThread, EncoderThread
 
 
 def store_lidar_data_05_05_2019(thread_lidar, i_measure: int):

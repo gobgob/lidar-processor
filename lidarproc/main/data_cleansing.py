@@ -15,8 +15,8 @@ from typing import List, Union
 
 import numpy as np
 
-from main.constants import *
-from main.clustering import Cluster
+from lidarproc.main.constants import *
+from lidarproc.main.clustering import Cluster
 
 __author__ = "Clément Besnier"
 
