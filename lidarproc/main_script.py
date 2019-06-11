@@ -8,6 +8,12 @@ The aim is to follow opponent robots' positions and to calibrate regularly our p
 /home/pi/lidar-processor/lidar_env/bin/python /home/pi/lidar-processor/src/main_script.py
 
 """
+
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.getcwd()))
+
 import shutil
 import time
 import datetime
