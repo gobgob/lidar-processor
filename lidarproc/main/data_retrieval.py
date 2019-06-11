@@ -140,11 +140,11 @@ def trame_delimiter(content):
 
 
 class EncoderThread(Thread):
-    def __init__(self, logger_name=None):
+    def __init__(self, logger_name=None, encoder_host="172.16.0.2", encoder_port=80):
         Thread.__init__(self)
 
-        self.encoder_host = "172.16.0.2"  # cdr 2019
-        self.encoder_port = 80  # cdr 2019
+        self.encoder_host = encoder_host
+        self.encoder_port = encoder_port
 
         self.measuring = True
         self.measures = queue.LifoQueue()
@@ -237,11 +237,11 @@ class EncoderThread(Thread):
 
 
 class LidarThread(Thread):
-    def __init__(self, logger_name=None):
+    def __init__(self, logger_name=None, lidar_host="172.24.1.1", lidar_port=17685):
         Thread.__init__(self)
 
-        self.lidar_host = "172.24.1.1"  # cdr 2019
-        self.lidar_port = 17685  # cdr 2019
+        self.lidar_host = lidar_host
+        self.lidar_port = lidar_port
 
         self.measuring = True
         self.measures = queue.LifoQueue()

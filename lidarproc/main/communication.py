@@ -16,8 +16,7 @@ from lidarproc.main.constants import *
 
 __author__ = ["Clément Besnier", "PF"]
 
-hl_host = "127.0.0.1"
-hl_port = 8765
+
 socket.setdefaulttimeout(3)
 
 
@@ -26,8 +25,11 @@ class HLThread(Thread):
     Communication to the High-Level
     https://github.com/gobgob/chariot-elevateur/blob/master/high_level/src/main/java/senpai/comm/LidarEth.java
     """
-    def __init__(self, logger_name=None):
+    def __init__(self, logger_name=None, hl_host="127.0.0.1", hl_port=8765):
         Thread.__init__(self)
+
+        self.hl_host = hl_host
+        self.hl_port = hl_port
 
         self.logger = logging.getLogger(logger_name)
         self.communicating = True
@@ -86,7 +88,7 @@ class HLThread(Thread):
 
     def run(self):
         if self.hl_socket:
-            self.logger.info("Connection au port {}".format(hl_port))
+            self.logger.info("Connection au port {}".format(self.hl_port))
             current_measure = []
 
             while self.communicating:
