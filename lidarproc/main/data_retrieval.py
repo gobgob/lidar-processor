@@ -27,10 +27,6 @@ except ImportError:
 
 __author__ = ["Clément Besnier", ]
 
-lidar_host = "172.24.1.1"
-lidar_port = 17685
-encoder_host = "172.16.0.2"
-encoder_port = 80
 
 if "numpy" in sys.modules:
     def from_encoder_position_to_lidar_measure(x, y, theta) -> np.ndarray:
@@ -146,6 +142,10 @@ def trame_delimiter(content):
 class EncoderThread(Thread):
     def __init__(self, logger_name=None):
         Thread.__init__(self)
+
+        self.encoder_host = "172.16.0.2"  # cdr 2019
+        self.encoder_port = 80  # cdr 2019
+
         self.measuring = True
         self.measures = queue.LifoQueue()
         if logger_name:
@@ -157,7 +157,7 @@ class EncoderThread(Thread):
         self.encoder_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         while True:
             try:
-                self.encoder_socket.connect((encoder_host, encoder_port))
+                self.encoder_socket.connect((self.encoder_host, self.encoder_port))
                 break
             except OSError as e:
                 pass
@@ -174,7 +174,7 @@ class EncoderThread(Thread):
 
     def run(self):
         if self.encoder_socket:
-            self.logger.info("Connexion au port {}".format(encoder_port))
+            self.logger.info("Connexion au port {}".format(self.encoder_port))
             current_measure = bytearray()
             are_robot_position_measures = True
             remaining_to_read = 56
@@ -223,10 +223,26 @@ class EncoderThread(Thread):
         else:
             return []
 
+    def get_encoder_host(self):
+        return self.encoder_host
+
+    def set_encoder_host(self, host: str):
+        self.encoder_host = host
+
+    def get_encoder_port(self):
+        return self.encoder_port
+
+    def set_encoder_port(self, port: int):
+        self.encoder_port = port
+
 
 class LidarThread(Thread):
     def __init__(self, logger_name=None):
         Thread.__init__(self)
+
+        self.lidar_host = "172.24.1.1"  # cdr 2019
+        self.lidar_port = 17685  # cdr 2019
+
         self.measuring = True
         self.measures = queue.LifoQueue()
 
@@ -240,14 +256,14 @@ class LidarThread(Thread):
         self.lidar_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         while True:
             try:
-                self.lidar_socket.connect((lidar_host, lidar_port))
+                self.lidar_socket.connect((self.lidar_host, self.lidar_port))
                 break
             except OSError as e:
                 pass
 
     def run(self):
         if self.lidar_socket:
-            self.logger.info("Connection au port {}".format(lidar_port))
+            self.logger.info("Connection au port {}".format(self.lidar_port))
             current_measure = []
             while self.measuring:
                 content = self.lidar_socket.recv(500).decode("utf-8")
@@ -275,6 +291,18 @@ class LidarThread(Thread):
             return res
         else:
             return []
+
+    def get_lidar_host(self):
+        return self.lidar_host
+
+    def set_lidar_host(self, host: str):
+        self.lidar_host = host
+
+    def get_lidar_port(self):
+        return self.lidar_port
+
+    def set_lidar_port(self, port: int):
+        self.lidar_port = port
 
 
 if __name__ == "__main__":
