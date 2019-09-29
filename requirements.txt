@@ -3,3 +3,4 @@ numpy
 scipy
 scikit-image
 # -e git+https://github.com/alyssaq/hough_transform.git#egg=hough_transform
+aiohttp
