@@ -43,6 +43,22 @@ def display_measures(polar_points):
 
 
 def display_polar_measures(polar_points):
+    """
+
+    :param polar_points: [(theta, rho), ...] with theta in radian
+    :return:
+    """
+    for theta, rho in polar_points:
+        pl.polar(theta, rho, 'r,')
+    pl.show()
+
+
+def display_deg2rad_polar_measures(polar_points):
+    """
+
+    :param polar_points: [(theta, rho), ...] with theta in degree
+    :return:
+    """
     for theta, rho in polar_points:
         pl.polar(math.radians(theta), rho, 'r,')
     pl.show()

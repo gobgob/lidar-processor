@@ -43,7 +43,7 @@ def display_measures(polar_points):
     pl.show()
 
 
-def display_polar_measures(polar_points):
+def display_deg2rad_polar_measures(polar_points):
 
     for theta, rho in polar_points:
         pl.polar(math.radians(theta), rho, 'r,')
@@ -284,5 +284,5 @@ if __name__ == "__main__":
     # display raw measures
     print("-----------Measures display-----------")
     filtered_data = dacl.keep_good_measures(measures[3], 30)
-    display_polar_measures(filtered_data)
+    display_deg2rad_polar_measures(filtered_data)
     display_measures(filtered_data)

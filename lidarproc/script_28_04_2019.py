@@ -9,7 +9,7 @@ import numpy as np
 import lidarproc.main.data_cleansing as dacl
 from lidarproc.main.geometry import Point, Vector
 from lidarproc.main.table import Table, Square
-from lidarproc.plot_measures import display_polar_measures
+from lidarproc.plot_measures import display_deg2rad_polar_measures
 from lidarproc.retrieve_realistic_measures import get_table_measures
 
 import lidarproc.main.output_rendering as outr
@@ -23,7 +23,7 @@ def display_just_measures():
     for i in range(len(measures)):
         one_turn_measure = dacl.keep_good_measures(measures[i], 100)
         one_turn_measure = dacl.keep_not_too_far_or_not_too_close(one_turn_measure)
-        display_polar_measures(one_turn_measure)
+        display_deg2rad_polar_measures(one_turn_measure)
 
 
 def display_measures_and_table():

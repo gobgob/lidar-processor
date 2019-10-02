@@ -51,7 +51,7 @@ def get_table_measures(directory_name: str):
     """
     if os.path.exists(os.path.join(PACKDIR, "samples", directory_name)):
         measures = []
-        for filename in os.listdir(PACKDIR, os.path.join(PACKDIR, "samples", directory_name)):
+        for filename in os.listdir(os.path.join(PACKDIR, "samples", directory_name)):
             with open(os.path.join(PACKDIR, "samples", directory_name, filename), "r") as f:
                 data = json.load(f)
                 measures.append([[float(k) for k in j] for j in data])

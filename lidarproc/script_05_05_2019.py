@@ -7,7 +7,7 @@ Display measures of a trajectory
 import lidarproc.main.data_cleansing as dacl
 from lidarproc.main.geometry import Point, Vector
 from lidarproc.main.table import Table, Square
-from lidarproc.plot_measures import display_polar_measures
+from lidarproc.plot_measures import display_polar_measures, display_deg2rad_polar_measures
 from lidarproc.retrieve_realistic_measures import get_05_05_2019_lidar_measures
 
 import lidarproc.main.output_rendering as outr
