@@ -15,9 +15,9 @@ def get_05_05_2019_encoder_measures(directory_name: str):
     """
     if os.path.exists(os.path.join(PACKDIR, "samples", "05_05_2019", directory_name)):
         measures = []
-        for filename in os.listdir(os.path.join("samples", "05_05_2019", directory_name)):
+        for filename in os.listdir(os.path.join(PACKDIR, "samples", "05_05_2019", directory_name)):
             if filename.startswith("encoder"):
-                with open(os.path.join("samples", "05_05_2019", directory_name, filename), "r") as f:
+                with open(os.path.join(PACKDIR, "samples", "05_05_2019", directory_name, filename), "r") as f:
                     data = json.load(f)
                     measures.append([[float(k) for k in j] for j in data])
         return measures
@@ -33,9 +33,9 @@ def get_05_05_2019_lidar_measures(directory_name: str):
     """
     if os.path.exists(os.path.join(PACKDIR, "samples", "05_05_2019", directory_name)):
         measures = []
-        for filename in os.listdir(os.path.join("samples", "05_05_2019", directory_name)):
+        for filename in os.listdir(os.path.join(PACKDIR, "samples", "05_05_2019", directory_name)):
             if filename.startswith("lidar"):
-                with open(os.path.join("samples", "05_05_2019", directory_name, filename), "r") as f:
+                with open(os.path.join(PACKDIR, "samples", "05_05_2019", directory_name, filename), "r") as f:
                     data = json.load(f)
                     measures.append([[float(k) for k in j] for j in data])
         return measures
@@ -51,8 +51,8 @@ def get_table_measures(directory_name: str):
     """
     if os.path.exists(os.path.join(PACKDIR, "samples", directory_name)):
         measures = []
-        for filename in os.listdir(os.path.join(PACKDIR, "samples", directory_name)):
-            with open(os.path.join("samples", directory_name, filename), "r") as f:
+        for filename in os.listdir(PACKDIR, os.path.join(PACKDIR, "samples", directory_name)):
+            with open(os.path.join(PACKDIR, "samples", directory_name, filename), "r") as f:
                 data = json.load(f)
                 measures.append([[float(k) for k in j] for j in data])
         return measures
