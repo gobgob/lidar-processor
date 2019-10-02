@@ -9,7 +9,7 @@ from typing import List, Union
 import numpy as np
 try:
     import matplotlib.pylab as pl
-    from check_clustering import main_clustering
+    from lidarproc.check_clustering import main_clustering
 except ImportError:
     pl = None
     main_clustering = None
@@ -166,7 +166,7 @@ class Table:
     def add_point(self, point: geom.Point):
         self.points.append(point)
 
-    def init_plot(self, ):
+    def init_plot(self):
         self.fig = pl.figure()
         ax = self.fig.add_subplot(111)
         ax.clear()
