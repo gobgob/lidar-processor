@@ -9,10 +9,10 @@ import math
 import numpy as np
 import matplotlib.pylab as pl
 
+from lidarproc import retrieve_measures
 from lidarproc.main.constants import *
 
 import lidarproc.main.output_rendering as outr
-import lidarproc.retrieve_measures
 
 __author__ = ["Clément Besnier", ]
 

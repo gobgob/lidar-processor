@@ -9,13 +9,13 @@ import os
 import sys
 import enum
 import logging
+from lidarproc import PACKDIR
 
 __author__ = "Clément Besnier"
 
 PROJECT_NAME = "lidar-processor"
 # Useful in case we don't run the code in the right directory.
-home_path = os.getenv("HOME") if os.getenv("HOME") is not None else "C:/Users/Clément/PycharmProjects/"
-own_path = os.path.join(home_path, PROJECT_NAME)
+own_path = os.path.join(PACKDIR, PROJECT_NAME)
 sys.path.append(own_path)
 # region LiDAR settings
 angle_resolution = 0.3

@@ -3,15 +3,14 @@
 # import sys
 import os
 import json
-
-the_path = os.path.dirname(os.path.abspath(__file__))
+from lidarproc import PACKDIR
 
 
 def get_data():
     measures = []
     for i in range(20):
 
-        with open(os.path.join(the_path, "samples", "data_" + str(i) + ".json"), "r") as f:
+        with open(os.path.join(PACKDIR, "samples", "data_" + str(i) + ".json"), "r") as f:
             data = json.load(f)
             measures.append([[float(k) for k in j] for j in data])
     return measures

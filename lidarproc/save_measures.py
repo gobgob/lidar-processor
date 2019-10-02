@@ -4,12 +4,13 @@ import datetime
 import os
 import time
 import json
+from lidarproc import PACKDIR
 from lidarproc.main.data_retrieval import LidarThread, EncoderThread
 
 
 def store_lidar_data(t):
     for i in range(5):
-        with open(os.path.join("samples", "data_"+datetime.datetime.today().ctime().replace(":", "")+".json"), "w")\
+        with open(os.path.join(PACKDIR, "samples", "data_"+datetime.datetime.today().ctime().replace(":", "")+".json"), "w")\
                 as f:
             data = t.get_measures()
             json.dump(data, f)
@@ -29,7 +30,7 @@ def store_lidar_and_encoder_data(lidar_thread: LidarThread, encoder_thread: Enco
     now = time.time()
     while now - start_time < measureing_duration:
 
-        with open(os.path.join("samples", "lidar_data_" + str(now) + ".json"), "w") as f:
+        with open(os.path.join(PACKDIR, "samples", "lidar_data_" + str(now) + ".json"), "w") as f:
             lidar_turn_data = lidar_thread.get_measures()
             json.dump(lidar_turn_data, f)
             print("lidar")

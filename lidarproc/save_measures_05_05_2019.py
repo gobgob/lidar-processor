@@ -8,11 +8,13 @@ import os
 import sys
 import time
 import json
+
+from lidarproc import PACKDIR
 from lidarproc.main.data_retrieval import LidarThread, EncoderThread
 
 
 def store_lidar_data_05_05_2019(thread_lidar, i_measure: int):
-    folder = os.path.join("samples", "05_05_2019")
+    folder = os.path.join(PACKDIR, "samples", "05_05_2019")
     if not os.path.exists(os.path.join(folder, str(i_measure))):
         os.mkdir(os.path.join(folder, str(i_measure)))
     for i in range(20):
@@ -35,17 +37,17 @@ def store_lidar_and_encoder_data_05_05_2019(lidar_thread: LidarThread, encoder_t
     measuring_duration = 30
     start_time = time.time()
     now = time.time()
-    folder = os.path.join("samples", "05_05_2019")
+    folder = os.path.join(PACKDIR, "samples", "05_05_2019")
     if not os.path.exists(os.path.join(folder, str(i_measure))):
         os.mkdir(os.path.join(folder, str(i_measure)))
 
     while now - start_time < measuring_duration:
-        with open(os.path.join("samples", "05_05_2019", str(i_measure), "lidar_data_"+str(now)+".json"), "w") as f:
+        with open(os.path.join(PACKDIR, "samples", "05_05_2019", str(i_measure), "lidar_data_"+str(now)+".json"), "w") as f:
             lidar_turn_data = lidar_thread.get_measures()
             json.dump(lidar_turn_data, f)
             print("lidar")
 
-        with open(os.path.join("samples", "05_05_2019", str(i_measure), "encoder_data_"+str(now)+".json"), "w") as f:
+        with open(os.path.join(PACKDIR, "samples", "05_05_2019", str(i_measure), "encoder_data_"+str(now)+".json"), "w") as f:
             encoder_data = encoder_thread.get_measures()
             json.dump(encoder_data, f)
             print("encoder")

@@ -4,9 +4,9 @@
 
 """
 
-from main.table import *
-from retrieve_realistic_measures import get_table_measures
-import main.data_cleansing as dacl
+from lidarproc.main.table import *
+from lidarproc.retrieve_realistic_measures import get_table_measures
+import lidarproc.main.data_cleansing as dacl
 
 __author__ = "Clément Besnier"
 

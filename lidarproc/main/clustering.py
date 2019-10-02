@@ -10,6 +10,7 @@ from typing import List, Tuple
 import numpy as np
 from scipy.optimize import root
 
+import lidarproc.main.output_rendering as outr
 import lidarproc.main.geometry as geom
 from lidarproc.main.constants import *
 
@@ -277,7 +278,7 @@ def cluster_polar_distance_closest(cluster, other):
     return min([dist1, dist2])
 
 
-def polar_clusterize(polar_measures)-> Tuple[List, List, List]:
+def polar_clusterize(polar_measures) -> Tuple[List, List, List]:
     """
 
     :param polar_measures: Polar coordinates

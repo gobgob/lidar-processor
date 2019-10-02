@@ -13,6 +13,7 @@ import datetime
 import queue
 
 from lidarproc.main.constants import *
+from lidarproc import HOME
 import lidarproc.main.output_rendering as outr
 import lidarproc.main.data_retrieval as datr
 import lidarproc.main.data_cleansing as dacl
@@ -26,7 +27,7 @@ __author__ = ["Clément Besnier", ]
 
 
 # region logs
-log_folder = os.path.join(os.getenv("HOME"), "lidar-processor", "logs")
+log_folder = os.path.join(HOME, "lidar-processor", "logs")
 last_log_folder = os.path.join(log_folder, "last")
 history_log_folder = os.path.join(log_folder, "history")
 
@@ -40,12 +41,12 @@ if not os.path.exists(history_log_folder):
     os.mkdir(history_log_folder)
 
 if len(os.listdir(last_log_folder)) != 0:
-    shutil.move(last_log_folder+"/*", os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "hitory"))
+    shutil.move(last_log_folder+"/*", os.path.join(HOME, "lidar-processor", "logs", "hitory"))
 
 # log_filename = "lidar_logs" + datetime.datetime.today().ctime().replace(":", "")
 log_filename = ""
 if log_filename:
-    logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last",
+    logging.basicConfig(filename=os.path.join(HOME, "lidar-processor", "logs", "last",
                                               log_filename + ".txt"), level=15)
 else:
     logging.basicConfig(stream=sys.stdout, level=5)

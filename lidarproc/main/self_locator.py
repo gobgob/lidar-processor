@@ -94,6 +94,7 @@ def find_beacons_with_odometry(clusters: List[Cluster], odometry_state, own_colo
     """
     Function which uses raw estimation of encoders for robot's position to find a priori positions of beacons.
 
+    :param logger_name:
     :param clusters:
     :param odometry_state:
     :param own_colour:
@@ -185,6 +186,7 @@ def compute_own_state(beacons: List[np.ndarray], own_colour: TeamColor, logger_n
     """
     The ultimate function which computes the position of the robot with the LiDAR!
 
+    :param logger_name:
     :param beacons: clusters which are measures of beacons
     :param own_colour: colour defined at the beginning of the match
     :return:

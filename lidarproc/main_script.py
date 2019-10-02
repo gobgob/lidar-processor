@@ -12,14 +12,13 @@ The aim is to follow opponent robots' positions and to calibrate regularly our p
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.getcwd()))
-
 import shutil
 import time
 import datetime
 import queue
 
 from lidarproc.main.constants import *
+from lidarproc import HOME
 import lidarproc.main.output_rendering as outr
 import lidarproc.main.data_retrieval as datr
 import lidarproc.main.data_cleansing as dacl
@@ -28,10 +27,12 @@ import lidarproc.main.clustering as clus
 import lidarproc.main.self_locator as sloc
 import lidarproc.main.enemy_locator as eloc
 import numpy as np
+
+
 __author__ = "Clément Besnier"
 
 # region logs
-log_folder = os.path.join(os.getenv("HOME"), "lidar-processor", "logs")
+log_folder = os.path.join(HOME, "lidar-processor", "logs")
 last_log_folder = os.path.join(log_folder, "last")
 history_log_folder = os.path.join(log_folder, "history")
 
@@ -50,11 +51,11 @@ log_files = os.listdir(last_log_folder)
 #                 os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "history"))
 
 log_filename = "lidar_logs"  # + datetime.datetime.today().ctime().replace(":", "")
-if os.path.exists(os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last", log_filename + ".txt")):
-    os.remove(os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last", log_filename + ".txt"))
+if os.path.exists(os.path.join(HOME, "lidar-processor", "logs", "last", log_filename + ".txt")):
+    os.remove(os.path.join(HOME, "lidar-processor", "logs", "last", log_filename + ".txt"))
 # log_filename = ""
 if log_filename:
-    logging.basicConfig(filename=os.path.join(os.getenv("HOME"), "lidar-processor", "logs", "last",
+    logging.basicConfig(filename=os.path.join(HOME, "lidar-processor", "logs", "last",
                                               log_filename + ".txt"), level=5, filemode='w')
 else:
     logging.basicConfig(stream=sys.stdout, level=5)
