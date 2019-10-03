@@ -221,7 +221,7 @@ def distance(point, other):
 
 
 def norm(point):
-    return np.sqrt(point * point)
+    return np.sqrt(np.sum(point * point))
 
 
 def distance_al_kashi(angle1, distance1, angle2, distance2):
@@ -397,6 +397,7 @@ def clusterize(cartesian_measures: List[np.ndarray]) -> Tuple[List, List, List]:
                 closest_point = cluster[0]
                 for point in cluster:
                     current_norm = norm(point)
+                    # print(point, current_norm, min_dist)
                     if current_norm < min_dist:
                         closest_point = point
                         min_dist = current_norm

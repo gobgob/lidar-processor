@@ -22,8 +22,8 @@ def main_clustering():
     one_turn_measure = dacl.keep_not_too_far_or_not_too_close(one_turn_measure)
     cartesian_one_turn_measure = outr.one_turn_to_cartesian_points(one_turn_measure)
     cartesian_one_turn_measure = [np.array(measure) for measure in cartesian_one_turn_measure]
-    clusters, means = clus.clusterize(cartesian_one_turn_measure)
-    return clusters, means
+    clusters, means, closest_points = clus.clusterize(cartesian_one_turn_measure)
+    return clusters, means, closest_points
 
 
 def main_polar_clustering():
@@ -31,8 +31,8 @@ def main_polar_clustering():
     one_turn_measure = dacl.keep_good_measures(one_turn_measure, 30)
     one_turn_measure = dacl.keep_not_too_far_or_not_too_close(one_turn_measure)
     one_turn_measure = [np.array([np.deg2rad(measure[0]), measure[1]]) for measure in one_turn_measure]
-    clusters, means = clus.polar_clusterize(one_turn_measure)
-    return clusters, means
+    clusters, means, closest_points = clus.polar_clusterize(one_turn_measure)
+    return clusters, means, closest_points
 
 
 def plot_clustering(clusters, showing=True):
@@ -145,9 +145,9 @@ def plot_polar_clustering(clusters, showing=True):
 
 if __name__ == "__main__":
     # main_clustering()
-    clusters, _ = main_clustering()
+    clusters, _, _ = main_clustering()
     plot_clustering(clusters)
 
-    clusters, _ = main_polar_clustering()
+    clusters, _, _ = main_polar_clustering()
     plot_polar_clustering(clusters)
 
