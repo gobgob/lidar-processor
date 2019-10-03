@@ -16,16 +16,31 @@ __author__ = "Clément Besnier"
 
 
 def polar_to_x(measure: Union[List, np.ndarray]):
+    """
+    x = rho * cos(theta)
+    :param measure: (theta, rho), theta in radian
+    :return:
+    """
     angle, distance = measure[0], measure[1]
     return distance*math.cos(angle)
 
 
 def polar_to_y(measure: Union[List, np.ndarray]):
+    """
+    y = rho * sin(theta)
+    :param measure: (theta, rho), theta in radian
+    :return:
+    """
     angle, distance = measure[0], measure[1]
     return distance*math.sin(angle)
 
 
 def cartesian_to_polar(cartesian):
+    """
+
+    :param cartesian: (x, y)
+    :return: (theta, rho), theta in radian
+    """
     x, y = cartesian
     if x != 0:
         if x > 0 and y >= 0:
@@ -46,6 +61,11 @@ def cartesian_to_polar(cartesian):
 
 
 def one_turn_to_cartesian_points(turn: List):
+    """
+
+    :param turn: [(theta, rho), ...], theta in radian
+    :return: [array(x, y), ...]
+    """
     return [np.array([polar_to_x(measure), polar_to_y(measure)]) for measure in turn]
 
 
@@ -56,7 +76,7 @@ def one_turn_to_cartesian_points(turn: List):
 def get_width_height(cartesian_points):
     """
 
-    :param cartesian_points:
+    :param cartesian_points: [(x, y), ...]
     :return:
     """
     points = np.array(cartesian_points)
@@ -78,6 +98,11 @@ def get_mins(cartesian_points):
 
 
 def change_basis(cartesian_points):
+    """
+
+    :param cartesian_points:
+    :return:
+    """
     l = []
     x_min, y_min = get_mins(cartesian_points)
     for i in range(len(cartesian_points)):
