@@ -14,7 +14,7 @@ setup(
     name='lidarproc',
     version='1.0.1',
     packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
-    include_package_data= True,
+    include_package_data=True,
     url='https://www.clementbesnier.fr/projets/cdr2019',
     keywords=[],
     scripts=[],
